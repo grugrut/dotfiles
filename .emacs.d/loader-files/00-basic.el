@@ -53,4 +53,9 @@
 (use-package clipmon
   :ensure t)
 
+;; ブラウザ設定
+(setq browse-url-generic-program
+      (executable-find (getenv "BROWSER"))
+      browse-url-browser-function 'browse-url-generic)
+
 (load (setq custom-file (expand-file-name "custom.el" user-emacs-directory)))

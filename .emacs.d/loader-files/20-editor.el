@@ -49,3 +49,8 @@
   :ensure t
   :config
   (global-aggressive-indent-mode t))
+
+(use-package google-this
+  :ensure t
+  :config
+  (global-set-key (kbd "M-s g") 'google-this-noconfirm))
