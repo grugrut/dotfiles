@@ -14,3 +14,10 @@
 (setq eol-mnemonic-unix      ":Unx")
 (setq eol-mnemonic-undecided ":???")
 
+(use-package smart-mode-line
+  :ensure t
+  :config
+  (setq sml/no-confirm-load-theme t)
+  (setq sml/theme 'dark)
+  (add-to-list 'sml/replacer-regexp-list '("^~/dotfiles/\\.emacs\\.d" ":ED:"))
+  (sml/setup))

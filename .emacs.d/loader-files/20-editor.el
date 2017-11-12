@@ -54,3 +54,20 @@
   :ensure t
   :config
   (global-set-key (kbd "M-s g") 'google-this-noconfirm))
+
+(use-package smartparens
+  :ensure t
+  :config
+  (use-package smartparens-config
+    :config
+    (smartparens-global-mode t)))
+
+(use-package smooth-scroll
+  :ensure t
+  :config
+  (smooth-scroll-mode t))
+
+(use-package rainbow-delimiters
+  :ensure t
+  :init
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
