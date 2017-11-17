@@ -4,8 +4,8 @@
   :mode ("\\.org$'" . org-mode)
   :init
   (add-hook 'org-mode-hook
-          (lambda ()
-            (set (make-local-variable 'system-time-locale) "C")))
+            (lambda ()
+              (set (make-local-variable 'system-time-locale) "C")))
   :config
   (setq org-directory "~/org/"))
 
@@ -72,4 +72,15 @@
   :ensure t
   :init
   (add-hook 'org-mode-hook '(lambda () (org-bullets-mode 1))))
+
+;;; #+UPDATE:を保存時に更新
+(use-package time-stamp
+  :init
+  (add-hook 'before-save-hook 'time-stamp)
+  :config
+  (setq time-stamp-active t
+        time-stamp-line 10
+        time-stamp-start "^#\\+UPDATE:"
+        time-stamp-format " %:y-%02m-%02d"
+        time-stamp-end "$"))
 
