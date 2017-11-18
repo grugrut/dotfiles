@@ -5,8 +5,9 @@
   (("M-%" . anzu-query-replace))
   :init
   (global-anzu-mode +1)
-  (setq anzu-mode-lighter ""                ;マイナーモードに表示する文字列
-        anzu-search-threshold 1000)         ;これ以上は件数表示しない
+  (setq anzu-mode-lighter ""               ;マイナーモードに表示する文字列
+        anzu-search-threshold 1000         ;これ以上は件数表示しない
+        anzu-cons-mode-line-p nil)         ;件数を表示しない(spaceline対応)
   )
 
 ;; migemo
@@ -20,7 +21,7 @@
   (setq migemo-regex-dictionary nil)
   (setq migemo-coding-system 'utf-8-unix)
   (migemo-init))
-        
+
 ;; avy
 (use-package avy
   :ensure t

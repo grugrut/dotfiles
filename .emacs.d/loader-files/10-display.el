@@ -78,18 +78,24 @@
 (set-face-attribute 'tooltip nil :family "Migu 1M" :height 110)
 ;;(set-face-font 'tooltip "Migu 1M-9:antialias=standard")
 
+;; 絵文字
+;;(use-package unicode-fonts
+;;  :ensure t
+;;  :config
+;;  (unicode-fonts-setup))
+
 (setq default-frame-alist
       (append '((width                . 120)  ; フレーム幅
                 (height               . 42 ) ; フレーム高
-             ;; (left                 . 70 ) ; 配置左位置
-             ;; (top                  . 28 ) ; 配置上位置
+                ;; (left                 . 70 ) ; 配置左位置
+                ;; (top                  . 28 ) ; 配置上位置
                 (line-spacing         . 0  ) ; 文字間隔
                 (left-fringe          . 12 ) ; 左フリンジ幅
                 (right-fringe         . 12 ) ; 右フリンジ幅
                 (menu-bar-lines       . 1  ) ; メニューバー
-             ;; (tool-bar-lines       . 1  ) ; ツールバー
-             ;;   (vertical-scroll-bars . 1  ) ; スクロールバー
-             ;;   (scroll-bar-width     . 17 ) ; スクロールバー幅
+                ;; (tool-bar-lines       . 1  ) ; ツールバー
+                ;;   (vertical-scroll-bars . 1  ) ; スクロールバー
+                ;;   (scroll-bar-width     . 17 ) ; スクロールバー幅
                 (cursor-type          . box) ; カーソル種別
                 (alpha                . 100) ; 透明度
                 )
@@ -154,4 +160,12 @@
   :init
   (load-theme 'solarized-dark))
 
-(load-theme 'manoj-dark)
+(use-package manoj-dark
+  :init
+  (load-theme 'manoj-dark))
+
+(use-package dracula-theme
+  :disabled t
+  :ensure t
+  :init
+  (load-theme 'dracula))

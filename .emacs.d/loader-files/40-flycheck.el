@@ -1,5 +1,6 @@
 (use-package flycheck
   :ensure t
+  :diminish ""
   :init
   (add-hook 'after-init-hook #'global-flycheck-mode)
   :config

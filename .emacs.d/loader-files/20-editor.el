@@ -64,6 +64,7 @@
 
 (use-package smooth-scroll
   :ensure t
+  :diminish ""
   :config
   (smooth-scroll-mode t))
 
