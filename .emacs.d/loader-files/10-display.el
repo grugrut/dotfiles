@@ -79,10 +79,12 @@
 ;;(set-face-font 'tooltip "Migu 1M-9:antialias=standard")
 
 ;; 絵文字
-;;(use-package unicode-fonts
-;;  :ensure t
-;;  :config
-;;  (unicode-fonts-setup))
+(use-package unicode-fonts
+  :ensure t
+  ;;(unicode-fonts-setup) ; 最初に本コマンドの実行が必要
+  )
+(use-package all-the-icons
+  :ensure t)
 
 (setq default-frame-alist
       (append '((width                . 120)  ; フレーム幅
