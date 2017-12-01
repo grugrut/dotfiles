@@ -1,26 +1,12 @@
-;; 時刻表示
-(defvar display-time-string-forms
-  '(month "/" day " " 24-hours ":" minutes))
-(display-time)
-
-(use-package smart-mode-line
-  :ensure t
-  :disabled t
-  :config
-  (setq sml/no-confirm-load-theme t)
-  (setq sml/theme 'dark)
-  (add-to-list 'sml/replacer-regexp-list '("^~/dotfiles/\\.emacs\\.d" ":ED:"))
-  (sml/setup))
-
 ;; 本当はひとつのuse-packageにまとめたいが、spaceline-define-segmentがマクロ展開できないため、先にrequireする
 (use-package spaceline-config
   :ensure spaceline)
 
 (spaceline-define-segment my/buffer-modified
   "A modified segment"
-  (let* ((config-alist '(("*" all-the-icons-faicon-family all-the-icons-faicon "chain-broken" :height 1.2 :v-align -0.0)
-                         ("-" all-the-icons-faicon-family all-the-icons-faicon "link" :height 1.2)
-                         ("%" all-the-icons-faicon-family all-the-icons-faicon "lock" :height 1.2)))
+  (let* ((config-alist '(("*" all-the-icons-faicon-family all-the-icons-faicon "chain-broken" :v-adjust 0.0)
+                         ("-" all-the-icons-faicon-family all-the-icons-faicon "link" :v-adjust 0.0)
+                         ("%" all-the-icons-faicon-family all-the-icons-faicon "lock" :v-adjust 0.0)))
          (result (cdr (assoc (format-mode-line "%*") config-alist))))
     (propertize (format "%s" (apply (cadr result) (cddr result))) 'face `(:family ,(funcall (car result)) :inherit))))
 
@@ -38,7 +24,19 @@
                                (define-key map [mode-line mouse-2] 'describe-mode)
                                (define-key map [mode-line down-mouse-3] mode-line-mode-menu)
                                map)
-                  'face `(:height 1.4 :family ,(all-the-icons-icon-family-for-buffer) :inherit)))))
+                  'face `(:family ,(all-the-icons-icon-family-for-buffer) :inherit)))))
+
+(spaceline-define-segment my/time
+  "A datetime segment"
+  (let* ((time (string-to-number (format-time-string "%I")))
+         (time-icon (all-the-icons-wicon (format "time-%s" time) :v-adjust 0.0)))
+    (propertize
+     (concat
+      (propertize (format-time-string "%m/%d %H:%M ") 'display '(raise 0.1))
+      (propertize time-icon 'face `(:family ,(all-the-icons-wicon-family) :height ,(my/spaceline-all-the-icons--height 2.0) :inherit))
+      (propertize " " 'display '(space . (:width 1))))
+     'help-echo (format-time-string "%c")))
+  :tight t :enabled t)
 
 (use-package spaceline-config
   :init
@@ -51,11 +49,22 @@
                       :foreground nil
                       :background nil
                       :height 120)
+  (set-face-attribute 'mode-line-inactive nil
+                      :foreground nil
+                      :background nil
+                      :box nil
+                      :height 120)
+  (set-face-attribute 'mode-line-buffer-id-inactive nil
+                      :foreground nil
+                      :background nil
+                      :box nil
+                      :height 120)
   :config
   (setq-default powerline-default-separator 'wave
-                spaceline-separator-dir-left '(right . right)
-                spaceline-separator-dir-right '(left . left)
-                powerline-height 20
+                spaceline-separator-dir-left '(left . left)
+                spaceline-separator-dir-right '(right . right)
+                powerline-height 24
+                powerline-text-scale-factor 0.78
                 mode-line-format '("%e" (:eval (spaceline-ml-main))))
   (spaceline-helm-mode +1)
   (spaceline-compile
@@ -72,5 +81,11 @@
       (org-clock :when active))
     `((selection-info :when mark-active)
       ((buffer-encoding-abbrev point-position line-column))
-      buffer-position)))
+      buffer-position
+      my/time)))
 
+(defun my/spaceline-all-the-icons--height (&optional height)
+  "Scale `powerline-text-scale-factor' by HEIGHT."
+  (if (bound-and-true-p powerline-text-scale-factor)
+      (* (or height 1) (or powerline-text-scale-factor 1))
+    (or height 1)))
