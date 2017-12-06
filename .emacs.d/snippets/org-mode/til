@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: til template
+# key: til
+# --
+#+TITLE: $0
+#+DATE: `(format-time-string "%Y-%m-%d")`
+#+LASTMOD:

@@ -80,7 +80,7 @@
   :config
   (setq time-stamp-active t
         time-stamp-line 10
-        time-stamp-start "^#\\+UPDATE:"
+        time-stamp-start "^#\\+LASTMOD:"
         time-stamp-format " %:y-%02m-%02d"
         time-stamp-end "$"))
 
