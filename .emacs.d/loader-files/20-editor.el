@@ -4,6 +4,9 @@
 ;; バッファの最後の改行を抑制
 (setq next-line-add-newlines nil)
 
+;; リージョン選択時にリージョンまるごと削除
+(delete-selection-mode t)
+
 ;; hightlight-symbol
 (use-package highlight-symbol
   :ensure t
@@ -72,3 +75,9 @@
   :ensure t
   :init
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+
+(use-package fontawesome
+  :ensure t)
+
+(use-package codic
+  :ensure t)
