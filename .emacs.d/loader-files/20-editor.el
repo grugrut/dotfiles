@@ -81,3 +81,6 @@
 
 (use-package codic
   :ensure t)
+
+(use-package pocket-reader
+  :ensure t)
