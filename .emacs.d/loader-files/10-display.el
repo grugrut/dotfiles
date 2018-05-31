@@ -113,11 +113,7 @@
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
   (setq uniquify-ignore-buffers-re "*[^*]+*"))
 
-(use-package nlinum
-  :ensure t
-  :config
-  (global-nlinum-mode t)
-  (setq nlinum-format "%5d "))
+(global-display-line-numbers-mode t)
 
 ;; 操作した際に、操作箇所を強調表示する
 (use-package volatile-highlights
