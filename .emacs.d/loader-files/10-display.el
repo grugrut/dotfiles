@@ -63,20 +63,16 @@
 (mouse-avoidance-mode 'jump)
 
 ;; デフォルト フォント
-(set-face-attribute 'default nil :family "Migu 1M" :height 140)
-;(set-face-font 'default "Migu 1M-11:antialias=standard")
+(set-face-font 'default "Migu 1M-16:antialias=standard")
 
 ;; プロポーショナル フォント
-(set-face-attribute 'variable-pitch nil :family "Migu 1M" :height 140)
-;;(set-face-font 'variable-pitch "Migu 1M-11:antialias=standard")
+(set-face-font 'variable-pitch "Migu 1M-16:antialias=standard")
 
 ;; 等幅フォント
-(set-face-attribute 'fixed-pitch nil :family "Migu 1M" :height 140)
-;;(set-face-font 'fixed-pitch "Migu 1M-11:antialias=standard")
+(set-face-font 'fixed-pitch "Migu 1M-16:antialias=standard")
 
 ;; ツールチップ表示フォント
-(set-face-attribute 'tooltip nil :family "Migu 1M" :height 110)
-;;(set-face-font 'tooltip "Migu 1M-9:antialias=standard")
+(set-face-font 'tooltip "Migu 1M-12:antialias=standard")
 
 ;; 絵文字
 (use-package unicode-fonts
@@ -113,6 +109,7 @@
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
   (setq uniquify-ignore-buffers-re "*[^*]+*"))
 
+;; 行番号表示(Emacs26以降)
 (global-display-line-numbers-mode t)
 
 ;; 操作した際に、操作箇所を強調表示する
@@ -140,30 +137,7 @@
   (setq display-buffer-function 'popwin:display-buffer)
   (setq popwin:popup-window-position 'bottom))
 
-(use-package zenburn-theme
-  :disabled t
-  :ensure t
-  :init
-  (load-theme 'zenburn)
-  :config
-  (zenburn-with-color-variables
-   (custom-theme-set-faces
-    'zenburn
-    `(region ((t (:background ,zenburn-bg-2)))))))
-
-
-(use-package solarized-theme
-  :disabled t
-  :ensure t
-  :init
-  (load-theme 'solarized-dark))
-
 (use-package manoj-dark
   :init
   (load-theme 'manoj-dark))
 
-(use-package dracula-theme
-  :disabled t
-  :ensure t
-  :init
-  (load-theme 'dracula))

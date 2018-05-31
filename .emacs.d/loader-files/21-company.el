@@ -3,7 +3,9 @@
   :diminish ""
   :config
   (global-company-mode)
-  (setq company-idle-delay 0.5)
+  (setq company-idle-delay 0.3)
+  (setq company-minimum-prefix-length 1)
+  (setq company-begin-commands '(self-insert-command))
   (setq company-selection-wrap-around t)
   (setq company-show-numbers t)
   (let ((map company-active-map))
