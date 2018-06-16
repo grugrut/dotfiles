@@ -2,21 +2,21 @@
 (use-package cl)
 
 (use-package dash
-  :ensure t)
+  :ensure)
 
 (use-package s
-  :ensure t)
+  :ensure)
 
 (use-package f
-  :ensure t)
+  :ensure)
 
 (use-package ht
-  :ensure t)
+  :ensure)
 
 (use-package smartrep
-  :ensure t)
+  :ensure)
 
 (use-package quickrun
-  :ensure t
+  :ensure
   :init
   (bind-key "C-c C-c" 'quickrun prog-mode-map))
