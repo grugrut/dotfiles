@@ -1,9 +1,9 @@
 (use-package python-mode
-  :ensure t
+  :ensure
   :mode (("\\.py\\'" . python-mode))
   :config
   (use-package py-autopep8
-    :ensure t
+    :ensure
     :init
     (add-hook 'python-mode-hook 'py-autopep8-enable-on-save))
   (bind-key "C-c C-c" 'quickrun python-mode-map)
@@ -12,12 +12,12 @@
 )
 
 (use-package jedi-core
-  :ensure t
+  :ensure
   :init
   (add-hook 'python-mode-hook 'jedi:setup)
   :config
   (use-package company-jedi
-    :ensure t)
+    :ensure)
   (add-to-list 'company-backends 'company-jedi)
   (setq jedi:complete-on-dot t))
 

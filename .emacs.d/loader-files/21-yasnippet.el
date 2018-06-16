@@ -1,5 +1,5 @@
 (use-package yasnippet
-  :ensure t
+  :ensure
   :diminish yas-minor-mode
   :init
   (yas-global-mode 1))

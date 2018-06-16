@@ -1,5 +1,5 @@
 (use-package view
-  :ensure t
+  :ensure
   :defer t
   :init
   (setq view-read-only t)

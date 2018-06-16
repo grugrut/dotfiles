@@ -69,7 +69,7 @@
 
 (use-package org-bullets
   :disabled t
-  :ensure t
+  :ensure
   :init
   (add-hook 'org-mode-hook '(lambda () (org-bullets-mode 1))))
 

@@ -23,7 +23,7 @@
 
 
 (use-package init-loader
-  :ensure t
+  :ensure
   :init
   (setq init-loader-byte-compile t)
   :config

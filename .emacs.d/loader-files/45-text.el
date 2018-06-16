@@ -1,7 +1,7 @@
 (use-package yaml-mode
-  :ensure t
+  :ensure
   :mode ("\\.yaml\\'" . yaml-mode))
 
 (use-package markdown-mode
-  :ensure t
+  :ensure
   :mode ("\\.md\\'" . gfm-mode))

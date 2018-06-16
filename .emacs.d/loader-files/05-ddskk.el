@@ -1,5 +1,5 @@
 (use-package ddskk
-  :ensure t
+  :ensure
   :bind
   (("C-x C-j" . skk-mode)
    ("C-x j" . skk-mode))

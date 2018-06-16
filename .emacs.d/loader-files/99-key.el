@@ -9,7 +9,7 @@
 
 ;; which-key
 (use-package which-key
-  :ensure t
+  :ensure
   :diminish which-key-mode
   :config
   (which-key-mode)
@@ -17,7 +17,7 @@
 
 ;; 同時押し
 (use-package key-chord
-  :ensure t
+  :ensure
   :init
   (key-chord-mode 1)
   (defvar key-chord-two-keys-delay 0.04)
@@ -28,7 +28,7 @@
 (global-set-key (kbd "<convert>") esc-map)
 
 (use-package keyfreq
-  :ensure t
+  :ensure
   :init
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))

@@ -12,13 +12,13 @@
 ;(global-hl-line-mode)
 
 (use-package beacon
-  :ensure t
+  :ensure
   :diminish ""
   :config
   (beacon-mode 1))
 
 (use-package indent-guide
-  :ensure t
+  :ensure
   :diminish ""
   :init
   (defvar indent-guide-delay 0.1)
@@ -34,27 +34,6 @@
 
 ;; カーソルを点滅させない
 (blink-cursor-mode 0)
-
-;; 空白文字を強調
-(setq whitespace-style '(spaces tabs space-mark tab-mark))
-(setq whitespace-display-mappings
-      '(
-        ;;; (space-mark 32 [183] [46]) ; normal space, ·
-        (space-mark 160 [164] [95])
-        (space-mark 2208 [2212] [95])
-        (space-mark 2336 [2340] [95])
-        (space-mark 3616 [3620] [95])
-        (space-mark 3872 [3876] [95])
-        (space-mark ?\x3000 [?\□]) ;;; Zenkaku space [　]
-        ;(tab-mark ?\t [?\x276F ?\t] [?\\ ?\t]) ; tab, ❯ [ ]
-        ))
-(global-whitespace-mode 1)
-(set-face-attribute 'whitespace-tab nil
-                    :foreground "LightSkyBlue"
-                    :underline t)
-
-;;; Show trailing whitespaces
-(setq-default show-trailing-whitespace t)
 
 ;; 単語での折り返し
 (global-visual-line-mode t)
@@ -76,11 +55,11 @@
 
 ;; 絵文字
 (use-package unicode-fonts
-  :ensure t
+  :ensure
   ;;(unicode-fonts-setup) ; 最初に本コマンドの実行が必要
   )
 (use-package all-the-icons
-  :ensure t)
+  :ensure)
 
 (setq default-frame-alist
       (append '((width                . 120)  ; フレーム幅
@@ -114,30 +93,35 @@
 
 ;; 操作した際に、操作箇所を強調表示する
 (use-package volatile-highlights
-  :ensure t
+  :ensure
   :diminish ""
   :init
   (volatile-highlights-mode t))
 
 ;; vi風に空行に~を表示する
-(use-package vi-tilde-fringe :ensure t
+(use-package vi-tilde-fringe
+  :ensure
   :diminish ""
   :init
   (add-hook 'prog-mode-hook 'vi-tilde-fringe-mode))
 
 (use-package rainbow-mode
-  :ensure t)
+  :ensure)
 
 (use-package neotree
-  :ensure t)
+  :ensure)
 
 (use-package popwin
-  :ensure t
+  :ensure
   :config
-  (setq display-buffer-function 'popwin:display-buffer)
   (setq popwin:popup-window-position 'bottom))
 
 (use-package manoj-dark
+  :disabled t
   :init
   (load-theme 'manoj-dark))
 
+(use-package atom-one-dark-theme
+  :ensure
+  :init
+  (load-theme 'atom-one-dark t))

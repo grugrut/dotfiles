@@ -9,19 +9,19 @@
 
 ;; hightlight-symbol
 (use-package highlight-symbol
-  :ensure t
+  :ensure
   :bind
   (("C-." . highlight-symbol-at-point)))
 
 ;; expand-region
 (use-package expand-region
-  :ensure t
+  :ensure
   :bind
   (("C-," . er/expand-region)
    ("C-M-," . er/contract-region)))
 
 (use-package multiple-cursors
-  :ensure t
+  :ensure
   :init
   (global-unset-key (kbd "C-t"))
   :config
@@ -49,38 +49,38 @@
             (deactivate-input-method)))
 
 (use-package aggressive-indent
-  :ensure t
+  :ensure
   :config
   (global-aggressive-indent-mode t))
 
 (use-package google-this
-  :ensure t
+  :ensure
   :config
   (global-set-key (kbd "M-s g") 'google-this-noconfirm))
 
 (use-package smartparens
-  :ensure t
+  :ensure
   :config
   (use-package smartparens-config
     :config
     (smartparens-global-mode t)))
 
 (use-package smooth-scroll
-  :ensure t
+  :ensure
   :diminish ""
   :config
   (smooth-scroll-mode t))
 
 (use-package rainbow-delimiters
-  :ensure t
+  :ensure
   :init
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
 (use-package fontawesome
-  :ensure t)
+  :ensure)
 
 (use-package codic
-  :ensure t)
+  :ensure)
 
 (use-package pocket-reader
-  :ensure t)
+  :ensure)

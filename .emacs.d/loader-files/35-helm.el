@@ -1,27 +1,27 @@
 (use-package helm
   :diminish ""
-  :ensure t
+  :ensure
   :init
   (global-unset-key (kbd "C-z"))
   (use-package helm-config
     :init
     (setq helm-command-prefix-key "C-z"))
   (use-package helm-descbinds
-    :ensure t
+    :ensure
     :bind
     (("C-z d" . helm-descbinds))
     :config
     (helm-descbinds-mode))
   (use-package helm-swoop
-    :ensure t
+    :ensure
     :bind
     (("C-z w" . helm-swoop)))
   (use-package helm-ghq
-    :ensure t
+    :ensure
     :bind
     (("C-z g" . helm-ghq)))
   (use-package helm-projectile
-    :ensure t
+    :ensure
     :bind
     (("C-z p" . helm-projectile))
     :config

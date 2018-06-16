@@ -51,7 +51,7 @@
 
 ;; クリップボードを監視して自動貼り付け
 (use-package clipmon
-  :ensure t)
+  :ensure)
 
 ;; ブラウザ設定
 (setq browse-url-generic-program

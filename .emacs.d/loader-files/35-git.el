@@ -1,10 +1,10 @@
 (use-package magit
-  :ensure t
+  :ensure
   :bind (("C-x g" . magit-status)))
 
 ;; gitの差分を表示する
 (use-package git-gutter-fringe
-  :ensure t
+  :ensure
   :diminish git-gutter-mode
   :config
   (global-git-gutter-mode t))

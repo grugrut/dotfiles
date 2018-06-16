@@ -1,16 +1,16 @@
 (use-package company-go
-  :ensure t)
+  :ensure)
 
 (use-package go-eldoc
-  :ensure t
+  :ensure
   :init
   (add-hook 'go-mode-hook 'go-eldoc-setup))
 
 (use-package go-snippets
-  :ensure t)
+  :ensure)
 
 (use-package go-mode
-  :ensure t
+  :ensure
   :init
   (add-hook 'before-save-hook 'gofmt-before-save)
   (add-hook 'go-mode-hook (lambda ()

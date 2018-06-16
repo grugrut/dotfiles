@@ -17,4 +17,6 @@
   :ensure t)
 
 (use-package quickrun
-  :ensure t)
+  :ensure t
+  :init
+  (bind-key "C-c C-c" 'quickrun prog-mode-map))

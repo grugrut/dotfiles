@@ -1,5 +1,5 @@
 (use-package company
-  :ensure t
+  :ensure
   :diminish ""
   :config
   (global-company-mode)

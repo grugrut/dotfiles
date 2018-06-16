@@ -1,6 +1,6 @@
 ;; anzu
 (use-package anzu
-  :ensure t
+  :ensure
   :bind
   (("M-%" . anzu-query-replace))
   :init
@@ -12,7 +12,7 @@
 
 ;; migemo
 (use-package migemo
-  :ensure t
+  :ensure
   :config
   (setq migemo-command "cmigemo")
   (setq migemo-options '("-q" "--emacs" "-i" "\a"))
@@ -24,14 +24,14 @@
 
 ;; avy
 (use-package avy
-  :ensure t
+  :ensure
   :bind
   (("C-:" . avy-goto-char-timer)
    ("M-g M-g" . avy-goto-line)))
 
 ;; ripgrep
 (use-package ripgrep
-  :ensure t
+  :ensure
   :bind (("M-s r" . ripgrep-regexp))
   :config
   (setq ripgrep-arguments '("-S")))
