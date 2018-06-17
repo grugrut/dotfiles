@@ -28,14 +28,8 @@
 
 (spaceline-define-segment my/time
   "A datetime segment"
-  (let* ((time (string-to-number (format-time-string "%I")))
-         (time-icon (all-the-icons-wicon (format "time-%s" time) :v-adjust 0.0)))
-    (propertize
-     (concat
-      (propertize (format-time-string "%m/%d %H:%M ") 'display '(raise 0.1))
-      (propertize time-icon 'face `(:family ,(all-the-icons-wicon-family) :height ,(my/spaceline-all-the-icons--height 2.0) :inherit))
-      (propertize " " 'display '(space . (:width 1))))
-     'help-echo (format-time-string "%c")))
+  (propertize (format-time-string "%m/%d %H:%M") 'display '(raise 0.1)
+              'help-echo (format-time-string "%c"))
   :tight t :enabled t)
 
 (use-package spaceline-config
@@ -70,8 +64,7 @@
   (spaceline-compile
     `(((my/buffer-modified buffer-size))
       (anzu :when active)
-      ((buffer-id remote-host)
-       :face highlight-face)
+      (buffer-id remote-host)
       my/major-mode
       (process :when active)
       ((flycheck-error flycheck-warning flycheck-info)
@@ -82,7 +75,8 @@
     `((selection-info :when mark-active)
       ((buffer-encoding-abbrev point-position line-column))
       buffer-position
-      my/time)))
+      my/time
+      )))
 
 (defun my/spaceline-all-the-icons--height (&optional height)
   "Scale `powerline-text-scale-factor' by HEIGHT."
