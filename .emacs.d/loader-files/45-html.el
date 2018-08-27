@@ -3,10 +3,12 @@
   :after (web-beautify)
   :init
   (add-hook 'web-mode-hook 'rainbow-mode)
+  (flycheck-add-mode 'javascript-eslint 'web-mode)
   :mode (("\\.html?\\'" . web-mode)
          ("\\.scss\\'" . web-mode)
          ("\\.css\\'" . web-mode)
-         ("\\.twig\\'" . web-mode))
+         ("\\.twig\\'" . web-mode)
+         ("\\.vue\\'" . web-mode))
   :config
   (setq web-mode-markup-indent-offset 2)
   (define-key web-mode-map (kbd "C-c b") 'web-beautify-html)
