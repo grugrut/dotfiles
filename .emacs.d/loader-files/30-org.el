@@ -12,23 +12,23 @@
 (use-package org-capture
   :config
   (setq org-capture-templates
-        '(
+        `(
           ("t" "Todo" entry
-           (file (concat org-directory "todo.org"))
+           (file ,(concat org-directory "todo.org"))
            "* TODO %?\n %i\n %a\n"
            :prepend nil
            :unnarrowed nil
            :kill-buffer t
            )
           ("m" "Memo" entry
-           (file+datetree (concat org-directory "diary.org"))
+           (file+datetree ,(concat org-directory "diary.org"))
            "* %?\n %a"
            :prepend t
            :unnarrowed nil
            :kill-buffer t
            )
           ("i" "interrupt" entry
-           (file+datetree (concat org-directory "diary.org"))
+           (file+datetree ,(concat org-directory "diary.org"))
            "* PHONE %?\n %a"
            :prepend t
            :unnarrowed nil
@@ -36,9 +36,9 @@
            :clock-in t
            :clock-resume t
            )
-          ("b" "book memo" entry
-           (file (concat org-directory "book.org"))
-           "* %^{Book Title} \n%[~/.emacs.d/org-capture-templates/book.txt]")
+          ("b" "blog" entry
+           (file+headline "~/src/github.com/grugrut/til/draft/blog.org" ,(format-time-string "%Y"))
+           "** TODO %?\n:PROPERTIES:\n:EXPORT_FILE_NAME: %(format-time-string \"%Y%m%d%H%M%S\")\n:END:\n")
           )))
 
 ;; TODO状態の設定
@@ -84,3 +84,24 @@
         time-stamp-format " %:y-%02m-%02d"
         time-stamp-end "$"))
 
+(use-package ox-hugo
+  :ensure
+  :after ox)
+(use-package ox-hugo-auto-export)
+
+(use-package ob-elixir
+  :ensure
+  :after ob)
+(use-package ob-go
+  :ensure
+  :after ob)
+(use-package ob-rust
+  :ensure
+  :after ob)
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (elixir . t)
+   (go . t)
+   (rust . t)))
