@@ -1,0 +1,4 @@
+# key: :
+# name: commit emoji prefix
+# --
+`(yas-choose-value '(":sparkles:" ":pencil2:" ":recycle:" ":package:" ":100:"))`
