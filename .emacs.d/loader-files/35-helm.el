@@ -20,6 +20,12 @@
     :ensure
     :bind
     (("C-z g" . helm-ghq)))
+  (use-package helm-ag
+    :ensure
+    :bind
+    (("C-z ;" . helm-ag))
+    :config
+    (setq helm-ag-base-command "rg --no-heading"))
   (use-package helm-projectile
     :ensure
     :bind
