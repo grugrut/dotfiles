@@ -10,7 +10,12 @@
          ("\\.twig\\'" . web-mode)
          ("\\.vue\\'" . web-mode))
   :config
-  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-markup-indent-offset 2
+        web-mode-css-indent-offset 2
+        web-mode-code-indent-offset 2
+        web-mode-comment-style 2
+        web-mode-style-padding 1
+        web-mode-script-padding 1)
   (define-key web-mode-map (kbd "C-c b") 'web-beautify-html)
   (define-key web-mode-map (kbd "C-c b") 'web-beautify-css)
   )
