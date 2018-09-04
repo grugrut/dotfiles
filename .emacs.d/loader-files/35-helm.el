@@ -25,7 +25,7 @@
     :bind
     (("C-z ;" . helm-ag))
     :config
-    (setq helm-ag-base-command "rg --no-heading"))
+    (setq helm-ag-base-command "rg -S --no-heading"))
   (use-package helm-projectile
     :ensure
     :bind
