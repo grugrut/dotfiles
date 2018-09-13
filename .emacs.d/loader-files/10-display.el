@@ -41,17 +41,13 @@
 ;; マウスを避けさせる
 (mouse-avoidance-mode 'jump)
 
-;; デフォルト フォント
-(set-face-font 'default "Migu 1M-16:antialias=standard")
-
-;; プロポーショナル フォント
-(set-face-font 'variable-pitch "Migu 1M-16:antialias=standard")
-
-;; 等幅フォント
-(set-face-font 'fixed-pitch "Migu 1M-16:antialias=standard")
-
-;; ツールチップ表示フォント
-(set-face-font 'tooltip "Migu 1M-12:antialias=standard")
+;; フォント設定
+(set-face-attribute 'default nil
+                    :family "Migu 1M"
+                    :height 120)
+(set-fontset-font
+ nil 'japanese-jisx0208
+ (font-spec :family "Migu 1M"))
 
 ;; 絵文字
 (use-package unicode-fonts
