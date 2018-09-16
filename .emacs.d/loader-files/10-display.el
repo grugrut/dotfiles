@@ -44,7 +44,7 @@
 ;; フォント設定
 (set-face-attribute 'default nil
                     :family "Migu 1M"
-                    :height 120)
+                    :height 140)
 (set-fontset-font
  nil 'japanese-jisx0208
  (font-spec :family "Migu 1M"))
