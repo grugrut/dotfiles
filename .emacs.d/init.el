@@ -15,7 +15,7 @@
 	("melpa" . "https://melpa.org/packages/")
 	("org" . "https://orgmode.org/elpa/")))
 (package-initialize)
-(package-refresh-contents)
+;;(package-refresh-contents) ;;重たいので手動でやる
 
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
@@ -24,11 +24,10 @@
 
 (use-package init-loader
   :ensure
-  :init
-  (setq init-loader-byte-compile t)
   :config
+  (setq init-loader-byte-compile t)
   (init-loader-load (concat user-emacs-directory "loader-files")))
 
-(setq custom-file "custom.el")
+(load (setq custom-file (expand-file-name "custom.el" user-emacs-directory)))
 
 ;;; init.el ends here

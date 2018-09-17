@@ -3,7 +3,7 @@
 (global-font-lock-mode t)
 
 ;; GC
-(setq gc-cons-threshold (* gc-cons-threshold 100))
+(setq gc-cons-threshold (* 256 1024 1024))
 (setq garbage-collection-messages t)
 
 ;; バッファの自動掃除
@@ -50,12 +50,14 @@
 (setq password-cache-expiry nil)
 
 ;; クリップボードを監視して自動貼り付け
+;; WSLで使えないので一時利用中止
 (use-package clipmon
-  :ensure)
+  :ensure
+  :disabled)
 
 ;; ブラウザ設定
 (setq browse-url-generic-program
       (executable-find (getenv "BROWSER"))
       browse-url-browser-function 'browse-url-generic)
 
-(load (setq custom-file (expand-file-name "custom.el" user-emacs-directory)))
+

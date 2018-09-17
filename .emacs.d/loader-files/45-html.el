@@ -1,15 +1,15 @@
 (use-package web-mode
   :ensure
   :after (web-beautify)
-  :init
-  (add-hook 'web-mode-hook 'rainbow-mode)
-  (flycheck-add-mode 'javascript-eslint 'web-mode)
+  :defer t
   :mode (("\\.html?\\'" . web-mode)
          ("\\.scss\\'" . web-mode)
          ("\\.css\\'" . web-mode)
          ("\\.twig\\'" . web-mode)
          ("\\.vue\\'" . web-mode))
   :config
+  (add-hook 'web-mode-hook 'rainbow-mode)
+  (flycheck-add-mode 'javascript-eslint 'web-mode)
   (setq web-mode-markup-indent-offset 2
         web-mode-css-indent-offset 2
         web-mode-code-indent-offset 2
@@ -22,6 +22,7 @@
 
 (use-package emmet-mode
   :ensure
+  :commands (emmet-mode)
   :init
   (add-hook 'web-mode-hook 'emmet-mode))
 
@@ -35,6 +36,7 @@
 
 (use-package company-tern
   :ensure
+  :commands tern-mode
   :init
   (add-hook 'js2-mode-hook 'tern-mode)
   :config
@@ -42,6 +44,7 @@
 
 (use-package coffee-mode
   :ensure
+  :defer t
   :config
   (setq coffee-tab-width 2))
 
@@ -50,5 +53,6 @@
   :mode ("\\.php\\'" . php-mode))
 
 (use-package web-beautify
-  :ensure)
+  :ensure
+  :defer t)
 

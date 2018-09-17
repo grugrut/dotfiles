@@ -13,14 +13,16 @@
 
 (use-package beacon
   :ensure
+  :defer t
   :diminish ""
   :config
   (beacon-mode 1))
 
 (use-package indent-guide
   :ensure
+  :defer t
   :diminish ""
-  :init
+  :config
   (defvar indent-guide-delay 0.1)
   (defvar indent-guide-recursive t)
   (add-hook 'prog-mode-hook 'indent-guide-mode))
@@ -51,10 +53,12 @@
 
 ;; 絵文字
 (use-package unicode-fonts
+  :defer t
   :ensure
   ;;(unicode-fonts-setup) ; 最初に本コマンドの実行が必要
   )
 (use-package all-the-icons
+  :defer t
   :ensure)
 
 (setq default-frame-alist
@@ -80,6 +84,7 @@
 
 ;; 同一バッファ名にディレクトリ付与
 (use-package uniquify
+  :defer t
   :config
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
   (setq uniquify-ignore-buffers-re "*[^*]+*"))
@@ -90,25 +95,30 @@
 ;; 操作した際に、操作箇所を強調表示する
 (use-package volatile-highlights
   :ensure
+  :defer t
   :diminish ""
-  :init
+  :config
   (volatile-highlights-mode t))
 
 ;; vi風に空行に~を表示する
 (use-package vi-tilde-fringe
   :ensure
+  :commands vi-tilde-fringe-mode
   :diminish ""
   :init
   (add-hook 'prog-mode-hook 'vi-tilde-fringe-mode))
 
 (use-package rainbow-mode
+  :defer t
   :ensure)
 
 (use-package neotree
+  :defer t
   :ensure)
 
 (use-package popwin
   :ensure
+  :defer t
   :config
   (setq popwin:popup-window-position 'bottom))
 
@@ -119,5 +129,5 @@
 
 (use-package atom-one-dark-theme
   :ensure
-  :init
+  :config
   (load-theme 'atom-one-dark t))

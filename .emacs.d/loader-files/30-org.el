@@ -2,11 +2,10 @@
   :bind (("C-c c" . org-capture)
          ("C-c a" . org-agenda))
   :mode ("\\.org$'" . org-mode)
-  :init
+  :config
   (add-hook 'org-mode-hook
             (lambda ()
               (set (make-local-variable 'system-time-locale) "C")))
-  :config
   (setq org-directory "~/org/"))
 
 (use-package org-capture
@@ -75,6 +74,8 @@
 
 ;;; #+UPDATE:を保存時に更新
 (use-package time-stamp
+  :defer t
+  :disabled t
   :init
   (add-hook 'before-save-hook 'time-stamp)
   :config
@@ -89,19 +90,18 @@
   :after ox)
 (use-package ox-hugo-auto-export)
 
-(use-package ob-elixir
-  :ensure
-  :after ob)
-(use-package ob-go
-  :ensure
-  :after ob)
-(use-package ob-rust
-  :ensure
-  :after ob)
+(use-package ob
+  :config
+  (use-package ob-elixir
+    :ensure)
+  (use-package ob-go
+    :ensure)
+  (use-package ob-rust
+    :ensure)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (elixir . t)
+     (go . t)
+     (rust . t))))
 
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((emacs-lisp . t)
-   (elixir . t)
-   (go . t)
-   (rust . t)))

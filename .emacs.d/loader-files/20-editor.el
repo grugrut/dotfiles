@@ -10,37 +10,40 @@
 ;; hightlight-symbol
 (use-package highlight-symbol
   :ensure
+  :defer t
   :bind
   (("C-." . highlight-symbol-at-point)))
 
 ;; expand-region
 (use-package expand-region
   :ensure
+  :defer t
   :bind
   (("C-," . er/expand-region)
    ("C-M-," . er/contract-region)))
 
 (use-package multiple-cursors
   :ensure
+  :defer t
   :init
   (global-unset-key (kbd "C-t"))
   :config
   (smartrep-define-key global-map "C-t"
-    '(("C-t" . 'mc/mark-next-like-this)
-      ("n"   . 'mc/mark-next-like-this)
-      ("p"   . 'mc/mark-previous-like-this)
-      ("m"   . 'mc/mark-more-like-this-extended)
-      ("u"   . 'mc/unmark-next-like-this)
-      ("U"   . 'mc/unmark-previous-like-this)
-      ("s"   . 'mc/skip-to-next-like-this)
-      ("S"   . 'mc/skip-to-previous-like-this)
-      ("*"   . 'mc/mark-all-like-this)
-      ("a"   . 'mc/mark-all-like-this)
-      ("d"   . 'mc/mark-all-like-this-dwim)
-      ("i"   . 'mc/insert-numbers)
-      ("l"   . 'mc/insert-letters)
-      ("o"   . 'mc/sort-regions)
-      ("O"   . 'mc/reverse-regions))))
+                       '(("C-t" . 'mc/mark-next-like-this)
+                         ("n"   . 'mc/mark-next-like-this)
+                         ("p"   . 'mc/mark-previous-like-this)
+                         ("m"   . 'mc/mark-more-like-this-extended)
+                         ("u"   . 'mc/unmark-next-like-this)
+                         ("U"   . 'mc/unmark-previous-like-this)
+                         ("s"   . 'mc/skip-to-next-like-this)
+                         ("S"   . 'mc/skip-to-previous-like-this)
+                         ("*"   . 'mc/mark-all-like-this)
+                         ("a"   . 'mc/mark-all-like-this)
+                         ("d"   . 'mc/mark-all-like-this-dwim)
+                         ("i"   . 'mc/insert-numbers)
+                         ("l"   . 'mc/insert-letters)
+                         ("o"   . 'mc/sort-regions)
+                         ("O"   . 'mc/reverse-regions))))
 
 
 ;; minibufferのアクティブ時、IMEを無効化
@@ -55,32 +58,38 @@
 
 (use-package google-this
   :ensure
+  :defer t
   :config
   (global-set-key (kbd "M-s g") 'google-this-noconfirm))
 
 (use-package smartparens
-  :ensure
+  :ensure)
+(use-package smartparens-config
+  :after smartparens
   :config
-  (use-package smartparens-config
-    :config
-    (smartparens-global-mode t)))
+  (smartparens-global-mode t))
 
 (use-package smooth-scroll
   :ensure
+  :defer t
   :diminish ""
   :config
   (smooth-scroll-mode t))
 
 (use-package rainbow-delimiters
   :ensure
+  :defer t
   :init
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
 (use-package fontawesome
-  :ensure)
+  :ensure
+  :defer t)
 
 (use-package codic
-  :ensure)
+  :ensure
+  :defer t)
 
 (use-package pocket-reader
-  :ensure)
+  :ensure
+  :defer t)

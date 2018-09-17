@@ -33,7 +33,7 @@
   :tight t :enabled t)
 
 (use-package spaceline-config
-  :init
+  :config
   (set-face-attribute 'mode-line nil
                       :foreground nil
                       :background nil
@@ -53,7 +53,6 @@
                       :background nil
                       :box nil
                       :height 120)
-  :config
   (setq-default powerline-default-separator 'wave
                 spaceline-separator-dir-left '(left . left)
                 spaceline-separator-dir-right '(right . right)
