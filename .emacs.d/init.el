@@ -17,10 +17,22 @@
 (package-initialize)
 ;;(package-refresh-contents) ;;重たいので手動でやる
 
+;; ベンチマーク
+(use-package benchmark-init
+  :ensure t
+  :disabled t
+  :config
+  ;; To disable collection of benchmark data after init is done.
+  (benchmark-init/activate)
+  (add-hook 'after-init-hook 'benchmark-init/deactivate))
+
+
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 (require 'use-package)
 
+;; Xを使う場合の高速化設定らしい
+(modify-frame-parameters nil '((wait-for-wm . nil)))
 
 (use-package init-loader
   :ensure
