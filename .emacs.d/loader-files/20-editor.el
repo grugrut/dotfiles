@@ -24,10 +24,9 @@
 
 (use-package multiple-cursors
   :ensure
-  :defer t
-  :init
-  (global-unset-key (kbd "C-t"))
+  :after smartrep
   :config
+  (global-unset-key (kbd "C-t"))
   (smartrep-define-key global-map "C-t"
                        '(("C-t" . 'mc/mark-next-like-this)
                          ("n"   . 'mc/mark-next-like-this)

@@ -1,6 +1,5 @@
 (use-package web-mode
   :ensure
-  :after (web-beautify)
   :defer t
   :mode (("\\.html?\\'" . web-mode)
          ("\\.scss\\'" . web-mode)
@@ -29,7 +28,6 @@
 
 (use-package js2
   :ensure js2-mode
-  :after (web-beautify)
   :mode ("\\.js\\'" . js2-mode)
   :config
   (define-key js2-mode-map (kbd "C-c b") 'web-beautify-js))

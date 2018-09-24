@@ -53,12 +53,10 @@
 
 ;; 絵文字
 (use-package unicode-fonts
-  :defer t
   :ensure
   ;;(unicode-fonts-setup) ; 最初に本コマンドの実行が必要
   )
 (use-package all-the-icons
-  :defer t
   :ensure)
 
 (setq default-frame-alist
