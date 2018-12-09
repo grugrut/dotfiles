@@ -1,4 +1,4 @@
-;;; init.el --- My first loaded init script
+;;; init.el --- My init script -*- coding: utf-8 ; lexical-binding: t -*-
 
 ;; Author: grugrut
 ;; URL: https://github.com/grugrut/.emacs.d/init.el
@@ -17,24 +17,55 @@
 (package-initialize)
 ;;(package-refresh-contents) ;;重たいので手動でやる
 
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(eval-when-compile
+  (require 'use-package))
+
 ;; ベンチマーク
 (use-package benchmark-init
   :ensure t
-                                        ;  :disabled t
   :config
   ;; To disable collection of benchmark data after init is done.
   (benchmark-init/activate)
   (add-hook 'after-init-hook 'benchmark-init/deactivate))
 
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-(require 'use-package)
+(use-package auto-async-byte-compile :ensure
+             :config
+             (setq auto-async-byte-compile-init-file "~/.emacs.d/init.el")
+             :hook ((emacs-lis--mode . enable-auto-async-byte-compile-mode)))
+
+;;; diminish
+(use-package diminish :ensure)
+
+;;; ライブラリ群
+(use-package cl)
+
+(use-package dash
+  :defer t
+  :ensure)
+
+(use-package s
+  :defer t
+  :ensure)
+
+(use-package f
+  :defer t
+  :ensure)
+
+(use-package ht
+  :defer t
+  :ensure)
+
+(use-package smartrep
+  :defer t
+  :ensure)
 
 ;; Xを使う場合の高速化設定らしい
 (modify-frame-parameters nil '((wait-for-wm . nil)))
 
 (load (setq custom-file (expand-file-name "custom.el" user-emacs-directory)))
-
 
 ;; 色をつける
 (global-font-lock-mode t)
@@ -82,44 +113,11 @@
 ;; 初期画面を表示しない
 (setq inhibit-startup-message t)
 
-(setq tramp-debug-buffer t)
-(setq tramp-verbose 10)
-(setq password-cache-expiry nil)
 
-;; クリップボードを監視して自動貼り付け
-;; WSLで使えないので一時利用中止
-(use-package clipmon
-  :ensure
-  :disabled)
-
-;; ブラウザ設定
+;; ブラウザ設定 WSL限定
 (setq browse-url-generic-program
       (executable-find (getenv "BROWSER"))
       browse-url-browser-function 'browse-url-generic)
-
-
-;; clを有効に
-(use-package cl)
-
-(use-package dash
-  :defer t
-  :ensure)
-
-(use-package s
-  :defer t
-  :ensure)
-
-(use-package f
-  :defer t
-  :ensure)
-
-(use-package ht
-  :defer t
-  :ensure)
-
-(use-package smartrep
-  :defer t
-  :ensure)
 
 (use-package quickrun
   :ensure
@@ -177,9 +175,6 @@
 ;; 行番号を表示
 (line-number-mode +1)
 (column-number-mode +1)
-
-;; 現在行を強調
-                                        ;(global-hl-line-mode)
 
 (use-package beacon
   :ensure
@@ -302,7 +297,8 @@
 
 ;; 本当はひとつのuse-packageにまとめたいが、spaceline-define-segmentがマクロ展開できないため、先にrequireする
 (use-package spaceline-config
-  :ensure spaceline)
+  :ensure spaceline
+  :config
 
 (spaceline-define-segment my/buffer-modified
   "A modified segment"
@@ -332,7 +328,7 @@
   "A datetime segment"
   (propertize (format-time-string "%m/%d %H:%M") 'display '(raise 0.1)
               'help-echo (format-time-string "%c"))
-  :tight t :enabled t)
+  :tight t :enabled t))
 
 (use-package spaceline-config
   :config
@@ -444,10 +440,10 @@
 (use-package google-this
   :ensure
   :defer t
-  :config
-  (global-set-key (kbd "M-s g") 'google-this-noconfirm))
+  :bind (("M-s g" . google-this-noconfirm)))
 
 (use-package smartparens
+  :diminish smartparens-mode
   :ensure)
 (use-package smartparens-config
   :after smartparens
@@ -481,14 +477,14 @@
 
 (use-package company
   :ensure
-  :diminish ""
+  :diminish company-mode
   :config
   (global-company-mode)
-  (setq company-idle-delay 0.3)
-  (setq company-minimum-prefix-length 1)
-  (setq company-begin-commands '(self-insert-command))
-  (setq company-selection-wrap-around t)
-  (setq company-show-numbers t)
+  (setq company-idle-delay 0.3
+        company-minimum-prefix-length 1
+        company-begin-commands '(self-insert-command)
+        company-selection-wrap-around t
+        company-show-numbers t)
   (let ((map company-active-map))
     (mapc
      (lambda (x)
@@ -721,7 +717,7 @@
   (global-git-gutter-mode t))
 
 (use-package helm
-  :diminish ""
+  :diminish helm-mode
   :ensure
   :init
   (global-unset-key (kbd "C-z"))
@@ -767,7 +763,7 @@
 
 (use-package flycheck
   :ensure
-  :diminish ""
+  :diminish flycheck-mode
   :init
   (add-hook 'after-init-hook #'global-flycheck-mode)
   :config
@@ -779,6 +775,7 @@
 
 (use-package company-go
   :ensure
+  :disabled t
   :defer t)
 
 (use-package go-eldoc
@@ -789,6 +786,7 @@
   (add-hook 'go-mode-hook 'go-eldoc-setup))
 
 (use-package go-snippets
+  :disabled t
   :ensure
   :defer t)
 
@@ -798,10 +796,8 @@
   :commands (gofmt-before-save)
   :init
   (add-hook 'before-save-hook 'gofmt-before-save)
-  (add-hook 'go-mode-hook (lambda ()
-                            (set (make-local-variable 'company-backends) '(company-go))
-                            (local-set-key (kbd "M-.") 'godef-jump)
-                            (setq tab-width 4))))
+  (setq tab-width 4))
+
 
 (use-package web-mode
   :ensure
@@ -1002,6 +998,6 @@
   :ensure
   :config
   (require 'lsp-clients)
-  :hook (prog-mode . lsp))
+  :hook (go-mode . lsp))
 
 ;;; init.el ends here
