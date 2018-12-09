@@ -609,6 +609,8 @@
   (setq org-directory "~/org/"))
 
 (use-package org-capture
+  :defer t
+  :commands (org-capture)
   :config
   (setq org-capture-templates
         `(
@@ -691,6 +693,7 @@
 (use-package ox-hugo-auto-export)
 
 (use-package ob
+  :defer t
   :config
   (use-package ob-elixir
     :ensure)
@@ -954,8 +957,9 @@
 ;; sequential-command
 (use-package sequential-command-config
   :ensure sequential-command
-  :config
-  (sequential-command-setup-keys))
+  :defer t
+  :bind (("C-a" . seq-home)
+         ("C-e" . seq-end)))
 
 ;; which-key
 (use-package which-key
