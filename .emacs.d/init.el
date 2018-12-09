@@ -998,4 +998,10 @@
     (error "Suspend canceld")))
 (add-hook 'suspend-hook 'my/confirm-suspend)
 
+(use-package lsp-mode
+  :ensure
+  :config
+  (require 'lsp-clients)
+  :hook (prog-mode . lsp))
+
 ;;; init.el ends here
