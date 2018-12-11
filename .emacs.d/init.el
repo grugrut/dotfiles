@@ -115,9 +115,8 @@
 
 
 ;; ブラウザ設定 WSL限定
-(setq browse-url-generic-program
-      (executable-find (getenv "BROWSER"))
-      browse-url-browser-function 'browse-url-generic)
+(setq  browse-url-browser-function 'browse-url-generic
+       browse-url-generic-program  (executable-find (getenv "BROWSER")))
 
 (use-package quickrun
   :ensure
@@ -178,7 +177,6 @@
 
 (use-package beacon
   :ensure
-  :defer t
   :diminish ""
   :config
   (beacon-mode 1))
@@ -190,7 +188,7 @@
   :config
   (defvar indent-guide-delay 0.1)
   (defvar indent-guide-recursive t)
-  (add-hook 'prog-mode-hook 'indent-guide-mode))
+  :hook (prog-mode . indent-guide-mode))
 
 ;; タイトルバーにファイル名を表示
 (setq frame-title-format "%f")
@@ -248,9 +246,9 @@
 ;; 同一バッファ名にディレクトリ付与
 (use-package uniquify
   :defer t
-  :config
-  (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
-  (setq uniquify-ignore-buffers-re "*[^*]+*"))
+  :custom
+  (uniquify-buffer-name-style 'post-forward-angle-brackets)
+  (uniquify-ignore-buffers-re "*[^*]+*"))
 
 ;; 行番号表示(Emacs26以降)
 (global-display-line-numbers-mode t)
@@ -258,7 +256,6 @@
 ;; 操作した際に、操作箇所を強調表示する
 (use-package volatile-highlights
   :ensure
-  :defer t
   :diminish ""
   :config
   (volatile-highlights-mode t))
@@ -268,8 +265,8 @@
   :ensure
   :commands vi-tilde-fringe-mode
   :diminish ""
-  :init
-  (add-hook 'prog-mode-hook 'vi-tilde-fringe-mode))
+  :hook
+  (prog-mode . vi-tilde-fringe-mode))
 
 (use-package rainbow-mode
   :defer t
@@ -282,8 +279,8 @@
 (use-package popwin
   :ensure
   :defer t
-  :config
-  (setq popwin:popup-window-position 'bottom))
+  :custom
+  (popwin:popup-window-position 'bottom))
 
 (load-theme 'manoj-dark)
 
@@ -291,7 +288,6 @@
 (use-package spaceline-config
   :ensure spaceline
   :config
-
   (spaceline-define-segment my/buffer-modified
     "A modified segment"
     (let* ((config-alist '(("*" all-the-icons-faicon-family all-the-icons-faicon "chain-broken" :v-adjust 0.0)
@@ -444,7 +440,6 @@
 
 (use-package smooth-scroll
   :ensure
-  :defer t
   :diminish ""
   :config
   (smooth-scroll-mode t))
@@ -452,8 +447,8 @@
 (use-package rainbow-delimiters
   :ensure
   :defer t
-  :init
-  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+  :hook
+  (prog-mode . rainbow-delimiters-mode))
 
 (use-package fontawesome
   :ensure
@@ -501,12 +496,13 @@
 (use-package yasnippet
   :ensure
   :diminish yas-minor-mode
-  :init
+  :config
   (yas-global-mode 1))
 
 ;; anzu
 (use-package anzu
   :ensure
+  :defer t
   :bind
   (("M-%" . anzu-query-replace))
   :init
@@ -519,13 +515,14 @@
 ;; migemo
 (use-package migemo
   :ensure
+  :custom
+  (migemo-command "cmigemo")
+  (migemo-options '("-q" "--emacs" "-i" "\a"))
+  (migemo-dictionary (file-truename "~/../../usr/local/share/migemo/utf-8/migemo-dict"))
+  (migemo-user-dictionary nil)
+  (migemo-regex-dictionary nil)
+  (migemo-coding-system 'utf-8-unix)
   :config
-  (setq migemo-command "cmigemo")
-  (setq migemo-options '("-q" "--emacs" "-i" "\a"))
-  (setq migemo-dictionary (file-truename "~/../../usr/local/share/migemo/utf-8/migemo-dict"))
-  (setq migemo-user-dictionary nil)
-  (setq migemo-regex-dictionary nil)
-  (setq migemo-coding-system 'utf-8-unix)
   (migemo-init))
 
 ;; avy
@@ -562,7 +559,7 @@
 
 ;; C-gで検索を終了
 (define-key isearch-mode-map (kbd "C-g")
-  '(lambda() (interactive) (isearch-done)))
+  '(lambda()(interactive) (isearch-done)))
 
 ;; 日本語の検索文字列をミニバッファに表示
 (define-key isearch-mode-map (kbd "<compend>")
@@ -581,9 +578,8 @@
 (use-package view
   :ensure
   :defer t
-  :init
-  (setq view-read-only t)
   :config
+  (setq view-read-only t)
   (bind-keys :map view-mode-map
              ("j" . next-line)
              ("k" . previous-line)
@@ -591,80 +587,75 @@
              ("l" . forward-char)))
 
 (use-package org
+  :defer t
   :bind (("C-c c" . org-capture)
          ("C-c a" . org-agenda))
   :mode ("\\.org$'" . org-mode)
-  :config
-  (add-hook 'org-mode-hook
-            (lambda ()
-              (set (make-local-variable 'system-time-locale) "C")))
-  (setq org-directory "~/org/"))
+  :hook  (org-mode . (lambda ()
+                       (set (make-local-variable 'system-time-locale) "C")))
+  :custom
+  (org-directory "~/org/")
+  ;; TODO状態の設定
+  (org-todo-keywords '((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d)")
+                       (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "MEETING")))
+  (org-todo-keyword-faces '(("TODO" :foreground "red" :weight bold)
+                            ("STARTED" :foreground "cornflower blue" :weight bold)
+                            ("DONE" :foreground "green" :weight bold)
+                            ("WAITING" :foreground "orange" :weight bold)
+                            ("HOLD" :foreground "magenta" :weight bold)
+                            ("CANCELLED" :foreground "green" :weight bold)
+                            ("MEETING" :foreground "gren" :weight bold)))
+  ;; 時間計測を開始したらSTARTED状態に
+  (org-clock-in-switch-to-state 'my-org-clock-in-switch-to-state)
+  (org-log-done 'time)
+  (org-clock-persist t)
+  (org-clock-out-when-done t)
+  )
 
 (use-package org-capture
   :defer t
   :commands (org-capture)
-  :config
-  (setq org-capture-templates
-        `(
-          ("t" "Todo" entry
-           (file ,(concat org-directory "todo.org"))
-           "* TODO %?\n %i\n %a\n"
-           :prepend nil
-           :unnarrowed nil
-           :kill-buffer t
-           )
-          ("m" "Memo" entry
-           (file+datetree ,(concat org-directory "diary.org"))
-           "* %?\n %a"
-           :prepend t
-           :unnarrowed nil
-           :kill-buffer t
-           )
-          ("i" "interrupt" entry
-           (file+datetree ,(concat org-directory "diary.org"))
-           "* PHONE %?\n %a"
-           :prepend t
-           :unnarrowed nil
-           :kill-buffer t
-           :clock-in t
-           :clock-resume t
-           )
-          ("b" "blog" entry
-           (file+headline "~/src/github.com/grugrut/til/draft/blog.org" ,(format-time-string "%Y"))
-           "** TODO %?\n:PROPERTIES:\n:EXPORT_FILE_NAME: %(format-time-string \"%Y%m%d%H%M%S\")\n:END:\n")
-          )))
-
-;; TODO状態の設定
-(setq org-todo-keywords
-      '((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d)")
-        (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "MEETING")))
-
-(setq org-todo-keyword-faces
-      '(("TODO" :foreground "red" :weight bold)
-        ("STARTED" :foreground "cornflower blue" :weight bold)
-        ("DONE" :foreground "green" :weight bold)
-        ("WAITING" :foreground "orange" :weight bold)
-        ("HOLD" :foreground "magenta" :weight bold)
-        ("CANCELLED" :foreground "green" :weight bold)
-        ("MEETING" :foreground "gren" :weight bold)))
-
-;; 時間計測を開始したらSTARTED状態に
-(defvar org-clock-in-switch-to-state 'my-org-clock-in-switch-to-state)
+  :custom
+  (org-capture-templates `(
+                           ("t" "Todo" entry
+                            (file ,(concat org-directory "todo.org"))
+                            "* TODO %?\n %i\n %a\n"
+                            :prepend nil
+                            :unnarrowed nil
+                            :kill-buffer t
+                            )
+                           ("m" "Memo" entry
+                            (file+datetree ,(concat org-directory "diary.org"))
+                            "* %?\n %a"
+                            :prepend t
+                            :unnarrowed nil
+                            :kill-buffer t
+                            )
+                           ("i" "interrupt" entry
+                            (file+datetree ,(concat org-directory "diary.org"))
+                            "* PHONE %?\n %a"
+                            :prepend t
+                            :unnarrowed nil
+                            :kill-buffer t
+                            :clock-in t
+                            :clock-resume t
+                            )
+                           ("b" "blog" entry
+                            (file+headline "~/src/github.com/grugrut/til/draft/blog.org" ,(format-time-string "%Y"))
+                            "** TODO %?\n:PROPERTIES:\n:EXPORT_FILE_NAME: %(format-time-string \"%Y%m%d%H%M%S\")\n:END:\n")
+                           )))
 
 ;;; TODOの場合だけSTARTEDに変更する
 (defun my-org-clock-in-switch-to-state (state)
+  "."
   (when (string-equal state "TODO")
     "STARTED"))
-
-(setq org-log-done 'time)
-(defvar org-clock-persist t)
-(defvar org-clock-out-when-done t)
 
 (use-package org-bullets
   :disabled t
   :ensure
-  :init
-  (add-hook 'org-mode-hook '(lambda () (org-bullets-mode 1))))
+  :hook
+  (org-mode (lambda () (org-bullets-mode 1))))
 
 ;;; #+UPDATE:を保存時に更新
 (use-package time-stamp
@@ -739,14 +730,6 @@
     (("C-z ;" . helm-ag))
     :config
     (setq helm-ag-base-command "rg -S --no-heading"))
-  (use-package helm-projectile
-    :ensure
-    :bind
-    (("C-z p" . helm-projectile))
-    :config
-    (projectile-mode t)
-    (helm-projectile-on)
-    (setq projectile-mode-line '(:eval (format " Prj[%s]" (projectile-project-name)))))
   :bind
   (("C-;" . helm-mini)
    ("C-M-z" . helm-resume)
@@ -759,14 +742,7 @@
 (use-package flycheck
   :ensure
   :diminish flycheck-mode
-  :init
-  (add-hook 'after-init-hook #'global-flycheck-mode)
-  :config
-  (use-package flycheck-pos-tip
-    :disabled t
-    :ensure t
-    :init
-    (flycheck-pos-tip-mode)))
+  :hook (after-init . global-flycheck-mode))
 
 (use-package company-go
   :ensure
@@ -792,7 +768,6 @@
   :init
   (add-hook 'before-save-hook 'gofmt-before-save)
   (setq tab-width 4))
-
 
 (use-package web-mode
   :ensure
@@ -992,8 +967,18 @@
 
 (use-package lsp-mode
   :ensure
-  :config
-  (require 'lsp-clients)
-  :hook (go-mode . lsp))
+  :init
+  (require 'lsp-clients))
+
+(use-package lsp-go
+  :ensure
+  :custom
+  (lsp-clients-go-language-server-flags '("-gocodecompletion"
+                                          "-diagnostics"
+                                          "-lint-tool=golint"))
+  (lsp-clients-go-library-directories '("~/" "~/bin" "/usr"))
+  :hook
+  (go-mode . lsp)
+  )
 
 ;;; init.el ends here
