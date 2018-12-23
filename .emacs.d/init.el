@@ -9,6 +9,16 @@
 
 (prefer-coding-system 'utf-8-unix)
 
+(load (setq custom-file (expand-file-name "custom.el" user-emacs-directory)))
+
+(modify-frame-parameters nil '((wait-for-wm . nil))) ; Xを使う場合の高速化設定らしい
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; パッケージ
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (require 'package)
 (setq package-archives
       '(("gnu" . "https://elpa.gnu.org/packages/")
@@ -23,6 +33,9 @@
 (eval-when-compile
   (require 'use-package))
 
+;;; diminishが付属しなくなったので手動で入れる
+(use-package diminish :ensure)
+
 ;; ベンチマーク
 (use-package benchmark-init
   :ensure t
@@ -31,16 +44,14 @@
   (benchmark-init/activate)
   (add-hook 'after-init-hook 'benchmark-init/deactivate))
 
-(use-package auto-async-byte-compile :ensure
-             :config
-             (setq auto-async-byte-compile-init-file "~/.emacs.d/init.el")
-             :hook ((emacs-lis--mode . enable-auto-async-byte-compile-mode)))
-
-;;; diminish
-(use-package diminish :ensure)
+(use-package auto-async-byte-compile
+  :ensure
+  :config
+  (setq auto-async-byte-compile-init-file "~/.emacs.d/init.el")
+  :hook ((emacs-lisp--mode . enable-auto-async-byte-compile-mode)))
 
 ;;; ライブラリ群
-(use-package cl)
+(use-package cl-lib)
 
 (use-package dash
   :defer t
@@ -58,14 +69,11 @@
   :defer t
   :ensure)
 
-(use-package smartrep
-  :defer t
-  :ensure)
-
-;; Xを使う場合の高速化設定らしい
-(modify-frame-parameters nil '((wait-for-wm . nil)))
-
-(load (setq custom-file (expand-file-name "custom.el" user-emacs-directory)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; 全般
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; 色をつける
 (global-font-lock-mode t)
@@ -113,57 +121,18 @@
 ;; 初期画面を表示しない
 (setq inhibit-startup-message t)
 
-
 ;; ブラウザ設定 WSL限定
 (setq  browse-url-browser-function 'browse-url-generic
        browse-url-generic-program  (executable-find (getenv "BROWSER")))
 
-(use-package quickrun
-  :ensure
-  :commands (quickrun)
-  :init
-  (bind-key "C-c C-c" 'quickrun prog-mode-map))
 
-(use-package ddskk
-  :ensure
-  :bind
-  (("C-x C-j" . skk-mode)
-   ("C-x j" . skk-mode))
-  :init
-  (defvar dired-bind-jump nil)  ; dired-xがC-xC-jを奪うので対処しておく
-  ;; AZIKを使用する
-  (defvar skk-use-azik t)
-  (defvar skk-azik-keyboard-type 'jp106)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; 画面
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  :config
-  (defvar skk-tut-file nil)
-  (defvar skk-server-host "localhost")
-  (defvar skk-server-portnum 1178)
-  ;; 変換時にリターンでは改行しない
-  (defvar skk-egg-like-newline t)
-
-  ;; メッセージを日本語にする
-  (defvar sskk-japanese-message-and-error t)
-
-  ;; 対応する括弧を自動挿入
-  (defvar skk-auto-insert-paren t)
-
-  (defvar skk-check-okurigana-on-touroku t)
-
-  ;; アノテーションを表示
-  (defvar skk-show-annotation t)
-  (defvar skk-anotation-show-wikipedia-url t)
-
-  ;; 変換候補をインライン表示しない
-  (defvar skk-show-tooltip nil)
-
-  ;; isearch時にSKKをオフ
-  (defvar skk-isearch-start-mode 'latin)
-
-  ;; 送り仮名を考慮した変換候補
-  (defvar skk-henkan-okuri-strictly nil)
-  (defvar skk-process-okuri-early nil)
-  )
+(load-theme 'manoj-dark)
 
 ;; ツールバーを表示しない
 (tool-bar-mode 0)
@@ -175,20 +144,14 @@
 (line-number-mode +1)
 (column-number-mode +1)
 
+;; 行番号表示(Emacs26以降)
+(global-display-line-numbers-mode t)
+
 (use-package beacon
   :ensure
   :diminish ""
   :config
   (beacon-mode 1))
-
-(use-package indent-guide
-  :ensure
-  :defer t
-  :diminish ""
-  :config
-  (defvar indent-guide-delay 0.1)
-  (defvar indent-guide-recursive t)
-  :hook (prog-mode . indent-guide-mode))
 
 ;; タイトルバーにファイル名を表示
 (setq frame-title-format "%f")
@@ -203,10 +166,17 @@
 ;; 単語での折り返し
 (global-visual-line-mode t)
 
+;; バッファ画面外文字の切り詰め表示（有効：t、無効：nil）
+(setq truncate-lines nil)
+
 ;; マウスを避けさせる
 (mouse-avoidance-mode 'jump)
 
 ;; フォント設定
+;;
+;; abcdefghi
+;; 012345678
+;; あいうえお
 (set-face-attribute 'default nil
                     :family "Migu 1M"
                     :height 140)
@@ -215,10 +185,10 @@
  (font-spec :family "Migu 1M"))
 
 ;; 絵文字
+;; (unicode-fonts-setup) ; 最初に本コマンドの実行が必要
+;; (all-the-icons-install-fonts)
 (use-package unicode-fonts
-  :ensure
-  ;;(unicode-fonts-setup) ; 最初に本コマンドの実行が必要
-  )
+  :ensure)
 (use-package all-the-icons
   :ensure)
 
@@ -240,49 +210,12 @@
               default-frame-alist))
 (setq initial-frame-alist default-frame-alist)
 
-;; バッファ画面外文字の切り詰め表示（有効：t、無効：nil）
-(setq truncate-lines nil)
-
 ;; 同一バッファ名にディレクトリ付与
 (use-package uniquify
   :defer t
   :custom
   (uniquify-buffer-name-style 'post-forward-angle-brackets)
   (uniquify-ignore-buffers-re "*[^*]+*"))
-
-;; 行番号表示(Emacs26以降)
-(global-display-line-numbers-mode t)
-
-;; 操作した際に、操作箇所を強調表示する
-(use-package volatile-highlights
-  :ensure
-  :diminish ""
-  :config
-  (volatile-highlights-mode t))
-
-;; vi風に空行に~を表示する
-(use-package vi-tilde-fringe
-  :ensure
-  :commands vi-tilde-fringe-mode
-  :diminish ""
-  :hook
-  (prog-mode . vi-tilde-fringe-mode))
-
-(use-package rainbow-mode
-  :defer t
-  :ensure)
-
-(use-package neotree
-  :defer t
-  :ensure)
-
-(use-package popwin
-  :ensure
-  :defer t
-  :custom
-  (popwin:popup-window-position 'bottom))
-
-(load-theme 'manoj-dark)
 
 ;; 本当はひとつのuse-packageにまとめたいが、spaceline-define-segmentがマクロ展開できないため、先にrequireする
 (use-package spaceline-config
@@ -368,136 +301,56 @@
   (if (bound-and-true-p powerline-text-scale-factor)
       (* (or height 1) (or powerline-text-scale-factor 1))
     (or height 1)))
-;; 最終行には必ず1行挿入
-(setq require-final-newline t)
 
-;; バッファの最後の改行を抑制
-(setq next-line-add-newlines nil)
-
-;; リージョン選択時にリージョンまるごと削除
-(delete-selection-mode t)
-
-;; hightlight-symbol
-(use-package highlight-symbol
+(use-package popwin
   :ensure
   :defer t
+  :custom
+  (popwin:popup-window-position 'bottom))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; 入力
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package ddskk
+  :ensure
   :bind
-  (("C-." . highlight-symbol-at-point)))
+  (("C-x C-j" . skk-mode)
+   ("C-x j"   . skk-mode))
+  :init
+  (defvar dired-bind-jump nil)  ; dired-xがC-xC-jを奪うので対処しておく
+  :custom
+  (skk-use-azik t)                     ; AZIKを使用する
+  (skk-azik-keyboard-type 'jp106)      ;
+  (skk-tut-file nil)                   ;
+  (skk-server-host "localhost")        ;
+  (skk-server-portnum 1178)            ;
+  (skk-egg-like-newline t)             ; 変換時にリターンでは改行しない
+  (skk-japanese-message-and-error t)   ; メッセージを日本語にする
+  (skk-auto-insert-paren t)            ; 対応する括弧を自動挿入
+  (skk-check-okurigana-on-touroku t)   ;
+  (skk-show-annotation t)              ; アノテーションを表示
+  (skk-anotation-show-wikipedia-url t) ;
+  (skk-show-tooltip nil)               ; 変換候補をインライン表示しない
+  (skk-isearch-start-mode 'latin)      ; isearch時にSKKをオフ
+  (skk-henkan-okuri-strictly nil)      ; 送り仮名を考慮した変換候補
+  (skk-process-okuri-early nil)
+  )
 
-;; expand-region
-(use-package expand-region
-  :ensure
-  :defer t
-  :bind
-  (("C-," . er/expand-region)
-   ("C-M-," . er/contract-region)))
-
-(use-package multiple-cursors
-  :ensure
-  :after smartrep
-  :config
-  (global-unset-key (kbd "C-t"))
-  (smartrep-define-key global-map "C-t"
-                       '(("C-t" . 'mc/mark-next-like-this)
-                         ("n"   . 'mc/mark-next-like-this)
-                         ("p"   . 'mc/mark-previous-like-this)
-                         ("m"   . 'mc/mark-more-like-this-extended)
-                         ("u"   . 'mc/unmark-next-like-this)
-                         ("U"   . 'mc/unmark-previous-like-this)
-                         ("s"   . 'mc/skip-to-next-like-this)
-                         ("S"   . 'mc/skip-to-previous-like-this)
-                         ("*"   . 'mc/mark-all-like-this)
-                         ("a"   . 'mc/mark-all-like-this)
-                         ("d"   . 'mc/mark-all-like-this-dwim)
-                         ("i"   . 'mc/insert-numbers)
-                         ("l"   . 'mc/insert-letters)
-                         ("o"   . 'mc/sort-regions)
-                         ("O"   . 'mc/reverse-regions))))
-
-
-;; minibufferのアクティブ時、IMEを無効化
-(add-hook 'minibuffer-setup-hook
-          (lambda ()
-            (deactivate-input-method)))
-
-(use-package aggressive-indent
-  :ensure
-  :config
-  (global-aggressive-indent-mode t))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; 検索
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package google-this
   :ensure
   :defer t
   :bind (("M-s g" . google-this-noconfirm)))
-
-(use-package smartparens
-  :diminish smartparens-mode
-  :ensure)
-(use-package smartparens-config
-  :after smartparens
-  :config
-  (smartparens-global-mode t))
-
-(use-package smooth-scroll
-  :ensure
-  :diminish ""
-  :config
-  (smooth-scroll-mode t))
-
-(use-package rainbow-delimiters
-  :ensure
-  :defer t
-  :hook
-  (prog-mode . rainbow-delimiters-mode))
-
-(use-package fontawesome
-  :ensure
-  :defer t)
-
-(use-package codic
-  :ensure
-  :defer t)
-
-(use-package pocket-reader
-  :ensure
-  :defer t)
-
-(use-package company
-  :ensure
-  :diminish company-mode
-  :config
-  (global-company-mode)
-  (setq company-idle-delay 0.3
-        company-minimum-prefix-length 1
-        company-begin-commands '(self-insert-command)
-        company-selection-wrap-around t
-        company-show-numbers t)
-  (let ((map company-active-map))
-    (mapc
-     (lambda (x)
-       (define-key map (format "%d" x) 'ora/company-number))
-     (number-sequence 0 9))
-    (define-key map " " (lambda ()
-                          (interactive)
-                          (company-abort)
-                          (self-insert-command 1)))
-    (define-key map (kbd "<return>") nil)))
-
-(defun ora/company-number ()
-  "Forward to `company-complete-number'."
-  (interactive)
-  (let* ((k (this-command-keys))
-         (re (concat "^" company-prefix k)))
-    (if (cl-find-if (lambda (s) (string-match re s))
-                    company-candidates)
-        (self-insert-command 1)
-      (company-complete-number (string-to-number k)))))
-
-(use-package yasnippet
-  :ensure
-  :diminish yas-minor-mode
-  :config
-  (yas-global-mode 1))
 
 ;; anzu
 (use-package anzu
@@ -524,13 +377,6 @@
   (migemo-coding-system 'utf-8-unix)
   :config
   (migemo-init))
-
-;; avy
-(use-package avy
-  :ensure
-  :bind
-  (("C-:" . avy-goto-char-timer)
-   ("M-g M-g" . avy-goto-line)))
 
 ;; ripgrep
 (use-package ripgrep
@@ -574,6 +420,352 @@
  'isearch-mode-end-hook
  '(lambda() (setq w32-ime-composition-window nil))
  )
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; コーディング
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(setq comment-style 'extra-line)
+
+(use-package quickrun
+  :ensure
+  :commands (quickrun)
+  :init
+  (bind-key "C-c C-c" 'quickrun prog-mode-map))
+
+(use-package indent-guide
+  :ensure
+  :defer t
+  :diminish ""
+  :config
+  (defvar indent-guide-delay 0.1)
+  (defvar indent-guide-recursive t)
+  :hook (prog-mode . indent-guide-mode))
+
+;; 操作した際に、操作箇所を強調表示する
+(use-package volatile-highlights
+  :ensure
+  :diminish ""
+  :config
+  (volatile-highlights-mode t))
+
+;; vi風に空行に~を表示する
+(use-package vi-tilde-fringe
+  :ensure
+  :commands vi-tilde-fringe-mode
+  :diminish ""
+  :hook
+  (prog-mode . vi-tilde-fringe-mode))
+
+(use-package rainbow-mode
+  :defer t
+  :ensure)
+
+(use-package neotree
+  :defer t
+  :ensure)
+
+(use-package flycheck
+  :ensure
+  :diminish flycheck-mode
+  :hook (after-init . global-flycheck-mode))
+
+(use-package eglot
+  :ensure
+  :defer t
+  :config
+  (add-to-list 'eglot-server-programs '(go-mode . ("go-langserver"
+                                                   "-mode=stdio"
+                                                   "-gocodecompletion"
+                                                   "-diagnostics"
+                                                   "-lint-tool=golint")))
+  :hook
+  (go-mode . eglot-ensure)
+  (python-mode . eglot-ensure)
+  (web-mode . eglot-ensure)
+  (js2-mode . eglot-ensure))
+
+(use-package go-mode
+  :ensure
+  :defer t
+  :commands (gofmt-before-save)
+  :init
+  (add-hook 'before-save-hook 'gofmt-before-save)
+  (setq tab-width 4))
+
+(use-package web-mode
+  :ensure
+  :defer t
+  :mode (("\\.html?\\'" . web-mode)
+         ("\\.scss\\'" . web-mode)
+         ("\\.css\\'" . web-mode)
+         ("\\.twig\\'" . web-mode)
+         ("\\.vue\\'" . web-mode))
+  :config
+  (add-hook 'web-mode-hook 'rainbow-mode)
+  (flycheck-add-mode 'javascript-eslint 'web-mode)
+  (setq web-mode-markup-indent-offset 2
+        web-mode-css-indent-offset 2
+        web-mode-code-indent-offset 2
+        web-mode-comment-style 2
+        web-mode-style-padding 1
+        web-mode-script-padding 1)
+  (define-key web-mode-map (kbd "C-c b") 'web-beautify-html)
+  (define-key web-mode-map (kbd "C-c b") 'web-beautify-css)
+  )
+
+(use-package emmet-mode
+  :ensure
+  :defer t
+  :commands (emmet-mode)
+  :hook
+  (web-mode . emmet-mode))
+
+(use-package js2
+  :ensure js2-mode
+  :defer t
+  :mode ("\\.js\\'" . js2-mode)
+  :config
+  (define-key js2-mode-map (kbd "C-c b") 'web-beautify-js))
+
+(use-package coffee-mode
+  :ensure
+  :defer t
+  :config
+  (setq coffee-tab-width 2))
+
+(use-package php-mode
+  :ensure
+  :mode ("\\.php\\'" . php-mode))
+
+(use-package web-beautify
+  :ensure
+  :defer t)
+
+(use-package groovy-mode
+  :ensure
+  :defer t
+  :mode (("Jenkinsfile" . groovy-mode)))
+
+(use-package rust-mode
+  :ensure
+  :defer t
+  :config
+  (setq-default rust-format-on-save t))
+
+(use-package racer
+  :ensure
+  :defer t
+  :init
+  (add-hook 'rust-mode-hook #'racer-mode)
+  (add-hook 'racer-mode-hook #'eldoc-mode))
+
+(use-package flycheck-rust
+  :ensure
+  :defer t
+  :after racer
+  :init
+  (add-hook 'rust-mode-hook (lambda ()
+                              (racer-mode)
+                              (flycheck-rust-setup))))
+
+(use-package alchemist
+  :ensure
+  :defer t
+  :config
+  (setq alchemist-hooks-compile-on-save t))
+
+(use-package elixir-mode
+  :ensure
+  :defer t
+  :config
+  ;; Create a buffer-local hook to run elixir-format on save, only when we enable elixir-mode.
+  (add-hook 'elixir-mode-hook
+            (lambda () (add-hook 'before-save-hook 'elixir-format nil t)))
+  )
+
+(use-package flycheck-elixir
+  :ensure
+  :defer t)
+
+(use-package elixir-yasnippets
+  :ensure
+  :defer t)
+
+(use-package python-mode
+  :ensure
+  :defer t
+  :mode (("\\.py\\'" . python-mode))
+  :config
+  (bind-key "C-c C-c" 'quickrun python-mode-map)
+  )
+
+(use-package ess
+  :ensure
+  :mode ("\\.[rR]\\'" . R-mode)
+  :config
+  (setq ess-ask-for-ess-directory nil)
+  (use-package ess-site)
+  (use-package ess-R-object-popup
+    :ensure
+    :init
+    (bind-key "C-c C-g" 'ess-R-object-popup ess-mode-map))
+  (use-package ess-R-data-view
+    :ensure))
+
+(use-package yaml-mode
+  :ensure
+  :mode ("\\.yaml\\'" . yaml-mode))
+
+(use-package markdown-mode
+  :ensure
+  :mode ("\\.md\\'" . gfm-mode))
+
+
+;; 最終行には必ず1行挿入
+(setq require-final-newline t)
+
+;; バッファの最後の改行を抑制
+(setq next-line-add-newlines nil)
+
+;; リージョン選択時にリージョンまるごと削除
+(delete-selection-mode t)
+
+;; hightlight-symbol
+(use-package highlight-symbol
+  :ensure
+  :defer t
+  :bind
+  (("C-." . highlight-symbol-at-point)))
+
+;; expand-region
+(use-package expand-region
+  :ensure
+  :defer t
+  :bind
+  (("C-," . er/expand-region)
+   ("C-M-," . er/contract-region)))
+
+(use-package smartrep
+  :defer t
+  :ensure)
+
+(use-package multiple-cursors
+  :ensure
+  :after smartrep
+  :config
+  (global-unset-key (kbd "C-t"))
+  (smartrep-define-key global-map "C-t"
+                       '(("C-t" . 'mc/mark-next-like-this)
+                         ("n"   . 'mc/mark-next-like-this)
+                         ("p"   . 'mc/mark-previous-like-this)
+                         ("m"   . 'mc/mark-more-like-this-extended)
+                         ("u"   . 'mc/unmark-next-like-this)
+                         ("U"   . 'mc/unmark-previous-like-this)
+                         ("s"   . 'mc/skip-to-next-like-this)
+                         ("S"   . 'mc/skip-to-previous-like-this)
+                         ("*"   . 'mc/mark-all-like-this)
+                         ("a"   . 'mc/mark-all-like-this)
+                         ("d"   . 'mc/mark-all-like-this-dwim)
+                         ("i"   . 'mc/insert-numbers)
+                         ("l"   . 'mc/insert-letters)
+                         ("o"   . 'mc/sort-regions)
+                         ("O"   . 'mc/reverse-regions))))
+
+
+;; minibufferのアクティブ時、IMEを無効化
+(add-hook 'minibuffer-setup-hook
+          (lambda ()
+            (deactivate-input-method)))
+
+(use-package aggressive-indent
+  :ensure
+  :diminish ""
+  :config
+  (global-aggressive-indent-mode t))
+
+
+(use-package smartparens
+  :diminish smartparens-mode
+  :ensure)
+(use-package smartparens-config
+  :after smartparens
+  :config
+  (smartparens-global-mode t))
+
+(use-package smooth-scroll
+  :ensure
+  :diminish ""
+  :config
+  (smooth-scroll-mode t))
+
+(use-package rainbow-delimiters
+  :ensure
+  :defer t
+  :hook
+  (prog-mode . rainbow-delimiters-mode))
+
+(use-package fontawesome
+  :ensure
+  :defer t)
+
+(use-package codic
+  :ensure
+  :defer t)
+
+(use-package pocket-reader
+  :ensure
+  :defer t)
+
+
+(use-package company
+  :ensure
+  :diminish company-mode
+  :config
+  (global-company-mode)
+  (setq company-idle-delay 0.3
+        company-minimum-prefix-length 1
+        company-begin-commands '(self-insert-command)
+        company-selection-wrap-around t
+        company-show-numbers t)
+  (let ((map company-active-map))
+    (mapc
+     (lambda (x)
+       (define-key map (format "%d" x) 'ora/company-number))
+     (number-sequence 0 9))
+    (define-key map " " (lambda ()
+                          (interactive)
+                          (company-abort)
+                          (self-insert-command 1)))
+    (define-key map (kbd "<return>") nil)))
+
+(defun ora/company-number ()
+  "Forward to `company-complete-number'."
+  (interactive)
+  (let* ((k (this-command-keys))
+         (re (concat "^" company-prefix k)))
+    (if (cl-find-if (lambda (s) (string-match re s))
+                    company-candidates)
+        (self-insert-command 1)
+      (company-complete-number (string-to-number k)))))
+
+(use-package yasnippet
+  :ensure
+  :diminish yas-minor-mode
+  :config
+  (yas-global-mode 1))
+
+
+;; avy
+(use-package avy
+  :ensure
+  :bind
+  (("C-:" . avy-goto-char-timer)
+   ("M-g M-g" . avy-goto-line)))
+
 
 (use-package view
   :ensure
@@ -647,7 +839,7 @@
 
 ;;; TODOの場合だけSTARTEDに変更する
 (defun my-org-clock-in-switch-to-state (state)
-  "."
+  "Change state to STRTED when previous STATE is only TODO."
   (when (string-equal state "TODO")
     "STARTED"))
 
@@ -739,184 +931,6 @@
   :config
   (helm-mode t))
 
-(use-package flycheck
-  :ensure
-  :diminish flycheck-mode
-  :hook (after-init . global-flycheck-mode))
-
-(use-package company-go
-  :ensure
-  :disabled t
-  :defer t)
-
-(use-package go-eldoc
-  :ensure
-  :defer t
-  :commands go-eldoc-setup
-  :init
-  (add-hook 'go-mode-hook 'go-eldoc-setup))
-
-(use-package go-snippets
-  :disabled t
-  :ensure
-  :defer t)
-
-(use-package go-mode
-  :ensure
-  :defer t
-  :commands (gofmt-before-save)
-  :init
-  (add-hook 'before-save-hook 'gofmt-before-save)
-  (setq tab-width 4))
-
-(use-package web-mode
-  :ensure
-  :defer t
-  :mode (("\\.html?\\'" . web-mode)
-         ("\\.scss\\'" . web-mode)
-         ("\\.css\\'" . web-mode)
-         ("\\.twig\\'" . web-mode)
-         ("\\.vue\\'" . web-mode))
-  :config
-  (add-hook 'web-mode-hook 'rainbow-mode)
-  (flycheck-add-mode 'javascript-eslint 'web-mode)
-  (setq web-mode-markup-indent-offset 2
-        web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2
-        web-mode-comment-style 2
-        web-mode-style-padding 1
-        web-mode-script-padding 1)
-  (define-key web-mode-map (kbd "C-c b") 'web-beautify-html)
-  (define-key web-mode-map (kbd "C-c b") 'web-beautify-css)
-  )
-
-(use-package emmet-mode
-  :ensure
-  :commands (emmet-mode)
-  :init
-  (add-hook 'web-mode-hook 'emmet-mode))
-
-
-(use-package js2
-  :ensure js2-mode
-  :mode ("\\.js\\'" . js2-mode)
-  :config
-  (define-key js2-mode-map (kbd "C-c b") 'web-beautify-js))
-
-(use-package company-tern
-  :ensure
-  :commands tern-mode
-  :init
-  (add-hook 'js2-mode-hook 'tern-mode)
-  :config
-  (add-to-list 'company-backends 'company-tern))
-
-(use-package coffee-mode
-  :ensure
-  :defer t
-  :config
-  (setq coffee-tab-width 2))
-
-(use-package php-mode
-  :ensure
-  :mode ("\\.php\\'" . php-mode))
-
-(use-package web-beautify
-  :ensure
-  :defer t)
-
-(use-package groovy-mode
-  :ensure
-  :mode (("Jenkinsfile" . groovy-mode)))
-
-
-(use-package rust-mode
-  :ensure
-  :defer t
-  :config
-  (setq-default rust-format-on-save t))
-
-(use-package racer
-  :ensure
-  :defer t
-  :init
-  (add-hook 'rust-mode-hook #'racer-mode)
-  (add-hook 'racer-mode-hook #'eldoc-mode))
-
-(use-package flycheck-rust
-  :ensure
-  :defer t
-  :after racer
-  :init
-  (add-hook 'rust-mode-hook (lambda ()
-                              (racer-mode)
-                              (flycheck-rust-setup))))
-
-(use-package alchemist
-  :ensure
-  :defer t
-  :config
-  (setq alchemist-hooks-compile-on-save t))
-
-(use-package elixir-mode
-  :ensure
-  :defer t
-  :config
-  ;; Create a buffer-local hook to run elixir-format on save, only when we enable elixir-mode.
-  (add-hook 'elixir-mode-hook
-            (lambda () (add-hook 'before-save-hook 'elixir-format nil t)))
-  )
-
-(use-package flycheck-elixir
-  :ensure
-  :defer t)
-
-(use-package elixir-yasnippets
-  :ensure
-  :defer t)
-(use-package python-mode
-  :ensure
-  :mode (("\\.py\\'" . python-mode))
-  :config
-  (use-package py-autopep8
-    :ensure
-    :init
-    (add-hook 'python-mode-hook 'py-autopep8-enable-on-save))
-  (bind-key "C-c C-c" 'quickrun python-mode-map)
-  ;;(setq python-shell-interpreter "python")
-  ;;(add-to-list 'python-shell-completion-native-disabled-interpreters "python"))
-  )
-
-(use-package jedi-core
-  :ensure
-  :init
-  (add-hook 'python-mode-hook 'jedi:setup)
-  :config
-  (use-package company-jedi
-    :ensure)
-  (add-to-list 'company-backends 'company-jedi)
-  (setq jedi:complete-on-dot t))
-
-(use-package ess
-  :ensure
-  :mode ("\\.[rR]\\'" . R-mode)
-  :config
-  (setq ess-ask-for-ess-directory nil)
-  (use-package ess-site)
-  (use-package ess-R-object-popup
-    :ensure
-    :init
-    (bind-key "C-c C-g" 'ess-R-object-popup ess-mode-map))
-  (use-package ess-R-data-view
-    :ensure))
-
-(use-package yaml-mode
-  :ensure
-  :mode ("\\.yaml\\'" . yaml-mode))
-
-(use-package markdown-mode
-  :ensure
-  :mode ("\\.md\\'" . gfm-mode))
 
 ;; C-hをバックスペース
 (keyboard-translate ?\C-h ?\C-?)
@@ -958,27 +972,10 @@
     (message text)
     (kill-new text)))
 
-;;; WSLでsuspendが暴発すると復帰できない？ ので確認する
-(defun my/confirm-suspend ()
-  ""
-  (unless (y-or-n-p "Really suspend? ")
-    (error "Suspend canceld")))
-(add-hook 'suspend-hook 'my/confirm-suspend)
+;;; サスペンドさせない
+(global-unset-key (kbd "C-x C-z"))
 
-(use-package lsp-mode
-  :ensure
-  :init
-  (require 'lsp-clients))
 
-(use-package lsp-go
-  :ensure
-  :custom
-  (lsp-clients-go-language-server-flags '("-gocodecompletion"
-                                          "-diagnostics"
-                                          "-lint-tool=golint"))
-  (lsp-clients-go-library-directories '("~/" "~/bin" "/usr"))
-  :hook
-  (go-mode . lsp)
-  )
+
 
 ;;; init.el ends here
