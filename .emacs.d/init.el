@@ -172,6 +172,18 @@
   :ensure
   :after spaceline
   :config
+  (setq spaceline-all-the-icons-separator-type 'arrow
+        spaceline-all-the-icons-primary-separator ""
+        spaceline-all-the-icons-secondary-separator ""
+        spaceline-all-the-icons-icon-set-modified 'chain
+        spaceline-all-the-icons-flycheck-alternate t
+        spaceline-all-the-icons-icon-set-git-stats 'diff-icons)
+  (spaceline-all-the-icons--setup-anzu)
+  (spaceline-all-the-icons--setup-git-ahead)
+  (spaceline-all-the-icons--setup-neotree)
+  (spaceline-toggle-all-the-icons-buffer-path-off)
+  (spaceline-toggle-all-the-icons-git-status-on)
+  (spaceline-toggle-all-the-icons-flycheck-status-info-on)
   (spaceline-all-the-icons-theme))
 
 ;; ツールバーを表示しない
@@ -214,10 +226,10 @@
 
 
 (setq default-frame-alist
-      (append '((width                . 200)  ; フレーム幅
+      (append '((width                . 180)  ; フレーム幅
                 (height               . 60 ) ; フレーム高
-                ;; (left                 . 70 ) ; 配置左位置
-                ;; (top                  . 28 ) ; 配置上位置
+                (left                 . 70 ) ; 配置左位置
+                (top                  . 28 ) ; 配置上位置
                 (line-spacing         . 0  ) ; 文字間隔
                 (left-fringe          . 12 ) ; 左フリンジ幅
                 (right-fringe         . 12 ) ; 右フリンジ幅
