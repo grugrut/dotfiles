@@ -373,6 +373,12 @@
 
 (setq comment-style 'extra-line)
 
+(use-package yafolding
+  :ensure t
+  :defer t
+  :hook
+  (prog-mode . yafolding-mode))
+
 (use-package quickrun
   :ensure
   :defer t
