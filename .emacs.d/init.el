@@ -30,17 +30,15 @@
   (package-install 'use-package))
 (eval-when-compile
   (require 'use-package)
-  (setq use-package-always-defer t
-        use-package-verbose t))
+  (setq use-package-verbose t))
 
 ;;; diminishが付属しなくなったので手動で入れる
 (use-package diminish :ensure)
 
 ;; ベンチマーク
 (use-package benchmark-init
-  :ensure t
+  :ensure
   :config
-  ;; To disable collection of benchmark data after init is done.
   (benchmark-init/activate)
   (add-hook 'after-init-hook 'benchmark-init/deactivate))
 
@@ -51,19 +49,24 @@
   :hook ((emacs-lisp--mode . enable-auto-async-byte-compile-mode)))
 
 ;;; ライブラリ群
-(use-package cl-lib)
+(use-package cl-lib
+  :defer t)
 
 (use-package dash
-  :ensure)
+  :ensure
+  :defer t)
 
 (use-package s
-  :ensure)
+  :ensure
+  :defer t)
 
 (use-package f
-  :ensure)
+  :ensure
+  :defer t)
 
 (use-package ht
-  :ensure)
+  :ensure
+  :defer t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -79,7 +82,9 @@
 (setq garbage-collection-messages t)
 
 ;; バッファの自動掃除
-(use-package midnight)
+(use-package midnight
+  :config
+  (midnight-mode))
 
 ;; 大きなファイルを開くときの警告を出にくくする
 (setq large-file-warning-threshold (* 25 1024 1024))
@@ -144,10 +149,11 @@
 ;; (unicode-fonts-setup) ; 最初に本コマンドの実行が必要
 ;; (all-the-icons-install-fonts)
 (use-package unicode-fonts
-  :ensure)
+  :ensure
+  :defer t)
 (use-package all-the-icons
-  :ensure)
-
+  :ensure
+  :defer t)
 
 (load-theme 'manoj-dark)
 
@@ -164,8 +170,9 @@
 
 (use-package spaceline-all-the-icons
   :ensure
-  :after spaceline)
-(spaceline-all-the-icons-theme)
+  :after spaceline
+  :config
+  (spaceline-all-the-icons-theme))
 
 ;; ツールバーを表示しない
 (tool-bar-mode 0)
@@ -207,8 +214,8 @@
 
 
 (setq default-frame-alist
-      (append '((width                . 120)  ; フレーム幅
-                (height               . 42 ) ; フレーム高
+      (append '((width                . 200)  ; フレーム幅
+                (height               . 60 ) ; フレーム高
                 ;; (left                 . 70 ) ; 配置左位置
                 ;; (top                  . 28 ) ; 配置上位置
                 (line-spacing         . 0  ) ; 文字間隔
@@ -216,8 +223,8 @@
                 (right-fringe         . 12 ) ; 右フリンジ幅
                 (menu-bar-lines       . 1  ) ; メニューバー
                 ;; (tool-bar-lines       . 1  ) ; ツールバー
-                ;;   (vertical-scroll-bars . 1  ) ; スクロールバー
-                ;;   (scroll-bar-width     . 17 ) ; スクロールバー幅
+                ;; (vertical-scroll-bars . 1  ) ; スクロールバー
+                ;; (scroll-bar-width     . 17 ) ; スクロールバー幅
                 (cursor-type          . box) ; カーソル種別
                 (alpha                . 100) ; 透明度
                 )
@@ -244,6 +251,7 @@
 
 (use-package ddskk
   :ensure
+  :defer t
   :bind
   (("C-x C-j" . skk-mode)
    ("C-x j"   . skk-mode))
@@ -275,6 +283,7 @@
 
 (use-package google-this
   :ensure
+  :defer t
   :bind (("M-s g" . google-this-noconfirm)))
 
 ;; anzu
@@ -282,11 +291,8 @@
   :ensure
   :bind
   (("M-%" . anzu-query-replace))
-  :init
+  :config
   (global-anzu-mode +1)
-  (setq anzu-mode-lighter ""               ;マイナーモードに表示する文字列
-        anzu-search-threshold 1000         ;これ以上は件数表示しない
-        anzu-cons-mode-line-p nil)         ;件数を表示しない(spaceline対応)
   )
 
 ;; migemo
@@ -305,6 +311,7 @@
 ;; ripgrep
 (use-package ripgrep
   :ensure
+  :defer t
   :bind (("M-s r" . ripgrep-regexp))
   :config
   (setq ripgrep-arguments '("-S")))
@@ -356,12 +363,14 @@
 
 (use-package quickrun
   :ensure
+  :defer t
   :commands (quickrun)
   :init
   (bind-key "C-c C-c" 'quickrun prog-mode-map))
 
 (use-package indent-guide
   :ensure
+  :defer t
   :diminish ""
   :config
   (defvar indent-guide-delay 0.1)
@@ -378,24 +387,30 @@
 ;; vi風に空行に~を表示する
 (use-package vi-tilde-fringe
   :ensure
+  :defer t
   :commands vi-tilde-fringe-mode
   :diminish ""
   :hook
   (prog-mode . vi-tilde-fringe-mode))
 
 (use-package rainbow-mode
-  :ensure)
+  :ensure
+  :defer t
+  :hook
+  (web-mode . rainbow-mode))
 
 (use-package neotree
   :ensure)
 
 (use-package flycheck
   :ensure
+  :defer t
   :diminish flycheck-mode
-  :hook (after-init . global-flycheck-mode))
+  :hook (prog-mode . global-flycheck-mode))
 
 (use-package eglot
   :ensure
+  :defer t
   :config
   (add-to-list 'eglot-server-programs '(go-mode . ("go-langserver"
                                                    "-mode=stdio"
@@ -411,6 +426,7 @@
 
 (use-package go-mode
   :ensure
+  :defer t
   :commands (gofmt-before-save)
   :init
   (add-hook 'before-save-hook 'gofmt-before-save)
@@ -418,6 +434,7 @@
 
 (use-package web-mode
   :ensure
+  :defer t
   :mode (("\\.html?\\'" . web-mode)
          ("\\.scss\\'" . web-mode)
          ("\\.css\\'" . web-mode)
@@ -438,12 +455,14 @@
 
 (use-package emmet-mode
   :ensure
+  :defer t
   :commands (emmet-mode)
   :hook
   (web-mode . emmet-mode))
 
 (use-package js2
   :ensure js2-mode
+  :defer t
   :mode ("\\.js\\'" . js2-mode)
   :bind (:map js2-mode-map
               ("C-c b" . web-beautify-js))
@@ -451,33 +470,40 @@
 
 (use-package coffee-mode
   :ensure
+  :defer t
   :config
   (setq coffee-tab-width 2))
 
 (use-package php-mode
   :ensure
+  :defer t
   :mode ("\\.php\\'" . php-mode))
 
 (use-package web-beautify
-  :ensure)
+  :ensure
+  :defer t)
 
 (use-package groovy-mode
   :ensure
+  :defer t
   :mode (("Jenkinsfile" . groovy-mode)))
 
 (use-package rust-mode
   :ensure
+  :defer t
   :config
   (setq-default rust-format-on-save t))
 
 (use-package racer
   :ensure
-  :init
-  (add-hook 'rust-mode-hook #'racer-mode)
-  (add-hook 'racer-mode-hook #'eldoc-mode))
+  :defer t
+  :hook
+  (rust-mode . racer-mode)
+  (racer-mode . eldoc-mode))
 
 (use-package flycheck-rust
   :ensure
+  :defer t
   :after racer
   :init
   (add-hook 'rust-mode-hook (lambda ()
@@ -486,11 +512,13 @@
 
 (use-package alchemist
   :ensure
+  :defer t
   :config
   (setq alchemist-hooks-compile-on-save t))
 
 (use-package elixir-mode
   :ensure
+  :defer t
   :config
   ;; Create a buffer-local hook to run elixir-format on save, only when we enable elixir-mode.
   (add-hook 'elixir-mode-hook
@@ -498,13 +526,18 @@
   )
 
 (use-package flycheck-elixir
-  :ensure)
+  :ensure
+  :defer t
+  :after elixir-mode)
 
 (use-package elixir-yasnippets
-  :ensure)
+  :ensure
+  :defer t
+  :after elixir-mode)
 
 (use-package python-mode
   :ensure
+  :defer t
   :mode (("\\.py\\'" . python-mode))
   :config
   (bind-key "C-c C-c" 'quickrun python-mode-map)
@@ -512,6 +545,7 @@
 
 (use-package ess
   :ensure
+  :defer t
   :mode ("\\.[rR]\\'" . R-mode)
   :config
   (setq ess-ask-for-ess-directory nil)
@@ -525,12 +559,13 @@
 
 (use-package yaml-mode
   :ensure
+  :defer t
   :mode ("\\.yaml\\'" . yaml-mode))
 
 (use-package markdown-mode
   :ensure
+  :defer t
   :mode ("\\.md\\'" . gfm-mode))
-
 
 ;; 最終行には必ず1行挿入
 (setq require-final-newline t)
@@ -544,12 +579,14 @@
 ;; hightlight-symbol
 (use-package highlight-symbol
   :ensure
+  :defer t
   :bind
   (("C-." . highlight-symbol-at-point)))
 
 ;; expand-region
 (use-package expand-region
   :ensure
+  :defer t
   :bind
   (("C-," . er/expand-region)
    ("C-M-," . er/contract-region)))
@@ -615,10 +652,12 @@
   :ensure)
 
 (use-package codic
-  :ensure)
+  :ensure
+  :defer t)
 
 (use-package pocket-reader
-  :ensure)
+  :ensure
+  :defer t)
 
 (use-package company
   :ensure
@@ -677,6 +716,7 @@
              ("l" . forward-char)))
 
 (use-package org
+  :defer t
   :bind (("C-c c" . org-capture)
          ("C-c a" . org-agenda))
   :mode ("\\.org$'" . org-mode)
@@ -702,6 +742,8 @@
   )
 
 (use-package org-capture
+  :defer t
+  :after org
   :commands (org-capture)
   :custom
   (org-capture-templates `(
@@ -759,10 +801,12 @@
 
 (use-package ox-hugo
   :ensure
+  :defer t
   :after ox)
 (use-package ox-hugo-auto-export)
 
 (use-package ob
+  :defer t
   :after org
   :config
   (use-package ob-elixir
@@ -851,7 +895,6 @@
   (key-chord-mode 1)
   (defvar key-chord-two-keys-delay 0.04)
   (key-chord-define-global "jk" 'view-mode))
-
 
 (use-package keyfreq
   :ensure
