@@ -312,8 +312,8 @@
   :ensure
   :custom
   (migemo-command "cmigemo")
-  (migemo-options '("-q" "--emacs" "-i" "\a"))
-  (migemo-dictionary (file-truename "/usr/share/migemo/utf-8/migemo-dict"))
+  (migemo-options '("-q" "--emacs"))
+  (migemo-dictionary (file-truename "/usr/share/cmigemo/utf-8/migemo-dict"))
   (migemo-user-dictionary nil)
   (migemo-regex-dictionary nil)
   (migemo-coding-system 'utf-8-unix)
