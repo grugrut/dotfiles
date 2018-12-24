@@ -31,7 +31,9 @@
   (package-refresh-contents)
   (package-install 'use-package))
 (eval-when-compile
-  (require 'use-package))
+  (require 'use-package)
+  (setq use-package-always-defer t
+        use-package-verbose t))
 
 ;;; diminishが付属しなくなったので手動で入れる
 (use-package diminish :ensure)
@@ -54,19 +56,15 @@
 (use-package cl-lib)
 
 (use-package dash
-  :defer t
   :ensure)
 
 (use-package s
-  :defer t
   :ensure)
 
 (use-package f
-  :defer t
   :ensure)
 
 (use-package ht
-  :defer t
   :ensure)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -212,7 +210,6 @@
 
 ;; 同一バッファ名にディレクトリ付与
 (use-package uniquify
-  :defer t
   :custom
   (uniquify-buffer-name-style 'post-forward-angle-brackets)
   (uniquify-ignore-buffers-re "*[^*]+*"))
@@ -304,7 +301,6 @@
 
 (use-package popwin
   :ensure
-  :defer t
   :custom
   (popwin:popup-window-position 'bottom))
 
@@ -349,13 +345,11 @@
 
 (use-package google-this
   :ensure
-  :defer t
   :bind (("M-s g" . google-this-noconfirm)))
 
 ;; anzu
 (use-package anzu
   :ensure
-  :defer t
   :bind
   (("M-%" . anzu-query-replace))
   :init
@@ -438,7 +432,6 @@
 
 (use-package indent-guide
   :ensure
-  :defer t
   :diminish ""
   :config
   (defvar indent-guide-delay 0.1)
@@ -461,11 +454,9 @@
   (prog-mode . vi-tilde-fringe-mode))
 
 (use-package rainbow-mode
-  :defer t
   :ensure)
 
 (use-package neotree
-  :defer t
   :ensure)
 
 (use-package flycheck
@@ -475,7 +466,6 @@
 
 (use-package eglot
   :ensure
-  :defer t
   :config
   (add-to-list 'eglot-server-programs '(go-mode . ("go-langserver"
                                                    "-mode=stdio"
@@ -491,7 +481,6 @@
 
 (use-package go-mode
   :ensure
-  :defer t
   :commands (gofmt-before-save)
   :init
   (add-hook 'before-save-hook 'gofmt-before-save)
@@ -499,7 +488,6 @@
 
 (use-package web-mode
   :ensure
-  :defer t
   :mode (("\\.html?\\'" . web-mode)
          ("\\.scss\\'" . web-mode)
          ("\\.css\\'" . web-mode)
@@ -520,14 +508,12 @@
 
 (use-package emmet-mode
   :ensure
-  :defer t
   :commands (emmet-mode)
   :hook
   (web-mode . emmet-mode))
 
 (use-package js2
   :ensure js2-mode
-  :defer t
   :mode ("\\.js\\'" . js2-mode)
   :bind (:map js2-mode-map
               ("C-c b" . web-beautify-js))
@@ -535,7 +521,6 @@
 
 (use-package coffee-mode
   :ensure
-  :defer t
   :config
   (setq coffee-tab-width 2))
 
@@ -544,30 +529,25 @@
   :mode ("\\.php\\'" . php-mode))
 
 (use-package web-beautify
-  :ensure
-  :defer t)
+  :ensure)
 
 (use-package groovy-mode
   :ensure
-  :defer t
   :mode (("Jenkinsfile" . groovy-mode)))
 
 (use-package rust-mode
   :ensure
-  :defer t
   :config
   (setq-default rust-format-on-save t))
 
 (use-package racer
   :ensure
-  :defer t
   :init
   (add-hook 'rust-mode-hook #'racer-mode)
   (add-hook 'racer-mode-hook #'eldoc-mode))
 
 (use-package flycheck-rust
   :ensure
-  :defer t
   :after racer
   :init
   (add-hook 'rust-mode-hook (lambda ()
@@ -576,13 +556,11 @@
 
 (use-package alchemist
   :ensure
-  :defer t
   :config
   (setq alchemist-hooks-compile-on-save t))
 
 (use-package elixir-mode
   :ensure
-  :defer t
   :config
   ;; Create a buffer-local hook to run elixir-format on save, only when we enable elixir-mode.
   (add-hook 'elixir-mode-hook
@@ -590,16 +568,13 @@
   )
 
 (use-package flycheck-elixir
-  :ensure
-  :defer t)
+  :ensure)
 
 (use-package elixir-yasnippets
-  :ensure
-  :defer t)
+  :ensure)
 
 (use-package python-mode
   :ensure
-  :defer t
   :mode (("\\.py\\'" . python-mode))
   :config
   (bind-key "C-c C-c" 'quickrun python-mode-map)
@@ -639,20 +614,17 @@
 ;; hightlight-symbol
 (use-package highlight-symbol
   :ensure
-  :defer t
   :bind
   (("C-." . highlight-symbol-at-point)))
 
 ;; expand-region
 (use-package expand-region
   :ensure
-  :defer t
   :bind
   (("C-," . er/expand-region)
    ("C-M-," . er/contract-region)))
 
 (use-package smartrep
-  :defer t
   :ensure)
 
 (use-package multiple-cursors
@@ -706,22 +678,17 @@
 
 (use-package rainbow-delimiters
   :ensure
-  :defer t
   :hook
   (prog-mode . rainbow-delimiters-mode))
 
 (use-package fontawesome
-  :ensure
-  :defer t)
+  :ensure)
 
 (use-package codic
-  :ensure
-  :defer t)
+  :ensure)
 
 (use-package pocket-reader
-  :ensure
-  :defer t)
-
+  :ensure)
 
 (use-package company
   :ensure
@@ -771,7 +738,6 @@
 
 (use-package view
   :ensure
-  :defer t
   :config
   (setq view-read-only t)
   (bind-keys :map view-mode-map
@@ -781,7 +747,6 @@
              ("l" . forward-char)))
 
 (use-package org
-  :defer t
   :bind (("C-c c" . org-capture)
          ("C-c a" . org-agenda))
   :mode ("\\.org$'" . org-mode)
@@ -807,7 +772,6 @@
   )
 
 (use-package org-capture
-  :defer t
   :commands (org-capture)
   :custom
   (org-capture-templates `(
@@ -853,7 +817,6 @@
 
 ;;; #+UPDATE:を保存時に更新
 (use-package time-stamp
-  :defer t
   :disabled t
   :init
   (add-hook 'before-save-hook 'time-stamp)
@@ -870,7 +833,7 @@
 (use-package ox-hugo-auto-export)
 
 (use-package ob
-  :defer t
+  :after org
   :config
   (use-package ob-elixir
     :ensure)
@@ -940,7 +903,6 @@
 ;; sequential-command
 (use-package sequential-command-config
   :ensure sequential-command
-  :defer t
   :bind (("C-a" . seq-home)
          ("C-e" . seq-end)))
 
