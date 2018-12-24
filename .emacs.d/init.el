@@ -371,7 +371,7 @@
   :custom
   (migemo-command "cmigemo")
   (migemo-options '("-q" "--emacs" "-i" "\a"))
-  (migemo-dictionary (file-truename "~/../../usr/local/share/migemo/utf-8/migemo-dict"))
+  (migemo-dictionary (file-truename "/usr/share/migemo/utf-8/migemo-dict"))
   (migemo-user-dictionary nil)
   (migemo-regex-dictionary nil)
   (migemo-coding-system 'utf-8-unix)
@@ -482,6 +482,7 @@
                                                    "-gocodecompletion"
                                                    "-diagnostics"
                                                    "-lint-tool=golint")))
+  (define-key eglot-mode-map (kbd "C-c h") 'eglot-help-at-point)
   :hook
   (go-mode . eglot-ensure)
   (python-mode . eglot-ensure)
@@ -528,8 +529,9 @@
   :ensure js2-mode
   :defer t
   :mode ("\\.js\\'" . js2-mode)
-  :config
-  (define-key js2-mode-map (kbd "C-c b") 'web-beautify-js))
+  :bind (:map js2-mode-map
+              ("C-c b" . web-beautify-js))
+  )
 
 (use-package coffee-mode
   :ensure
@@ -974,8 +976,5 @@
 
 ;;; サスペンドさせない
 (global-unset-key (kbd "C-x C-z"))
-
-
-
 
 ;;; init.el ends here
