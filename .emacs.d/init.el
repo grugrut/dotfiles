@@ -266,9 +266,15 @@
   :config
   (backward-forward-mode 1))
 
+(use-package avy
+  :ensure
+  :bind
+  (("C-:" . avy-goto-char-timer)
+   ("M-g M-g" . avy-goto-line)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; 入力
+;; 入力・編集
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -298,6 +304,66 @@
   (skk-process-okuri-early nil)
   )
 
+;; 操作した際に、操作箇所を強調表示する
+(use-package volatile-highlights
+  :ensure
+  :diminish ""
+  :config
+  (volatile-highlights-mode t))
+
+;; 最終行には必ず1行挿入
+(setq require-final-newline t)
+
+;; バッファの最後の改行を抑制
+(setq next-line-add-newlines nil)
+
+;; リージョン選択時にリージョンまるごと削除
+(delete-selection-mode t)
+
+(use-package highlight-symbol
+  :ensure
+  :defer t
+  :bind
+  (("C-." . highlight-symbol-at-point)))
+
+(use-package expand-region
+  :ensure
+  :defer t
+  :bind
+  (("C-," . er/expand-region)
+   ("C-M-," . er/contract-region)))
+
+(use-package smartrep
+  :ensure)
+
+(use-package multiple-cursors
+  :ensure
+  :after smartrep
+  :config
+  (global-unset-key (kbd "C-t"))
+  (smartrep-define-key global-map "C-t"
+    '(("C-t" . 'mc/mark-next-like-this)
+      ("n"   . 'mc/mark-next-like-this)
+      ("p"   . 'mc/mark-previous-like-this)
+      ("m"   . 'mc/mark-more-like-this-extended)
+      ("u"   . 'mc/unmark-next-like-this)
+      ("U"   . 'mc/unmark-previous-like-this)
+      ("s"   . 'mc/skip-to-next-like-this)
+      ("S"   . 'mc/skip-to-previous-like-this)
+      ("*"   . 'mc/mark-all-like-this)
+      ("a"   . 'mc/mark-all-like-this)
+      ("d"   . 'mc/mark-all-like-this-dwim)
+      ("i"   . 'mc/insert-numbers)
+      ("l"   . 'mc/insert-letters)
+      ("o"   . 'mc/sort-regions)
+      ("O"   . 'mc/reverse-regions))))
+
+(use-package smooth-scroll
+  :ensure
+  :diminish ""
+  :config
+  (smooth-scroll-mode t))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; 検索
@@ -309,7 +375,6 @@
   :defer t
   :bind (("M-s g" . google-this-noconfirm)))
 
-;; anzu
 (use-package anzu
   :ensure
   :bind
@@ -318,7 +383,6 @@
   (global-anzu-mode +1)
   )
 
-;; migemo
 (use-package migemo
   :ensure
   :custom
@@ -331,7 +395,6 @@
   :config
   (migemo-init))
 
-;; ripgrep
 (use-package ripgrep
   :ensure
   :defer t
@@ -340,7 +403,7 @@
   (setq ripgrep-arguments '("-S")))
 
 ;; 大文字・小文字を区別しないでサーチ（有効：t、無効：nil）
-(setq-default case-fold-search nil)
+(setq case-fold-search nil)
 
 ;; インクリメント検索時に縦スクロールを有効化（有効：t、無効：nil）
 (setq isearch-allow-scroll nil)
@@ -406,13 +469,6 @@
   (defvar indent-guide-recursive t)
   :hook (prog-mode . indent-guide-mode))
 
-;; 操作した際に、操作箇所を強調表示する
-(use-package volatile-highlights
-  :ensure
-  :diminish ""
-  :config
-  (volatile-highlights-mode t))
-
 ;; vi風に空行に~を表示する
 (use-package vi-tilde-fringe
   :ensure
@@ -470,7 +526,6 @@
          ("\\.twig\\'" . web-mode)
          ("\\.vue\\'" . web-mode))
   :config
-  (add-hook 'web-mode-hook 'rainbow-mode)
   (flycheck-add-mode 'javascript-eslint 'web-mode)
   (setq web-mode-markup-indent-offset 2
         web-mode-css-indent-offset 2
@@ -489,8 +544,8 @@
   :hook
   (web-mode . emmet-mode))
 
-(use-package js2
-  :ensure js2-mode
+(use-package js2-mode
+  :ensure
   :defer t
   :mode ("\\.js\\'" . js2-mode)
   :bind (:map js2-mode-map
@@ -596,56 +651,6 @@
   :defer t
   :mode ("\\.md\\'" . gfm-mode))
 
-;; 最終行には必ず1行挿入
-(setq require-final-newline t)
-
-;; バッファの最後の改行を抑制
-(setq next-line-add-newlines nil)
-
-;; リージョン選択時にリージョンまるごと削除
-(delete-selection-mode t)
-
-;; hightlight-symbol
-(use-package highlight-symbol
-  :ensure
-  :defer t
-  :bind
-  (("C-." . highlight-symbol-at-point)))
-
-;; expand-region
-(use-package expand-region
-  :ensure
-  :defer t
-  :bind
-  (("C-," . er/expand-region)
-   ("C-M-," . er/contract-region)))
-
-(use-package smartrep
-  :ensure)
-
-(use-package multiple-cursors
-  :ensure
-  :after smartrep
-  :config
-  (global-unset-key (kbd "C-t"))
-  (smartrep-define-key global-map "C-t"
-                       '(("C-t" . 'mc/mark-next-like-this)
-                         ("n"   . 'mc/mark-next-like-this)
-                         ("p"   . 'mc/mark-previous-like-this)
-                         ("m"   . 'mc/mark-more-like-this-extended)
-                         ("u"   . 'mc/unmark-next-like-this)
-                         ("U"   . 'mc/unmark-previous-like-this)
-                         ("s"   . 'mc/skip-to-next-like-this)
-                         ("S"   . 'mc/skip-to-previous-like-this)
-                         ("*"   . 'mc/mark-all-like-this)
-                         ("a"   . 'mc/mark-all-like-this)
-                         ("d"   . 'mc/mark-all-like-this-dwim)
-                         ("i"   . 'mc/insert-numbers)
-                         ("l"   . 'mc/insert-letters)
-                         ("o"   . 'mc/sort-regions)
-                         ("O"   . 'mc/reverse-regions))))
-
-
 ;; minibufferのアクティブ時、IMEを無効化
 (add-hook 'minibuffer-setup-hook
           (lambda ()
@@ -654,26 +659,22 @@
 (use-package aggressive-indent
   :ensure
   :diminish ""
-  :config
-  (global-aggressive-indent-mode t))
-
+  :hook
+  (prog-mode . aggressive-indent-mode))
 
 (use-package smartparens
-  :diminish smartparens-mode
-  :ensure)
-(use-package smartparens-config
-  :after smartparens
-  :config
-  (smartparens-global-mode t))
-
-(use-package smooth-scroll
   :ensure
-  :diminish ""
-  :config
-  (smooth-scroll-mode t))
+  :defer t
+  :diminish "")
+(use-package smartparens-config
+  :defer t
+  :after smartparens
+  :hook
+  (prog-mode . smartparens-mode))
 
 (use-package rainbow-delimiters
   :ensure
+  :defer t
   :hook
   (prog-mode . rainbow-delimiters-mode))
 
@@ -724,15 +725,6 @@
   :diminish yas-minor-mode
   :config
   (yas-global-mode 1))
-
-
-;; avy
-(use-package avy
-  :ensure
-  :bind
-  (("C-:" . avy-goto-char-timer)
-   ("M-g M-g" . avy-goto-line)))
-
 
 (use-package view
   :ensure
