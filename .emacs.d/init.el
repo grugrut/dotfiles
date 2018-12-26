@@ -563,10 +563,17 @@
 
 (use-package lsp-ui
   :ensure
-  :commands lsp-ui-mode)
+  :commands lsp-ui-mode
+  :config
+  (define-key lsp-ui-mode-map [remap xref-find-definitions] 'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map [remap xref-find-references] 'lsp-ui-peek-find-references)
+  (define-key lsp-ui-mode-map (kbd "C-c r") 'lsp-ui-peek-find-references)
+  (define-key lsp-ui-mode-map (kbd "C-c i") 'lsp-ui-imenu))
 (use-package company-lsp
   :ensure
-  :commands company-lsp)
+  :commands company-lsp
+  :config
+  (push 'company-lsp company-backends))
 
 (use-package go-mode
   :ensure
