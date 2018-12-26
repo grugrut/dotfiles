@@ -11,6 +11,7 @@
 
 (modify-frame-parameters nil '((wait-for-wm . nil))) ; Xを使う場合の高速化設定らしい
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; パッケージ
@@ -46,9 +47,7 @@
 
 (use-package auto-async-byte-compile
   :ensure
-  :config
-  (setq auto-async-byte-compile-init-file "~/.emacs.d/init.el")
-  :hook ((emacs-lisp--mode . enable-auto-async-byte-compile-mode)))
+  :hook ((emacs-lisp-mode . enable-auto-async-byte-compile-mode)))
 
 ;;; ライブラリ群
 (use-package cl-lib
@@ -70,6 +69,7 @@
   :ensure
   :defer t)
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; 全般
@@ -128,6 +128,7 @@
 (setq browse-url-browser-function 'browse-url-generic)
 (defvar browse-url-generic-program  (executable-find (getenv "BROWSER")))
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; 画面
@@ -270,6 +271,7 @@
   :custom
   (popwin:popup-window-position 'bottom))
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; 移動
@@ -287,6 +289,7 @@
   (("C-:" . avy-goto-char-timer)
    ("M-g M-g" . avy-goto-line)))
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; 入力・編集
@@ -380,6 +383,7 @@
   :config
   (smooth-scroll-mode t))
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; 検索
@@ -455,7 +459,7 @@
  '(lambda() (setq w32-ime-composition-window nil))
  )
 
-
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; コーディング
@@ -741,7 +745,8 @@
   :ensure
   :diminish company-mode
   :functions (global-company-mode
-              company-abort)
+              company-abort
+              company-complete-number)
   :config
   (global-company-mode)
   (setq company-idle-delay 0.3
