@@ -30,10 +30,12 @@
   (package-install 'use-package))
 (eval-when-compile
   (require 'use-package)
-  (setq use-package-verbose t))
+  (setq use-package-verbose t
+        use-package-expand-minimally byte-compile-current-file))
 
 ;;; diminishが付属しなくなったので手動で入れる
 (use-package diminish :ensure)
+(use-package bind-key)
 
 ;; ベンチマーク
 (use-package benchmark-init
@@ -123,9 +125,8 @@
 (setq inhibit-startup-message t)
 
 ;; ブラウザ設定 WSL限定
-(setq  browse-url-browser-function 'browse-url-generic
-       browse-url-generic-program  (executable-find (getenv "BROWSER")))
-
+(setq browse-url-browser-function 'browse-url-generic)
+(defvar browse-url-generic-program  (executable-find (getenv "BROWSER")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -165,12 +166,23 @@
 
 (use-package spaceline
   :ensure
+  :functions spaceline-helm-mode
   :config
   (spaceline-helm-mode +1))
 
 (use-package spaceline-all-the-icons
   :ensure
   :after spaceline
+  :functions (spaceline-all-the-icons--setup-anzu
+              spaceline-all-the-icons--setup-git-ahead
+              spaceline-all-the-icons--setup-neotree
+              spaceline-toggle-all-the-icons-battery-status-off
+              spaceline-toggle-all-the-icons-buffer-path-off
+              spaceline-toggle-all-the-icons-flycheck-status-on
+              spaceline-toggle-all-the-icons-flycheck-status-info-on
+              spaceline-toggle-all-the-icons-which-function-on
+              spaceline-toggle-all-the-icons-git-status-on
+              spaceline-all-the-icons-theme)
   :config
   (setq spaceline-all-the-icons-separator-type 'arrow
         spaceline-all-the-icons-primary-separator ""
@@ -364,6 +376,7 @@
 (use-package smooth-scroll
   :ensure
   :diminish ""
+  :functions smooth-scroll-mode
   :config
   (smooth-scroll-mode t))
 
@@ -388,6 +401,7 @@
 
 (use-package migemo
   :ensure
+  :functions migemo-init
   :custom
   (migemo-command "cmigemo")
   (migemo-options '("-q" "--emacs"))
@@ -491,6 +505,18 @@
   :diminish ""
   :hook
   (prog-mode . aggressive-indent-mode))
+
+(use-package minimap
+  :disabled t
+  :ensure
+  :defer t
+  :config
+  (setq minimap-window-location 'right
+        minimap-update-delay 0.2
+        minimap-minimum-width 20)
+  :hook
+  (prog-mode . minimap-mode))
+
 (use-package rainbow-mode
   :ensure
   :defer t
@@ -504,7 +530,7 @@
   :ensure
   :defer t
   :diminish flycheck-mode
-  :hook (prog-mode . global-flycheck-mode))
+  :hook (prog-mode . flycheck-mode))
 
 (use-package eglot
   :disabled t
@@ -553,6 +579,8 @@
 (use-package web-mode
   :ensure
   :defer t
+  :after flycheck
+  :functions flycheck-add-mode
   :mode (("\\.html?\\'" . web-mode)
          ("\\.scss\\'" . web-mode)
          ("\\.css\\'" . web-mode)
@@ -660,20 +688,6 @@
   (bind-key "C-c C-c" 'quickrun python-mode-map)
   )
 
-(use-package ess
-  :ensure
-  :defer t
-  :mode ("\\.[rR]\\'" . R-mode)
-  :config
-  (setq ess-ask-for-ess-directory nil)
-  (use-package ess-site)
-  (use-package ess-R-object-popup
-    :ensure
-    :init
-    (bind-key "C-c C-g" 'ess-R-object-popup ess-mode-map))
-  (use-package ess-R-data-view
-    :ensure))
-
 (use-package yaml-mode
   :ensure
   :defer t
@@ -719,6 +733,8 @@
 (use-package company
   :ensure
   :diminish company-mode
+  :functions (global-company-mode
+              company-abort)
   :config
   (global-company-mode)
   (setq company-idle-delay 0.3
@@ -750,6 +766,7 @@
 (use-package yasnippet
   :ensure
   :diminish yas-minor-mode
+  :functions yas-global-mode
   :config
   (yas-global-mode 1))
 
@@ -856,6 +873,7 @@
 (use-package ob
   :defer t
   :after org
+  :functions org-babel-do-load-languages
   :config
   (use-package ob-elixir
     :ensure)
