@@ -181,9 +181,12 @@
   (spaceline-all-the-icons--setup-anzu)
   (spaceline-all-the-icons--setup-git-ahead)
   (spaceline-all-the-icons--setup-neotree)
+  (spaceline-toggle-all-the-icons-battery-status-off)
   (spaceline-toggle-all-the-icons-buffer-path-off)
-  (spaceline-toggle-all-the-icons-git-status-on)
+  (spaceline-toggle-all-the-icons-flycheck-status-on)
   (spaceline-toggle-all-the-icons-flycheck-status-info-on)
+  (spaceline-toggle-all-the-icons-which-function-on)
+  (spaceline-toggle-all-the-icons-git-status-on)
   (spaceline-all-the-icons-theme))
 
 ;; ツールバーを表示しない
@@ -452,6 +455,11 @@
   :defer t
   :hook
   (prog-mode . yafolding-mode))
+
+(use-package which-function
+  :defer t
+  :hook
+  (prog-mode . which-function-mode))
 
 (use-package quickrun
   :ensure
