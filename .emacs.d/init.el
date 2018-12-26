@@ -486,6 +486,11 @@
   :hook
   (prog-mode . vi-tilde-fringe-mode))
 
+(use-package aggressive-indent
+  :ensure
+  :diminish ""
+  :hook
+  (prog-mode . aggressive-indent-mode))
 (use-package rainbow-mode
   :ensure
   :defer t
@@ -502,20 +507,40 @@
   :hook (prog-mode . global-flycheck-mode))
 
 (use-package eglot
+  :disabled t
   :ensure
   :defer t
   :config
-  (add-to-list 'eglot-server-programs '(go-mode . ("go-langserver"
-                                                   "-mode=stdio"
-                                                   "-gocodecompletion"
-                                                   "-diagnostics"
-                                                   "-lint-tool=golint")))
+  (add-to-list 'eglot-server-programs `((go-mode . ("go-langserver"
+                                                    "-mode=stdio"
+                                                    "-gocodecompletion"
+                                                    "-diagnostics"
+                                                    "-lint-tool=golint"))
+                                        (elixir-mode . ("language_server.sh"))))
   (define-key eglot-mode-map (kbd "C-c h") 'eglot-help-at-point)
   :hook
   (go-mode . eglot-ensure)
   (python-mode . eglot-ensure)
   (web-mode . eglot-ensure)
-  (js2-mode . eglot-ensure))
+  (js2-mode . eglot-ensure)
+  (elixir-mode . eglot-ensure))
+
+(use-package lsp-mode
+  :ensure
+  :commands lsp
+  :hook
+  (go-mode . lsp)
+  (python-mode . lsp)
+  (web-mode . lsp)
+  (js2-mode . lsp)
+  (elixir-mode . lsp))
+
+(use-package lsp-ui
+  :ensure
+  :commands lsp-ui-mode)
+(use-package company-lsp
+  :ensure
+  :commands company-lsp)
 
 (use-package go-mode
   :ensure
@@ -663,12 +688,6 @@
 (add-hook 'minibuffer-setup-hook
           (lambda ()
             (deactivate-input-method)))
-
-(use-package aggressive-indent
-  :ensure
-  :diminish ""
-  :hook
-  (prog-mode . aggressive-indent-mode))
 
 (use-package smartparens
   :ensure
