@@ -289,6 +289,17 @@
   (("C-:" . avy-goto-char-timer)
    ("M-g M-g" . avy-goto-line)))
 
+(use-package bm
+  :ensure
+  :defer t
+  :commands (bm-toggle
+             bm-next
+             bm-previous)
+  :bind
+  (("M-SPC" . bm-toggle)
+   ("M-[" . bm-previous)
+   ("M-]" . bm-next)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
