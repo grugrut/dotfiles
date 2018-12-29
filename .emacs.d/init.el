@@ -490,6 +490,13 @@
   :hook
   (prog-mode . which-function-mode))
 
+(use-package projectile
+  :ensure t
+  :init
+  :config
+  (projectile-mode +1)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+
 (use-package quickrun
   :ensure
   :defer t
@@ -950,6 +957,14 @@
     (("C-z ;" . helm-ag))
     :config
     (setq helm-ag-base-command "rg -S --no-heading"))
+  (use-package helm-projectile
+    :ensure
+    :config
+    (helm-projectile-on))
+  (use-package helm-git-grep
+    :ensure
+    :bind
+    (("C-z s" . helm-git-grep)))
   :bind
   (("C-;" . helm-mini)
    ("C-M-z" . helm-resume)
