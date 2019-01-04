@@ -30,9 +30,12 @@
   (package-refresh-contents)
   (package-install 'use-package))
 (eval-when-compile
+  (setq use-package-enable-imenu-support t)
   (require 'use-package)
   (setq use-package-verbose t
-        use-package-expand-minimally byte-compile-current-file))
+        use-package-expand-minimally byte-compile-current-file
+        use-package-compute-statistics t))
+
 
 ;;; diminishが付属しなくなったので手動で入れる
 (use-package diminish :ensure)
@@ -47,7 +50,9 @@
 
 (use-package auto-async-byte-compile
   :ensure
-  :hook ((emacs-lisp-mode . enable-auto-async-byte-compile-mode)))
+  :hook ((emacs-lisp-mode . enable-auto-async-byte-compile-mode))
+  :config
+  (setq auto-async-byte-compile-exclude-files-regexp "\\(?:.\\|\\)*?/elpa/\\(?:.\\|\\)*?"))
 
 ;;; ライブラリ群
 (use-package cl-lib
