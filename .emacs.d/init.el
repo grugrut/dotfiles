@@ -41,18 +41,16 @@
 (use-package diminish :ensure)
 (use-package bind-key)
 
+(use-package use-package-chords
+  :ensure
+  :config (key-chord-mode 1))
+
 ;; ベンチマーク
 (use-package benchmark-init
   :ensure
   :config
   (benchmark-init/activate)
   (add-hook 'after-init-hook 'benchmark-init/deactivate))
-
-(use-package auto-async-byte-compile
-  :ensure
-  :hook ((emacs-lisp-mode . enable-auto-async-byte-compile-mode))
-  :config
-  (setq auto-async-byte-compile-exclude-files-regexp "\\(?:.\\|\\)*?/elpa/\\(?:.\\|\\)*?"))
 
 ;;; ライブラリ群
 (use-package cl-lib
@@ -610,6 +608,11 @@
   (add-hook 'before-save-hook 'gofmt-before-save)
   (setq tab-width 4))
 
+(use-package go-impl
+  :ensure
+  :defer t
+  :commands go-impl)
+
 (use-package web-mode
   :ensure
   :defer t
@@ -807,6 +810,8 @@
 
 (use-package view
   :ensure
+  :defer t
+  :chords (("jk" . view-mode))
   :config
   (setq view-read-only t)
   (bind-keys :map view-mode-map
@@ -996,14 +1001,6 @@
   :config
   (which-key-mode)
   (which-key-setup-side-window-right-bottom))
-
-;; 同時押し
-(use-package key-chord
-  :ensure
-  :config
-  (key-chord-mode 1)
-  (defvar key-chord-two-keys-delay 0.04)
-  (key-chord-define-global "jk" 'view-mode))
 
 (use-package keyfreq
   :ensure
