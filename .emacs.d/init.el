@@ -609,7 +609,8 @@
   (define-key lsp-ui-mode-map [remap xref-find-definitions] 'lsp-ui-peek-find-definitions)
   (define-key lsp-ui-mode-map [remap xref-find-references] 'lsp-ui-peek-find-references)
   (define-key lsp-ui-mode-map (kbd "C-c r") 'lsp-ui-peek-find-references)
-  (define-key lsp-ui-mode-map (kbd "C-c i") 'lsp-ui-imenu))
+  (define-key lsp-ui-mode-map (kbd "C-c i") 'lsp-ui-imenu)
+  (setq lsp-ui-doc-position 'bottom))
 (use-package company-lsp
   :ensure
   :commands company-lsp
