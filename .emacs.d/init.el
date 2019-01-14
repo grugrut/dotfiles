@@ -924,8 +924,9 @@
 (use-package ox-hugo
   :ensure
   :defer t
-  :after ox)
-(use-package ox-hugo-auto-export)
+  :after ox
+  :config
+  (org-hugo-auto-export-mode))
 
 (use-package ob
   :defer t
