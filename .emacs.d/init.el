@@ -514,6 +514,7 @@
   :ensure t
   :init
   :config
+  (setq projectile-mode-line-prefix " Prj")
   (projectile-mode +1)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
@@ -954,9 +955,10 @@
 ;; gitの差分を表示する
 (use-package git-gutter-fringe
   :ensure
-  :diminish git-gutter-mode
   :hook
-  (prog-mode . git-gutter-mode))
+  (prog-mode . git-gutter-mode)
+  :custom
+  (git-gutter:lighter . nil))
 
 (use-package helm
   :diminish helm-mode
