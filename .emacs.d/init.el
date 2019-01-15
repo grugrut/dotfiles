@@ -1006,12 +1006,6 @@
 ;; C-hをバックスペース
 (keyboard-translate ?\C-h ?\C-?)
 
-;; sequential-command
-(use-package sequential-command-config
-  :ensure sequential-command
-  :bind (("C-a" . seq-home)
-         ("C-e" . seq-end)))
-
 ;; which-key
 (use-package which-key
   :ensure
