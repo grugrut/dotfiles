@@ -176,7 +176,8 @@
   :custom
   (doom-modeline-height 20)
   (doom-modeline-major-mode-color-icon t)
-  (doom-modeline-minor-modes t))
+  (doom-modeline-minor-modes t)
+  (doom-modeline-github nil))
 
 ;; (custom-set-faces
 ;;  '(mode-line ((t (:background "#282828" :foreground "#F5F5F5" :box nil :height 1.0))))
