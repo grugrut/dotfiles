@@ -574,16 +574,16 @@
   :hook (prog-mode . flycheck-mode))
 
 (use-package eglot
-  :disabled t
   :ensure
   :defer t
   :config
-  (add-to-list 'eglot-server-programs `((go-mode . ("go-langserver"
-                                                    "-mode=stdio"
-                                                    "-gocodecompletion"
-                                                    "-diagnostics"
-                                                    "-lint-tool=golint"))
-                                        (elixir-mode . ("language_server.sh"))))
+  (add-to-list 'eglot-server-programs '(go-mode . ("go-langserver"
+                                                   "-mode=stdio"
+                                                   "-gocodecompletion"
+                                                   "-diagnostics"
+                                                   "-lint-tool=golint")))
+  (add-to-list 'eglot-server-programs '(elixir-mode . ("language_server.sh")))
+  ;; (elixir-mode . ("language_server.sh"))))
   (define-key eglot-mode-map (kbd "C-c h") 'eglot-help-at-point)
   :hook
   (go-mode . eglot-ensure)
@@ -592,30 +592,30 @@
   (js2-mode . eglot-ensure)
   (elixir-mode . eglot-ensure))
 
-(use-package lsp-mode
-  :ensure
-  :commands lsp
-  :hook
-  (go-mode . lsp)
-  (python-mode . lsp)
-  (web-mode . lsp)
-  (js2-mode . lsp)
-  (elixir-mode . lsp))
+;; (use-package lsp-mode
+;;   :ensure
+;;   :commands lsp
+;;   :hook
+;;   (go-mode . lsp)
+;;   (python-mode . lsp)
+;;   (web-mode . lsp)
+;;   (js2-mode . lsp)
+;;   (elixir-mode . lsp))
 
-(use-package lsp-ui
-  :ensure
-  :commands lsp-ui-mode
-  :config
-  (define-key lsp-ui-mode-map [remap xref-find-definitions] 'lsp-ui-peek-find-definitions)
-  (define-key lsp-ui-mode-map [remap xref-find-references] 'lsp-ui-peek-find-references)
-  (define-key lsp-ui-mode-map (kbd "C-c r") 'lsp-ui-peek-find-references)
-  (define-key lsp-ui-mode-map (kbd "C-c i") 'lsp-ui-imenu)
-  (setq lsp-ui-doc-position 'bottom))
-(use-package company-lsp
-  :ensure
-  :commands company-lsp
-  :config
-  (push 'company-lsp company-backends))
+;; (use-package lsp-ui
+;;   :ensure
+;;   :commands lsp-ui-mode
+;;   :config
+;;   (define-key lsp-ui-mode-map [remap xref-find-definitions] 'lsp-ui-peek-find-definitions)
+;;   (define-key lsp-ui-mode-map [remap xref-find-references] 'lsp-ui-peek-find-references)
+;;   (define-key lsp-ui-mode-map (kbd "C-c r") 'lsp-ui-peek-find-references)
+;;   (define-key lsp-ui-mode-map (kbd "C-c i") 'lsp-ui-imenu)
+;;   (setq lsp-ui-doc-position 'bottom))
+;; (use-package company-lsp
+;;   :ensure
+;;   :commands company-lsp
+;;   :config
+;;   (push 'company-lsp company-backends))
 
 (use-package go-mode
   :ensure
