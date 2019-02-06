@@ -154,11 +154,12 @@
 ;; (unicode-fonts-setup) ; 最初に本コマンドの実行が必要
 ;; (all-the-icons-install-fonts)
 (use-package unicode-fonts
-  :ensure
-  :defer t)
+  :ensure)
 (use-package all-the-icons
-  :ensure
-  :defer t)
+  :ensure)
+
+(add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.9))
+(add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.9))
 
 ;; (load-theme 'manoj-dark)
 
@@ -798,27 +799,21 @@
         company-minimum-prefix-length 1
         company-begin-commands '(self-insert-command)
         company-selection-wrap-around t
-        company-show-numbers t)
-  (let ((map company-active-map))
-    (mapc
-     (lambda (x)
-       (define-key map (format "%d" x) 'ora/company-number))
-     (number-sequence 0 9))
-    (define-key map " " (lambda ()
-                          (interactive)
-                          (company-abort)
-                          (self-insert-command 1)))
-    (define-key map (kbd "<return>") nil)))
+        company-show-numbers t))
 
-(defun ora/company-number ()
-  "Forward to `company-complete-number'."
-  (interactive)
-  (let* ((k (this-command-keys))
-         (re (concat "^" company-prefix k)))
-    (if (cl-find-if (lambda (s) (string-match re s))
-                    company-candidates)
-        (self-insert-command 1)
-      (company-complete-number (string-to-number k)))))
+(use-package company-box
+  :ensure t
+  :diminish
+  :hook (company-mode . company-box-mode)
+  :init
+  (setq company-box-icons-elisp
+        (list
+         (concat (all-the-icons-material "functions") " ")
+         (concat (all-the-icons-material "check_circle") " ")
+         (concat (all-the-icons-material "stars") " ")
+         (concat (all-the-icons-material "format_paint") " ")))
+  (setq company-box-icons-unknown (concat (all-the-icons-material "find_in_page") " "))
+  (setq company-box-backends-colors nil))
 
 (use-package yasnippet
   :ensure
