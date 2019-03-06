@@ -145,7 +145,7 @@
 ;; あいうえお
 (set-face-attribute 'default nil
                     :family "Migu 1M"
-                    :height 140)
+                    :height 120)
 (set-fontset-font
  nil 'japanese-jisx0208
  (font-spec :family "Migu 1M"))
@@ -162,11 +162,14 @@
 (add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.9))
 
 ;; (load-theme 'manoj-dark)
+(add-to-list 'custom-theme-load-path "~/src/github.com/grugrut/doom-manoj-dark-theme.el/")
 
 (use-package doom-themes
   :ensure
   :config
-  (load-theme 'doom-dracula t)
+  ;;(load-theme 'doom-dracula t)
+  ;;(load-theme 'doom-manoj-dark t)
+  (load-theme 'doom-one t)
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
 
@@ -179,49 +182,6 @@
   (doom-modeline-major-mode-color-icon t)
   (doom-modeline-minor-modes t)
   (doom-modeline-github nil))
-
-;; (custom-set-faces
-;;  '(mode-line ((t (:background "#282828" :foreground "#F5F5F5" :box nil :height 1.0))))
-;;  '(mode-line-buffer-id ((t (:box nil :height 1.0))))
-;;  '(mode-line-inactive ((t (:box nil :height 1.0))))
-;;  '(spaceline-highlight-face ((t (:background "chocolate")))))
-
-;; (use-package spaceline
-;;   :ensure
-;;   :functions spaceline-helm-mode
-;;   :config
-;;   (spaceline-helm-mode +1))
-
-;; (use-package spaceline-all-the-icons
-;;   :ensure
-;;   :after spaceline
-;;   :functions (spaceline-all-the-icons--setup-anzu
-;;               spaceline-all-the-icons--setup-git-ahead
-;;               spaceline-all-the-icons--setup-neotree
-;;               spaceline-toggle-all-the-icons-battery-status-off
-;;               spaceline-toggle-all-the-icons-buffer-path-off
-;;               spaceline-toggle-all-the-icons-flycheck-status-on
-;;               spaceline-toggle-all-the-icons-flycheck-status-info-on
-;;               spaceline-toggle-all-the-icons-which-function-on
-;;               spaceline-toggle-all-the-icons-git-status-on
-;;               spaceline-all-the-icons-theme)
-;;   :config
-;;   (setq spaceline-all-the-icons-separator-type 'arrow
-;;         spaceline-all-the-icons-primary-separator ""
-;;         spaceline-all-the-icons-secondary-separator ""
-;;         spaceline-all-the-icons-icon-set-modified 'chain
-;;         spaceline-all-the-icons-flycheck-alternate t
-;;         spaceline-all-the-icons-icon-set-git-stats 'diff-icons)
-;;   (spaceline-all-the-icons--setup-anzu)
-;;   (spaceline-all-the-icons--setup-git-ahead)
-;;   (spaceline-all-the-icons--setup-neotree)
-;;   (spaceline-toggle-all-the-icons-battery-status-off)
-;;   (spaceline-toggle-all-the-icons-buffer-path-off)
-;;   (spaceline-toggle-all-the-icons-flycheck-status-on)
-;;   (spaceline-toggle-all-the-icons-flycheck-status-info-on)
-;;   (spaceline-toggle-all-the-icons-which-function-on)
-;;   (spaceline-toggle-all-the-icons-git-status-on)
-;;   (spaceline-all-the-icons-theme))
 
 ;; ツールバーを表示しない
 (tool-bar-mode 0)
@@ -264,7 +224,7 @@
 
 (setq default-frame-alist
       (append '((width                . 180)  ; フレーム幅
-                (height               . 60 ) ; フレーム高
+                (height               . 50 ) ; フレーム高
                 (left                 . 70 ) ; 配置左位置
                 (top                  . 28 ) ; 配置上位置
                 (line-spacing         . 0  ) ; 文字間隔
