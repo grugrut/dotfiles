@@ -125,6 +125,7 @@ export GOROOT=/usr/local/go
 export GOPATH=~/
 export PATH=${GOROOT}/bin:${GOPATH}/bin:${PATH}
 export DISPLAY=localhost:0.0
+export LIBGL_ALWAYS_INDIRECT=1
 export BROWSER=~/bin/browser
 
 gcd () {
