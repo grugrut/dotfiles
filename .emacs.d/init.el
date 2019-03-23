@@ -249,6 +249,12 @@
   :custom
   (popwin:popup-window-position 'bottom))
 
+;; アクティブなバッファがわかるように
+(use-package dimmer
+  :ensure
+  :config
+  (dimmer-mode))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
