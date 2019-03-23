@@ -18,17 +18,14 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require 'package)
-(setq package-archives
-      '(("gnu" . "https://elpa.gnu.org/packages/")
-	("melpa" . "https://melpa.org/packages/")
-	("org" . "https://orgmode.org/elpa/")))
-(package-initialize)
+
 ;;(package-refresh-contents) ;;重たいので手動でやる
 
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+(unless (fboundp 'use-package)
+  (require 'package)
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package)))
 (eval-when-compile
   (setq use-package-enable-imenu-support t)
   (require 'use-package)
@@ -783,7 +780,6 @@
   (yas-global-mode 1))
 
 (use-package view
-  :ensure
   :defer t
   :chords (("jk" . view-mode))
   :config
