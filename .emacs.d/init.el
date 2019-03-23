@@ -280,9 +280,9 @@
              bm-next
              bm-previous)
   :bind
-  (("M-SPC" . bm-toggle)
-   ("M-[" . bm-previous)
-   ("M-]" . bm-next)))
+  (("C-S-SPC" . bm-toggle)
+   ("C-}" . bm-previous)
+   ("C-]" . bm-next)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
