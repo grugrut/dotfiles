@@ -854,7 +854,7 @@
                             )
                            ("b" "blog" entry
                             (file+headline "~/src/github.com/grugrut/til/draft/blog.org" ,(format-time-string "%Y"))
-                            "** TODO %?\n:PROPERTIES:\n:EXPORT_FILE_NAME: %(format-time-string \"%Y%m%d%H%M%S\")\n:END:\n")
+                            "** TODO %?\n:PROPERTIES:\n:EXPORT_HUGO_SECTION: %(format-time-string \"%Y/%m\")\n:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :archives '(%(format-time-string \"%Y\") %(format-time-string \"%Y/%m\"))\n:EXPORT_FILE_NAME: %(format-time-string \"%Y%m%d%H%M%S\")\n:END:\n")
                            )))
 
 ;;; TODOの場合だけSTARTEDに変更する
@@ -884,7 +884,7 @@
 (use-package ox-hugo
   :ensure
   :defer t
-  :after ox
+  :after org
   :config
   (org-hugo-auto-export-mode))
 
