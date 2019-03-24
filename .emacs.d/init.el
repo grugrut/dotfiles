@@ -273,6 +273,15 @@
   (("C-:" . avy-goto-char-timer)
    ("M-g M-g" . avy-goto-line)))
 
+(use-package ace-window
+  :ensure
+  :bind
+  (("C-x o" . ace-window))
+  :config
+  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+  :custom-face
+  (aw-leading-char-face ((t (:height 2.0)))))
+
 (use-package bm
   :ensure
   :defer t
