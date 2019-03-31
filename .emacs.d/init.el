@@ -892,10 +892,8 @@
 
 (use-package ox-hugo
   :ensure
-  :defer t
-  :after org
-  :config
-  (org-hugo-auto-export-mode))
+  :after ox
+  :mode ("\\.org$'" . org-hugo-auto-export-mode))
 
 (use-package ob
   :defer t
