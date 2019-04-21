@@ -132,4 +132,4 @@ gcd () {
   cd $(ghq list --full-path | eval percol)
 }
 
-source .cargo/env
+source ~/.cargo/env
