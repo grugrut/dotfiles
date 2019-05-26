@@ -69,6 +69,10 @@
   :ensure
   :defer t)
 
+(use-package posframe
+  :ensure
+  :defer t)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -787,6 +791,13 @@
          (concat (all-the-icons-material "format_paint") " ")))
   (setq company-box-icons-unknown (concat (all-the-icons-material "find_in_page") " "))
   (setq company-box-backends-colors nil))
+
+(use-package company-posframe
+  :ensure t
+  :diminish
+  :after company
+  :config
+  (company-posframe-mode 1))
 
 (use-package yasnippet
   :ensure
