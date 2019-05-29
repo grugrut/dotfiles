@@ -21,30 +21,36 @@
 
 ;;(package-refresh-contents) ;;重たいので手動でやる
 
-(unless (fboundp 'use-package)
-  (require 'package)
-  (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package)))
-(eval-when-compile
-  (setq use-package-enable-imenu-support t)
-  (require 'use-package)
-  (setq use-package-verbose t
-        use-package-expand-minimally byte-compile-current-file
-        use-package-compute-statistics t))
+;; straight.el
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
+(straight-use-package 'use-package)
+(setq use-package-verbose t
+      use-package-expand-minimally byte-compile-current-file
+      use-package-compute-statistics t)
 
 ;;; diminishが付属しなくなったので手動で入れる
-(use-package diminish :ensure)
+(use-package diminish :straight t)
 (use-package bind-key)
 
 (use-package use-package-chords
-  :ensure
+  :straight t
   :config (key-chord-mode 1))
 
 ;; ベンチマーク
 (use-package benchmark-init
-  :ensure
+  :straight t
   :config
   (benchmark-init/activate)
   (add-hook 'after-init-hook 'benchmark-init/deactivate))
@@ -54,23 +60,23 @@
   :defer t)
 
 (use-package dash
-  :ensure
+  :straight t
   :defer t)
 
 (use-package s
-  :ensure
+  :straight t
   :defer t)
 
 (use-package f
-  :ensure
+  :straight t
   :defer t)
 
 (use-package ht
-  :ensure
+  :straight t
   :defer t)
 
 (use-package posframe
-  :ensure
+  :straight t
   :defer t)
 
 
@@ -155,9 +161,9 @@
 ;; (unicode-fonts-setup) ; 最初に本コマンドの実行が必要
 ;; (all-the-icons-install-fonts)
 (use-package unicode-fonts
-  :ensure)
+  :straight t)
 (use-package all-the-icons
-  :ensure)
+  :straight t)
 
 (add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.9))
 (add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.9))
@@ -166,7 +172,7 @@
 (add-to-list 'custom-theme-load-path "~/src/github.com/grugrut/doom-manoj-dark-theme.el/")
 
 (use-package doom-themes
-  :ensure
+  :straight t
   :config
   ;;(load-theme 'doom-dracula t)
   ;;(load-theme 'doom-manoj-dark t)
@@ -175,7 +181,7 @@
   (doom-themes-org-config))
 
 (use-package doom-modeline
-  :ensure
+  :straight t
   :defer t
   :hook (after-init . doom-modeline-init)
   :custom
@@ -198,7 +204,7 @@
 (global-display-line-numbers-mode t)
 
 (use-package beacon
-  :ensure
+  :straight t
   :diminish ""
   :config
   (beacon-mode 1))
@@ -249,13 +255,13 @@
 
 
 (use-package popwin
-  :ensure
+  :straight t
   :custom
   (popwin:popup-window-position 'bottom))
 
 ;; アクティブなバッファがわかるように
 (use-package dimmer
-  :ensure
+  :straight t
   :config
   (dimmer-mode))
 
@@ -267,18 +273,18 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package backward-forward
-  :ensure t
+  :straight t t
   :config
   (backward-forward-mode 1))
 
 (use-package avy
-  :ensure
+  :straight t
   :bind
   (("C-:" . avy-goto-char-timer)
    ("M-g M-g" . avy-goto-line)))
 
 (use-package ace-window
-  :ensure
+  :straight t
   :bind
   (("C-x o" . ace-window))
   :config
@@ -287,7 +293,7 @@
   (aw-leading-char-face ((t (:height 2.0)))))
 
 (use-package bm
-  :ensure
+  :straight t
   :defer t
   :commands (bm-toggle
              bm-next
@@ -305,7 +311,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package ddskk
-  :ensure
+  :straight t
   :defer t
   :bind
   (("C-x C-j" . skk-mode)
@@ -332,7 +338,7 @@
 
 ;; 操作した際に、操作箇所を強調表示する
 (use-package volatile-highlights
-  :ensure
+  :straight t
   :diminish ""
   :config
   (volatile-highlights-mode t))
@@ -347,23 +353,23 @@
 (delete-selection-mode t)
 
 (use-package highlight-symbol
-  :ensure
+  :straight t
   :defer t
   :bind
   (("C-." . highlight-symbol-at-point)))
 
 (use-package expand-region
-  :ensure
+  :straight t
   :defer t
   :bind
   (("C-," . er/expand-region)
    ("C-M-," . er/contract-region)))
 
 (use-package smartrep
-  :ensure)
+  :straight t)
 
 (use-package multiple-cursors
-  :ensure
+  :straight t
   :after smartrep
   :config
   (global-unset-key (kbd "C-t"))
@@ -385,7 +391,7 @@
       ("O"   . 'mc/reverse-regions))))
 
 (use-package smooth-scroll
-  :ensure
+  :straight t
   :diminish ""
   :functions smooth-scroll-mode
   :config
@@ -399,12 +405,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package google-this
-  :ensure
+  :straight t
   :defer t
   :bind (("M-s g" . google-this-noconfirm)))
 
 (use-package anzu
-  :ensure
+  :straight t
   :bind
   (("M-%" . anzu-query-replace))
   :config
@@ -412,7 +418,7 @@
   )
 
 (use-package migemo
-  :ensure
+  :straight t
   :functions migemo-init
   :custom
   (migemo-command "cmigemo")
@@ -425,7 +431,7 @@
   (migemo-init))
 
 (use-package ripgrep
-  :ensure
+  :straight t
   :defer t
   :bind (("M-s r" . ripgrep-regexp))
   :config
@@ -477,7 +483,7 @@
 (setq comment-style 'extra-line)
 
 (use-package yafolding
-  :ensure t
+  :straight t t
   :defer t
   :hook
   (prog-mode . yafolding-mode))
@@ -488,7 +494,7 @@
   (prog-mode . which-function-mode))
 
 (use-package projectile
-  :ensure t
+  :straight t t
   :init
   :config
   (setq projectile-mode-line-prefix " Prj")
@@ -496,14 +502,14 @@
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
 (use-package quickrun
-  :ensure
+  :straight t
   :defer t
   :commands (quickrun)
   :init
   (bind-key "C-c C-c" 'quickrun prog-mode-map))
 
 (use-package indent-guide
-  :ensure
+  :straight t
   :defer t
   :diminish ""
   :config
@@ -513,7 +519,7 @@
 
 ;; vi風に空行に~を表示する
 (use-package vi-tilde-fringe
-  :ensure
+  :straight t
   :defer t
   :commands vi-tilde-fringe-mode
   :diminish ""
@@ -521,14 +527,14 @@
   (prog-mode . vi-tilde-fringe-mode))
 
 (use-package aggressive-indent
-  :ensure
+  :straight t
   :diminish ""
   :hook
   (prog-mode . aggressive-indent-mode))
 
 (use-package minimap
   :disabled t
-  :ensure
+  :straight t
   :defer t
   :config
   (setq minimap-window-location 'right
@@ -538,22 +544,22 @@
   (prog-mode . minimap-mode))
 
 (use-package rainbow-mode
-  :ensure
+  :straight t
   :defer t
   :hook
   (web-mode . rainbow-mode))
 
 (use-package neotree
-  :ensure)
+  :straight t)
 
 (use-package flycheck
-  :ensure
+  :straight t
   :defer t
   :diminish flycheck-mode
   :hook (prog-mode . flycheck-mode))
 
 ;; (use-package eglot
-;;   :ensure
+;;   :straight t
 ;;   :defer t
 ;;   :config
 ;;   (add-to-list 'eglot-server-programs '(go-mode . ("go-langserver"
@@ -572,7 +578,7 @@
 ;;   (elixir-mode . eglot-ensure))
 
 (use-package lsp-mode
-  :ensure
+  :straight t
   :commands lsp
   :hook
   (go-mode . lsp)
@@ -582,7 +588,7 @@
   (elixir-mode . lsp))
 
 (use-package lsp-ui
-  :ensure
+  :straight t
   :commands lsp-ui-mode
   :config
   (define-key lsp-ui-mode-map [remap xref-find-definitions] 'lsp-ui-peek-find-definitions)
@@ -592,13 +598,13 @@
   (setq lsp-ui-doc-position 'bottom))
 
 (use-package company-lsp
-  :ensure
+  :straight t
   :commands company-lsp
   :config
   (push 'company-lsp company-backends))
 
 (use-package go-mode
-  :ensure
+  :straight t
   :defer t
   :commands (gofmt-before-save)
   :init
@@ -606,12 +612,12 @@
   (setq tab-width 4))
 
 (use-package go-impl
-  :ensure
+  :straight t
   :defer t
   :commands go-impl)
 
 (use-package web-mode
-  :ensure
+  :straight t
   :defer t
   :after flycheck
   :functions flycheck-add-mode
@@ -633,14 +639,14 @@
   )
 
 (use-package emmet-mode
-  :ensure
+  :straight t
   :defer t
   :commands (emmet-mode)
   :hook
   (web-mode . emmet-mode))
 
 (use-package js2-mode
-  :ensure
+  :straight t
   :defer t
   :mode ("\\.js\\'" . js2-mode)
   :bind (:map js2-mode-map
@@ -648,40 +654,40 @@
   )
 
 (use-package coffee-mode
-  :ensure
+  :straight t
   :defer t
   :config
   (setq coffee-tab-width 2))
 
 (use-package php-mode
-  :ensure
+  :straight t
   :defer t
   :mode ("\\.php\\'" . php-mode))
 
 (use-package web-beautify
-  :ensure
+  :straight t
   :defer t)
 
 (use-package groovy-mode
-  :ensure
+  :straight t
   :defer t
   :mode (("Jenkinsfile" . groovy-mode)))
 
 (use-package rust-mode
-  :ensure
+  :straight t
   :defer t
   :config
   (setq-default rust-format-on-save t))
 
 (use-package racer
-  :ensure
+  :straight t
   :defer t
   :hook
   (rust-mode . racer-mode)
   (racer-mode . eldoc-mode))
 
 (use-package flycheck-rust
-  :ensure
+  :straight t
   :defer t
   :after racer
   :init
@@ -690,13 +696,13 @@
                               (flycheck-rust-setup))))
 
 (use-package alchemist
-  :ensure
+  :straight t
   :defer t
   :config
   (setq alchemist-hooks-compile-on-save t))
 
 (use-package elixir-mode
-  :ensure
+  :straight t
   :defer t
   :config
   ;; Create a buffer-local hook to run elixir-format on save, only when we enable elixir-mode.
@@ -705,17 +711,17 @@
   )
 
 (use-package flycheck-elixir
-  :ensure
+  :straight t
   :defer t
   :after elixir-mode)
 
 (use-package elixir-yasnippets
-  :ensure
+  :straight t
   :defer t
   :after elixir-mode)
 
 (use-package python-mode
-  :ensure
+  :straight t
   :defer t
   :mode (("\\.py\\'" . python-mode))
   :config
@@ -723,12 +729,12 @@
   )
 
 (use-package yaml-mode
-  :ensure
+  :straight t
   :defer t
   :mode ("\\.yaml\\'" . yaml-mode))
 
 (use-package markdown-mode
-  :ensure
+  :straight t
   :defer t
   :mode ("\\.md\\'" . gfm-mode))
 
@@ -738,7 +744,7 @@
             (deactivate-input-method)))
 
 (use-package smartparens
-  :ensure
+  :straight t
   :defer t
   :diminish "")
 (use-package smartparens-config
@@ -748,24 +754,24 @@
   (prog-mode . smartparens-mode))
 
 (use-package rainbow-delimiters
-  :ensure
+  :straight t
   :defer t
   :hook
   (prog-mode . rainbow-delimiters-mode))
 
 (use-package fontawesome
-  :ensure)
+  :straight t)
 
 (use-package codic
-  :ensure
+  :straight t
   :defer t)
 
 (use-package pocket-reader
-  :ensure
+  :straight t
   :defer t)
 
 (use-package company
-  :ensure
+  :straight t
   :diminish company-mode
   :functions (global-company-mode
               company-abort
@@ -779,7 +785,7 @@
         company-show-numbers t))
 
 (use-package company-box
-  :ensure t
+  :straight t t
   :diminish
   :hook (company-mode . company-box-mode)
   :init
@@ -793,14 +799,14 @@
   (setq company-box-backends-colors nil))
 
 (use-package company-posframe
-  :ensure t
+  :straight t t
   :diminish
   :after company
   :config
   (company-posframe-mode 1))
 
 (use-package yasnippet
-  :ensure
+  :straight t
   :diminish yas-minor-mode
   :functions yas-global-mode
   :config
@@ -885,7 +891,7 @@
 
 (use-package org-bullets
   :disabled t
-  :ensure
+  :straight t
   :hook
   (org-mode (lambda () (org-bullets-mode 1))))
 
@@ -902,7 +908,7 @@
         time-stamp-end "$"))
 
 (use-package ox-hugo
-  :ensure
+  :straight t
   :after ox
   :mode ("\\.org$'" . org-hugo-auto-export-mode))
 
@@ -912,11 +918,11 @@
   :functions org-babel-do-load-languages
   :config
   (use-package ob-elixir
-    :ensure)
+    :straight t)
   (use-package ob-go
-    :ensure)
+    :straight t)
   (use-package ob-rust
-    :ensure)
+    :straight t)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
@@ -925,12 +931,12 @@
      (rust . t))))
 
 (use-package magit
-  :ensure
+  :straight t
   :bind (("C-x g" . magit-status)))
 
 ;; gitの差分を表示する
 (use-package git-gutter-fringe
-  :ensure
+  :straight t
   :hook
   (prog-mode . git-gutter-mode)
   :custom
@@ -938,38 +944,38 @@
 
 (use-package helm
   :diminish helm-mode
-  :ensure
+  :straight t
   :init
   (global-unset-key (kbd "C-z"))
   (use-package helm-config
     :init
     (setq helm-command-prefix-key "C-z"))
   (use-package helm-descbinds
-    :ensure
+    :straight t
     :bind
     (("C-z d" . helm-descbinds))
     :config
     (helm-descbinds-mode))
   (use-package helm-swoop
-    :ensure
+    :straight t
     :bind
     (("C-z w" . helm-swoop)))
   (use-package helm-ghq
-    :ensure
+    :straight t
     :bind
     (("C-z g" . helm-ghq)))
   (use-package helm-ag
-    :ensure
+    :straight t
     :bind
     (("C-z ;" . helm-ag))
     :config
     (setq helm-ag-base-command "rg -S --no-heading"))
   (use-package helm-projectile
-    :ensure
+    :straight t
     :config
     (helm-projectile-on))
   (use-package helm-git-grep
-    :ensure
+    :straight t
     :bind
     (("C-z s" . helm-git-grep)))
   :bind
@@ -987,14 +993,14 @@
 
 ;; which-key
 (use-package which-key
-  :ensure
+  :straight t
   :diminish which-key-mode
   :config
   (which-key-mode)
   (which-key-setup-side-window-right-bottom))
 
 (use-package keyfreq
-  :ensure
+  :straight t
   :config
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
