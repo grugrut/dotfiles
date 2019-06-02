@@ -44,6 +44,9 @@
 (use-package diminish :straight t)
 (use-package bind-key)
 
+(use-package key-chord
+  :straight (:host github :repo "zk-phi/key-chord" :branch "master")
+  )
 (use-package use-package-chords
   :straight t
   :config (key-chord-mode 1))
