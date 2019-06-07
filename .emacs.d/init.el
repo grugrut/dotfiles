@@ -153,9 +153,6 @@
 ;; abcdefghi
 ;; 012345678
 ;; あいうえお
-(set-face-attribute 'default nil
-                    :family "Migu 1M"
-                    :height 120)
 (set-fontset-font
  nil 'japanese-jisx0208
  (font-spec :family "Migu 1M"))
@@ -168,18 +165,14 @@
 (use-package all-the-icons
   :straight t)
 
-(add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.9))
-(add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.9))
-
-;; (load-theme 'manoj-dark)
 (add-to-list 'custom-theme-load-path "~/src/github.com/grugrut/doom-manoj-dark-theme.el/")
 
 (use-package doom-themes
   :straight t
   :config
-  ;;(load-theme 'doom-dracula t)
-  ;;(load-theme 'doom-manoj-dark t)
-  (load-theme 'doom-one t)
+  ;; (load-theme 'doom-dracula t)
+  (load-theme 'doom-manoj-dark t)
+  ;; (load-theme 'doom-one t)              
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
 
@@ -230,25 +223,6 @@
 
 ;; マウスを避けさせる
 (mouse-avoidance-mode 'jump)
-
-
-(setq default-frame-alist
-      (append '((width                . 180)  ; フレーム幅
-                (height               . 50 ) ; フレーム高
-                (left                 . 70 ) ; 配置左位置
-                (top                  . 28 ) ; 配置上位置
-                (line-spacing         . 0  ) ; 文字間隔
-                (left-fringe          . 12 ) ; 左フリンジ幅
-                (right-fringe         . 12 ) ; 右フリンジ幅
-                (menu-bar-lines       . 1  ) ; メニューバー
-                ;; (tool-bar-lines       . 1  ) ; ツールバー
-                ;; (vertical-scroll-bars . 1  ) ; スクロールバー
-                ;; (scroll-bar-width     . 17 ) ; スクロールバー幅
-                (cursor-type          . box) ; カーソル種別
-                (alpha                . 100) ; 透明度
-                )
-              default-frame-alist))
-(setq initial-frame-alist default-frame-alist)
 
 ;; 同一バッファ名にディレクトリ付与
 (use-package uniquify
@@ -990,6 +964,14 @@
   :config
   (helm-mode t))
 
+(use-package helm-posframe
+  :straight t
+                                        ;  :config
+                                        ;(helm-posframe-enable)
+  :custom
+  (helm-posframe-poshandler 'posframe-poshandler-frame-center)
+  (helm-posframe-parameters '((background-color . "gray50"))))
+
 
 ;; C-hをバックスペース
 (keyboard-translate ?\C-h ?\C-?)
@@ -1001,6 +983,12 @@
   :config
   (which-key-mode)
   (which-key-setup-side-window-right-bottom))
+(use-package which-key-posframe
+  :straight t
+  :config
+  (which-key-posframe-mode)
+  :custom
+  (which-key-posframe-border-width 2))
 
 (use-package keyfreq
   :straight t

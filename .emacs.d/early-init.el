@@ -31,7 +31,7 @@
 (modify-frame-parameters nil '((wait-for-wm . nil))) ; Xを使う場合の高速化設定らしい
 
 ;; GC
-(setq gc-cons-threshold (* 256 1024 1024))
+(setq gc-cons-threshold (* 512 1024 1024))
 (setq garbage-collection-messages t)
 
 ;; ツールバーを表示しない
@@ -47,12 +47,12 @@
 ;; 行番号表示(Emacs26以降)
 (global-display-line-numbers-mode t)
 
-(custom-set-variables
- '(initial-frame-alist
-   '((width . 180)
-     (height . 50)
-     (top . 0)
-     (left . 0))))
+;; (custom-set-variables
+;;  '(initial-frame-alist
+;;    '((width . 180)
+;;      (height . 50)
+;;      (top . 0)
+;;      (left . 0))))
 
 
 ;; (setq default-frame-alist
@@ -82,9 +82,8 @@
                     :family "Migu 1M"
                     :height 110)
 
-(add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.9))
-(add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.9))
-
+(add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.8))
+(add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.8))
 
 (message "Early-init end")
 
