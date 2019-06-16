@@ -9,7 +9,7 @@
 
 (prefer-coding-system 'utf-8-unix)
 
-(modify-frame-parameters nil '((wait-for-wm . nil))) ; Xを使う場合の高速化設定らしい
+;; (modify-frame-parameters nil '((wait-for-wm . nil))) ; Xを使う場合の高速化設定らしい
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -148,6 +148,15 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(setq default-frame-alist
+      '((width . 180)
+        (height . 50)))
+
+(setq initial-frame-alist
+      '((width . 180)
+        (height . 50)))
+
+
 ;; フォント設定
 ;;
 ;; abcdefghi
@@ -195,9 +204,6 @@
 ;; 行番号を表示
 (line-number-mode +1)
 (column-number-mode +1)
-
-;; 行番号表示(Emacs26以降)
-(global-display-line-numbers-mode t)
 
 (use-package beacon
   :straight t
@@ -762,7 +768,7 @@
         company-show-numbers t))
 
 (use-package company-box
-  :straight t t
+  :straight t
   :diminish
   :hook (company-mode . company-box-mode)
   :init
@@ -773,7 +779,8 @@
          (concat (all-the-icons-material "stars") " ")
          (concat (all-the-icons-material "format_paint") " ")))
   (setq company-box-icons-unknown (concat (all-the-icons-material "find_in_page") " "))
-  (setq company-box-backends-colors nil))
+  (setq company-box-backends-colors nil)
+  (setq company-box-icons-alist 'company-box-icons-all-the-icons))
 
 (use-package company-posframe
   :straight t t

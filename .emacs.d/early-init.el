@@ -54,6 +54,13 @@
 ;;      (top . 0)
 ;;      (left . 0))))
 
+(setq default-frame-alist
+      '((width . 180)
+        (height . 50)))
+
+(setq initial-frame-alist
+      '((width . 180)
+        (height . 50)))
 
 ;; (setq default-frame-alist
 ;;       (append '((width                . 180)  ; フレーム幅
@@ -82,8 +89,8 @@
                     :family "Migu 1M"
                     :height 110)
 
-(add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.8))
-(add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.8))
+(add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.9))
+(add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.9))
 
 (message "Early-init end")
 
