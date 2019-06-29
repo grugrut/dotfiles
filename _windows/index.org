@@ -1,0 +1,4 @@
+* Windows環境の構築
+** Chocolatey
+パッケージ管理にはchocolateyを使う。Scoopとかいろいろ別のも出ているらしい。
+
