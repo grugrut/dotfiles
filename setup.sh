@@ -1,6 +1,5 @@
 #!/bin/bash
 
-cd $(cd $(dirname $0) && pwd)
-ln -s .emacs.d ${HOME}/.emacs.d
-ln -s .config ${HOME}/.config
-ln -s .bashrc ${HOME}/.bashrc
+ln -fs ${PWD}/.emacs.d ${HOME}/.emacs.d
+ln -fs ${PWD}/.config ${HOME}/.config
+ln -fs ${PWD}/.bashrc ${HOME}/.bashrc
