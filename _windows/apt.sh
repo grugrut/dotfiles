@@ -17,6 +17,7 @@ libgnutls28-dev
 libtinfo-dev
 libncurses5-dev
 mailutils
+cmigemo
 "
 
 apt update

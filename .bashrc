@@ -121,6 +121,8 @@ if ! shopt -oq posix; then
   fi
 fi
 
+umask 022
+
 export GOROOT=/usr/local/go
 export GOPATH=~/
 export PATH=${GOROOT}/bin:${GOPATH}/bin:${PATH}
