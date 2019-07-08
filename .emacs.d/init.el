@@ -185,8 +185,9 @@
 
 (leaf doom-modeline
   :straight t
+  :require t
   :leaf-defer t
-  :hook (after-init . doom-modeline-init)
+  :hook (after-init . doom-modeline-mode)
   :custom
   (doom-modeline-height . 20)
   (doom-modeline-major-mode-color-icon . t)
@@ -373,6 +374,7 @@
 
 (leaf smooth-scroll
   :straight t
+  :require t
   :diminish ""
   :config
   (smooth-scroll-mode t))
@@ -399,10 +401,11 @@
 
 (leaf migemo
   :straight t
+  :require t
   :custom
   (migemo-command . "cmigemo")
   (migemo-options . '("-q" "--emacs"))
-  (migemo-dictionary . '(file-truename "/usr/share/cmigemo/utf-8/migemo-dict"))
+  (migemo-dictionary . "/usr/share/cmigemo/utf-8/migemo-dict")
   (migemo-user-dictionary . nil)
   (migemo-regex-dictionary . nil)
   (migemo-coding-system . 'utf-8-unix)
@@ -808,8 +811,8 @@
   :bind (("C-c c" . org-capture)
          ("C-c a" . org-agenda))
   :mode ("\\.org$'" . org-mode)
-  :hook  (org-mode . (lambda ()
-                       (set (make-local-variable 'system-time-locale) "C")))
+  ;; :hook  (org-mode . (lambda ()
+  ;;                      (set (make-local-variable 'system-time-locale) "C")))
   :custom
   (org-directory . "~/org/")
   ;; TODO状態の設定
@@ -824,7 +827,7 @@
                               ("MEETING" :foreground "gren" :weight bold)))
   ;; 時間計測を開始したらSTARTED状態に
   (org-clock-in-switch-to-state . 'my-org-clock-in-switch-to-state)
-  (org-log-done . 'time)
+  (org-log-done . 'time)                
   (org-clock-persist . t)
   (org-clock-out-when-done . t)
   )
@@ -928,6 +931,7 @@
   :init
   (global-unset-key (kbd "C-z"))
   (leaf helm-config
+    :require t
     :init
     (setq helm-command-prefix-key "C-z"))
   (leaf helm-descbinds
