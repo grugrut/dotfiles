@@ -18,6 +18,7 @@ libtinfo-dev
 libncurses5-dev
 mailutils
 cmigemo
+kubectl
 "
 
 apt update
