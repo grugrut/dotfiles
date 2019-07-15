@@ -125,10 +125,11 @@ umask 022
 
 export GOROOT=/usr/local/go
 export GOPATH=~/
-export PATH=${GOROOT}/bin:${GOPATH}/bin:${PATH}
+export PATH=${GOROOT}/bin:${GOPATH}/bin:~/.local/bin:${PATH}
 export DISPLAY=localhost:0.0
 export LIBGL_ALWAYS_INDIRECT=1
 export BROWSER=~/bin/browser
+export EDOTOR=vim
 
 gcd () {
   cd $(ghq list --full-path | eval percol)

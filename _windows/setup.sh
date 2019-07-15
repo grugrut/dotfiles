@@ -20,4 +20,4 @@ go get -u golang.org/x/tools/cmd/gopls
 ## tools
 go get -u github.com/motemen/ghq
 git config --global ghq.root ~/src
-pip install percol
+pip3 install percol

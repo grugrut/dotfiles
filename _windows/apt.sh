@@ -19,6 +19,7 @@ libncurses5-dev
 mailutils
 cmigemo
 kubectl
+python3-pip
 "
 
 apt update
