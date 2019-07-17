@@ -205,7 +205,7 @@
 
 (leaf beacon
   :straight t
-  :diminish ""
+  :diminish beacon-mode
   :require t
   :config
   (beacon-mode 1))
@@ -321,7 +321,8 @@
 ;; 操作した際に、操作箇所を強調表示する
 (leaf volatile-highlights
   :straight t
-  :diminish ""
+  :require t
+  :diminish volatile-highlights-mode
   :config
   (volatile-highlights-mode t))
 
@@ -754,6 +755,7 @@
 
 (leaf company
   :straight t
+  :require t
   :diminish company-mode
   :defun (global-company-mode
               company-abort
@@ -783,6 +785,7 @@
 
 (leaf company-posframe
   :straight t
+  :require t
   :diminish company-posframe-mode
   :after company
   :config
@@ -927,7 +930,8 @@
   (git-gutter:lighter . nil))
 
 (leaf helm
-  :diminish ""
+  :diminish helm-mode
+  :require t
   :straight t
   :init
   (global-unset-key (kbd "C-z"))
@@ -985,6 +989,7 @@
 ;; which-key
 (leaf which-key
   :straight t
+  :require t
   :diminish which-key-mode
   :config
   (which-key-mode)
