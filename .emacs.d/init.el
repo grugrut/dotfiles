@@ -42,7 +42,7 @@
   (leaf-keywords-init))
 
 ;;; diminishが付属しなくなったので手動で入れる
-(leaf diminish :straight t)
+(leaf diminish :straight t :require t)
 (leaf bind-key)
 
 (leaf key-chord
@@ -186,8 +186,7 @@
 (leaf doom-modeline
   :straight t
   :require t
-  :leaf-defer t
-  :hook (after-init . doom-modeline-mode)
+  :hook (after-init-hook . doom-modeline-mode)
   :custom
   (doom-modeline-height . 20)
   (doom-modeline-major-mode-color-icon . t)
@@ -207,6 +206,7 @@
 (leaf beacon
   :straight t
   :diminish ""
+  :require t
   :config
   (beacon-mode 1))
 
@@ -375,7 +375,7 @@
 (leaf smooth-scroll
   :straight t
   :require t
-  :diminish ""
+  :diminish smooth-scroll-mode
   :config
   (smooth-scroll-mode t))
 
@@ -768,7 +768,7 @@
 
 (leaf company-box
   :straight t
-  :diminish
+  :diminish ""
   :hook (company-mode . company-box-mode)
   :init
   (setq company-box-icons-elisp
@@ -782,8 +782,8 @@
   (setq company-box-icons-alist 'company-box-icons-all-the-icons))
 
 (leaf company-posframe
-  :straight t t
-  :diminish
+  :straight t
+  :diminish company-posframe-mode
   :after company
   :config
   (company-posframe-mode 1))
@@ -791,6 +791,7 @@
 (leaf yasnippet
   :straight t
   :diminish yas-minor-mode
+  :require t
   :defun yas-global-mode
   :config
   (yas-global-mode 1))
@@ -926,7 +927,7 @@
   (git-gutter:lighter . nil))
 
 (leaf helm
-  :diminish helm-mode
+  :diminish ""
   :straight t
   :init
   (global-unset-key (kbd "C-z"))
