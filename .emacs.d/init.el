@@ -9,7 +9,6 @@
 
 (prefer-coding-system 'utf-8-unix)
 
-;; (modify-frame-parameters nil '((wait-for-wm . nil))) ; Xを使う場合の高速化設定らしい
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -18,8 +17,6 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-;;(package-refresh-contents) ;;重たいので手動でやる
 
 ;; straight.el
 (defvar bootstrap-version)
@@ -727,7 +724,7 @@
 (leaf smartparens
   :straight t
   :leaf-defer t
-  :diminish "")
+  :diminish smartparens-mode)
 (leaf smartparens-config
   :leaf-defer t
   :after smartparens
