@@ -456,6 +456,12 @@
  '(lambda() (setq w32-ime-composition-window nil))
  )
 
+;; minibufferのアクティブ時、IMEを無効化
+(add-hook 'minibuffer-setup-hook
+          (lambda ()
+            (deactivate-input-method)))
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -466,15 +472,10 @@
 (setq comment-style 'extra-line)
 
 (leaf yafolding
-  :straight t t
+  :straight t
   :leaf-defer t
   :hook
-  (prog-mode . yafolding-mode))
-
-(leaf which-function
-  :leaf-defer t
-  :hook
-  (prog-mode . which-function-mode))
+  (prog-mode-hook . yafolding-mode))
 
 (leaf projectile
   :straight t t
@@ -491,29 +492,31 @@
   :init
   (bind-key "C-c C-c" 'quickrun prog-mode-map))
 
-(leaf indent-guide
+(leaf highlight-indent-guides
   :straight t
-  :leaf-defer t
-  :diminish ""
-  :config
-  (defvar indent-guide-delay 0.1)
-  (defvar indent-guide-recursive t)
-  :hook (prog-mode . indent-guide-mode))
+  :require t
+  :diminish highlight-indent-guides-mode
+  :custom
+  (highlight-indent-guides-method 'character)
+  :hook
+  (prog-mode-hook . highlight-indent-guides-mode))
 
 ;; vi風に空行に~を表示する
 (leaf vi-tilde-fringe
   :straight t
+  :require t
   :leaf-defer t
   :commands vi-tilde-fringe-mode
-  :diminish ""
+  :diminish vi-tilde-fringe-mode
   :hook
-  (prog-mode . vi-tilde-fringe-mode))
+  (prog-mode-hook . vi-tilde-fringe-mode))
 
 (leaf aggressive-indent
   :straight t
-  :diminish ""
+  :require t
+  :diminish aggressive-indent-mode
   :hook
-  (prog-mode . aggressive-indent-mode))
+  (prog-mode-hook . aggressive-indent-mode))
 
 (leaf minimap
   :disabled t
@@ -524,13 +527,13 @@
         minimap-update-delay 0.2
         minimap-minimum-width 20)
   :hook
-  (prog-mode . minimap-mode))
+  (prog-mode-hook . minimap-mode))
 
 (leaf rainbow-mode
   :straight t
   :leaf-defer t
   :hook
-  (web-mode . rainbow-mode))
+  (web-mode-hook . rainbow-mode))
 
 (leaf neotree
   :straight t)
@@ -539,7 +542,7 @@
   :straight t
   :leaf-defer t
   :diminish flycheck-mode
-  :hook (prog-mode . flycheck-mode))
+  :hook (prog-mode-hook . flycheck-mode))
 
 ;; (leaf eglot
 ;;   :straight t
@@ -564,11 +567,11 @@
   :straight t
   :commands lsp
   :hook
-  (go-mode . lsp)
-  (python-mode . lsp)
-  (web-mode . lsp)
-  (js2-mode . lsp)
-  (elixir-mode . lsp))
+  (go-mode-hook . lsp)
+  (python-mode-hook . lsp)
+  (web-mod-hook . lsp)
+  (js2-mode-hook . lsp)
+  (elixir-mode-hook . lsp))
 
 (leaf lsp-ui
   :straight t
@@ -626,7 +629,7 @@
   :leaf-defer t
   :commands (emmet-mode)
   :hook
-  (web-mode . emmet-mode))
+  (web-mode-hook . emmet-mode))
 
 (leaf js2-mode
   :straight t
@@ -666,8 +669,8 @@
   :straight t
   :leaf-defer t
   :hook
-  (rust-mode . racer-mode)
-  (racer-mode . eldoc-mode))
+  (rust-mode-hook . racer-mode)
+  (racer-mode-hook . eldoc-mode))
 
 (leaf flycheck-rust
   :straight t
@@ -721,11 +724,6 @@
   :leaf-defer t
   :mode ("\\.md\\'" . gfm-mode))
 
-;; minibufferのアクティブ時、IMEを無効化
-(add-hook 'minibuffer-setup-hook
-          (lambda ()
-            (deactivate-input-method)))
-
 (leaf smartparens
   :straight t
   :leaf-defer t
@@ -734,13 +732,13 @@
   :leaf-defer t
   :after smartparens
   :hook
-  (prog-mode . smartparens-mode))
+  (prog-mode-hook . smartparens-mode))
 
 (leaf rainbow-delimiters
   :straight t
   :leaf-defer t
   :hook
-  (prog-mode . rainbow-delimiters-mode))
+  (prog-mode-hook . rainbow-delimiters-mode))
 
 (leaf fontawesome
   :straight t)
@@ -770,8 +768,9 @@
 
 (leaf company-box
   :straight t
-  :diminish ""
-  :hook (company-mode . company-box-mode)
+  :require t
+  :diminish company-box-mode
+  :hook (company-mode-hook . company-box-mode)
   :init
   (setq company-box-icons-elisp
         (list
@@ -880,7 +879,7 @@
   :disabled t
   :straight t
   :hook
-  (org-mode (lambda () (org-bullets-mode 1))))
+  (org-mode-hook (lambda () (org-bullets-mode 1))))
 
 ;;; #+UPDATE:を保存時に更新
 (leaf time-stamp
@@ -924,13 +923,13 @@
 ;; gitの差分を表示する
 (leaf git-gutter-fringe
   :straight t
+  :require t
+  :diminish git-gutter-mode
   :hook
-  (prog-mode . git-gutter-mode)
-  :custom
-  (git-gutter:lighter . nil))
+  (prog-mode-hook . git-gutter-mode))
 
 (leaf helm
-  :diminish helm-mode
+  :diminish t
   :require t
   :straight t
   :init

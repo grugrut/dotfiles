@@ -22,16 +22,10 @@
 
 (message "Early-init start")
 
-(setq package-archives
-      '(("gnu" . "https://elpa.gnu.org/packages/")
-	("melpa" . "https://melpa.org/packages/")
-	("org" . "https://orgmode.org/elpa/")))
-(setq package-quickstart t)
-
 (modify-frame-parameters nil '((wait-for-wm . nil))) ; Xを使う場合の高速化設定らしい
 
 ;; GC
-(setq gc-cons-threshold (* 512 1024 1024))
+(setq gc-cons-threshold (* 2048 1024 1024))
 (setq garbage-collection-messages t)
 
 ;; ツールバーを表示しない
@@ -51,34 +45,26 @@
 ;;  '(initial-frame-alist
 ;;    '((width . 180)
 ;;      (height . 50)
-;;      (top . 0)
-;;      (left . 0))))
+;;      (top . 20)
+;;      (left . 20))))
 
 (setq default-frame-alist
-      '((width . 180)
-        (height . 50)))
-
-(setq initial-frame-alist
-      '((width . 180)
-        (height . 50)))
-
-;; (setq default-frame-alist
-;;       (append '((width                . 180)  ; フレーム幅
-;;                 (height               . 56 ) ; フレーム高
-;;                 (left                 . 70 ) ; 配置左位置
-;;                 (top                  . 28 ) ; 配置上位置
-;;                 (line-spacing         . 0  ) ; 文字間隔
-;;                 (left-fringe          . 12 ) ; 左フリンジ幅
-;;                 (right-fringe         . 12 ) ; 右フリンジ幅
-;;                 (menu-bar-lines       . 1  ) ; メニューバー
-;;                 ;; (tool-bar-lines       . 1  ) ; ツールバー
-;;                 ;; (vertical-scroll-bars . 1  ) ; スクロールバー
-;;                 ;; (scroll-bar-width     . 17 ) ; スクロールバー幅
-;;                 (cursor-type          . box) ; カーソル種別
-;;                 (alpha                . 100) ; 透明度
-;;                 )
-;;               default-frame-alist))
-;; (setq initial-frame-alist default-frame-alist)
+      (append '((width                . 100)  ; フレーム幅
+                (height               . 40 ) ; フレーム高
+                (left                 . 170 ) ; 配置左位置
+                (top                  . 30 ) ; 配置上位置
+                (line-spacing         . 0  ) ; 文字間隔
+                (left-fringe          . 12 ) ; 左フリンジ幅
+                (right-fringe         . 12 ) ; 右フリンジ幅
+                (menu-bar-lines       . 1  ) ; メニューバー
+                ;; (tool-bar-lines       . 1  ) ; ツールバー
+                ;; (vertical-scroll-bars . 1  ) ; スクロールバー
+                ;; (scroll-bar-width     . 17 ) ; スクロールバー幅
+                (cursor-type          . box) ; カーソル種別
+                (alpha                . 100) ; 透明度
+                )
+              default-frame-alist))
+(setq initial-frame-alist default-frame-alist)
 
 ;; フォント設定
 ;;
