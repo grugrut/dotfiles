@@ -1,0 +1,8 @@
+clear  mod3
+clear  mod4
+!<muhenkan>
+keycode 129 = Hyper_L Hyper_L Hyper_L Hyper_L
+!<henkan>
+keycode 131 = Super_L Super_L Super_L Super_L
+add    mod3 = Hyper_L
+add    mod4 = Super_L Super_R

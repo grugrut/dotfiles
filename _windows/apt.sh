@@ -20,6 +20,7 @@ mailutils
 cmigemo
 kubectl
 python3-pip
+x11-xserver-utils
 "
 
 apt update
