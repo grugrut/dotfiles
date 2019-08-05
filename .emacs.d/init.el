@@ -46,6 +46,9 @@
   :straight (key-chord :host github :repo "zk-phi/key-chord" :branch "master")
   )
 
+(leaf hydra
+  :straight t)
+
 ;; ベンチマーク
 (leaf benchmark-init
   :straight t
@@ -494,7 +497,7 @@
   :require t
   :diminish highlight-indent-guides-mode
   :custom
-  (highlight-indent-guides-method 'character)
+  (highlight-indent-guides-method . 'character)
   :hook
   (prog-mode-hook . highlight-indent-guides-mode))
 

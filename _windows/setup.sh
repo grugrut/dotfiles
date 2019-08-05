@@ -16,6 +16,7 @@ sudo ${NOW}/apt.sh
 ## golang setting
 go get -u golang.org/x/lint/golint
 go get -u golang.org/x/tools/cmd/gopls
+go get -u github.com/golang/dep/cmd/dep
 
 ## tools
 go get -u github.com/motemen/ghq
