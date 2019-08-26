@@ -33,6 +33,9 @@
   (load bootstrap-file nil 'nomessage))
 
 (straight-use-package 'leaf)
+(leaf leaf
+  :custom
+  (leaf-enable-imenu-support . t))
 (straight-use-package 'leaf-keywords)
 (leaf leaf-keywords
   :config
@@ -255,7 +258,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (leaf backward-forward
-  :straight t t
+  :straight t
   :config
   (backward-forward-mode 1))
 
@@ -977,6 +980,7 @@
 
 (leaf helm-posframe
   :straight t
+  :disabled t
   :config
   (helm-posframe-enable)
   :custom
