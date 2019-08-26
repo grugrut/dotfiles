@@ -932,7 +932,7 @@
   (prog-mode-hook . git-gutter-mode))
 
 (leaf helm
-  :diminish t
+  :diminish helm-mode
   :require t
   :straight t
   :init
@@ -974,7 +974,9 @@
    ("C-M-z" . helm-resume)
    ("C-x b" . helm-buffers-list)
    ("M-x" . helm-M-x)
-   ("C-x C-f" . helm-find-files))
+   ("C-x C-f" . helm-find-files)
+   (helm-map
+    ("C-z" . helm-execute-persistent-action)))
   :config
   (helm-mode t))
 
