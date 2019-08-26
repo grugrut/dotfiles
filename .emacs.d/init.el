@@ -47,6 +47,9 @@
 
 (leaf key-chord
   :straight (key-chord :host github :repo "zk-phi/key-chord" :branch "master")
+  :require t
+  :config
+  (key-chord-mode t)
   )
 
 (leaf hydra
@@ -287,6 +290,19 @@
   (("C-S-SPC" . bm-toggle)
    ("C-}" . bm-previous)
    ("C-]" . bm-next)))
+
+(leaf move-with-hydra
+  :chord (("jk" . hydra-move/body))
+  :hydra (hydra-move
+          (:hint nil)
+          "
+          ^move^
+-------------------------------------
+_g_
+_G_
+"
+          ("g" (goto-char (point-min)))
+          ("G" (goto-line (point-max)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -802,8 +818,8 @@
   (yas-global-mode 1))
 
 (leaf view
-  :leaf-defer t
-  :chord (("jk" . view-mode))
+  :require t
+  :chord (("fj" . view-mode))
   :bind  (:view-mode-map
           ("j" . next-line)
           ("k" . previous-line)
