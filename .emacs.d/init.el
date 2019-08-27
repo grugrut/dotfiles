@@ -42,49 +42,46 @@
   (leaf-keywords-init))
 
 ;;; diminishが付属しなくなったので手動で入れる
-(leaf diminish :straight t :require t)
-(leaf bind-key)
-
-(leaf key-chord
-  :straight (key-chord :host github :repo "zk-phi/key-chord" :branch "master")
-  :require t
+(leaf leaf-util-packages
   :config
-  (key-chord-mode t)
-  )
-
-(leaf hydra
-  :straight t)
+  (leaf diminish :straight t :require t)
+  (leaf bind-key)
+  (leaf key-chord
+    :straight (key-chord :host github :repo "zk-phi/key-chord" :branch "master")
+    :require t
+    :config
+    (key-chord-mode t))
+  (leaf hydra
+    :straight t))
 
 ;; ベンチマーク
 (leaf benchmark-init
   :straight t
   :config
   (benchmark-init/activate)
-  (add-hook 'after-init-hook 'benchmark-init/deactivate))
+  :hook
+  (after-init-hook . benchmark-init/deactivate))
 
 ;;; ライブラリ群
-(leaf cl-lib
-  :leaf-defer t)
-
-(leaf dash
-  :straight t
-  :leaf-defer t)
-
-(leaf s
-  :straight t
-  :leaf-defer t)
-
-(leaf f
-  :straight t
-  :leaf-defer t)
-
-(leaf ht
-  :straight t
-  :leaf-defer t)
-
-(leaf posframe
-  :straight t
-  :leaf-defer t)
+(leaf libraries
+  :config
+  (leaf cl-lib
+    :leaf-defer t)
+  (leaf dash
+    :straight t
+    :leaf-defer t)
+  (leaf s
+    :straight t
+    :leaf-defer t)
+  (leaf f
+    :straight t
+    :leaf-defer t)
+  (leaf ht
+    :straight t
+    :leaf-defer t)
+  (leaf posframe
+    :straight t
+    :leaf-defer t))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -183,9 +180,7 @@
 (leaf doom-themes
   :straight t
   :config
-  ;; (load-theme 'doom-dracula t)
   (load-theme 'doom-manoj-dark t)
-  ;; (load-theme 'doom-one t)              
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
 
@@ -241,17 +236,10 @@
   (uniquify-buffer-name-style . 'post-forward-angle-brackets)
   (uniquify-ignore-buffers-re . "*[^*]+*"))
 
-
 (leaf popwin
   :straight t
   :custom
   (popwin:popup-window-position . 'bottom))
-
-;; アクティブなバッファがわかるように
-(leaf dimmer
-  :straight t
-  :config
-  (dimmer-mode))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
