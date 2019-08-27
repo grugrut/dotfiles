@@ -943,9 +943,12 @@ _G_
 (leaf git-gutter-fringe
   :straight t
   :require t
-  :diminish git-gutter-mode
-  :hook
-  (prog-mode-hook . git-gutter-mode))
+  :custom
+  (git-gutter:lighter . "")
+  (global-git-gutter-mode . t)
+  :bind (("s-n" . git-gutter:next-hunk)
+         ("s-p" . git-gutter:previous-hunk)
+         ("s-d" . git-gutter:popup-hunk)))
 
 (leaf helm
   :diminish helm-mode
