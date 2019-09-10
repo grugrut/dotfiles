@@ -22,3 +22,9 @@ go get -u github.com/golang/dep/cmd/dep
 go get -u github.com/motemen/ghq
 git config --global ghq.root ~/src
 pip3 install percol
+
+# Using Ubuntu
+curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+sudo npm install -g npm

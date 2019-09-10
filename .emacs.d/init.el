@@ -286,11 +286,12 @@
           "
           ^move^
 -------------------------------------
-_g_
+_gg_
 _G_
 "
-          ("g" (goto-char (point-min)))
-          ("G" (goto-line (point-max)))))
+          ("gg" (goto-char (point-min)))
+          ("G" (goto-line (point-max)))
+          ("q" nil)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -301,7 +302,7 @@ _G_
 
 (leaf ddskk
   :straight t
-  :leaf-defer t
+  :require t
   :bind
   (("C-x C-j" . skk-mode)
    ("C-x j"   . skk-mode))
@@ -322,8 +323,7 @@ _G_
   (skk-show-tooltip . nil)               ; 変換候補をインライン表示しない
   (skk-isearch-start-mode . 'latin)      ; isearch時にSKKをオフ
   (skk-henkan-okuri-strictly . nil)      ; 送り仮名を考慮した変換候補
-  (skk-process-okuri-early . nil)
-  )
+  (skk-process-okuri-early . nil))
 
 ;; 操作した際に、操作箇所を強調表示する
 (leaf volatile-highlights
@@ -505,6 +505,8 @@ _G_
   :diminish highlight-indent-guides-mode
   :custom
   (highlight-indent-guides-method . 'character)
+  (highlight-indent-guides-auto-character-face-perc . 20)
+  (highlight-indent-guides-character . ?\|)
   :hook
   (prog-mode-hook . highlight-indent-guides-mode))
 
@@ -618,7 +620,8 @@ _G_
          ("\\.scss\\'" . web-mode)
          ("\\.css\\'" . web-mode)
          ("\\.twig\\'" . web-mode)
-         ("\\.vue\\'" . web-mode))
+         ("\\.vue\\'" . web-mode)
+         ("\\.js\\'" . web-mode))
   :config
   (flycheck-add-mode 'javascript-eslint 'web-mode)
   (setq web-mode-markup-indent-offset 2
@@ -640,6 +643,7 @@ _G_
 
 (leaf js2-mode
   :straight t
+  :disabled t
   :leaf-defer t
   :mode ("\\.js\\'" . js2-mode)
   :bind (:js2-mode-map
@@ -1008,6 +1012,7 @@ _G_
   (which-key-setup-side-window-right-bottom))
 (leaf which-key-posframe
   :straight t
+  :disabled t
   :config
   (which-key-posframe-mode)
   :custom

@@ -22,7 +22,6 @@
 
 (message "Early-init start")
 
-(modify-frame-parameters nil '((wait-for-wm . nil))) ; Xを使う場合の高速化設定らしい
 
 ;; GC
 (setq gc-cons-threshold (* 2048 1024 1024))
@@ -40,13 +39,6 @@
 
 ;; 行番号表示(Emacs26以降)
 (global-display-line-numbers-mode t)
-
-;; (custom-set-variables
-;;  '(initial-frame-alist
-;;    '((width . 180)
-;;      (height . 50)
-;;      (top . 20)
-;;      (left . 20))))
 
 (setq default-frame-alist
       (append '((width                . 100)  ; フレーム幅
@@ -77,6 +69,14 @@
 
 (add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.9))
 (add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.9))
+
+(modify-frame-parameters nil '((sticky . t) (width . 100) (height . 40))) ; Xを使う場合の高速化設定らしい
+
+;; (defun reset-frame-parameter (frame)
+;;   (sleep-for 0.1)
+;;   (set-frame-parameter frame 'height 32)
+;;   (message "Set frame height to 32"))
+;; (add-hook 'after-make-frame-functions #'reset-frame-parameter)
 
 (message "Early-init end")
 
