@@ -698,6 +698,12 @@ _G_
   :config
   (setq alchemist-hooks-compile-on-save t))
 
+(defun my/elixir-do-end-close-action (id action context)
+  (when (eq action 'insert)
+    (newline-and-indent)
+    (forward-line -1)
+    (indent-according-to-mode)))
+
 (leaf elixir-mode
   :straight t
   :leaf-defer t
@@ -705,6 +711,16 @@ _G_
   ;; Create a buffer-local hook to run elixir-format on save, only when we enable elixir-mode.
   (add-hook 'elixir-mode-hook
             (lambda () (add-hook 'before-save-hook 'elixir-format nil t)))
+  (sp-with-modes '(elixir-mode)
+    (sp-local-pair "->" "end"
+                   :when '(("RET"))
+                   :post-handlers '(:add my/elixir-do-end-close-action)
+                   :actions '(insert)))
+  (sp-with-modes '(elixir-mode)
+    (sp-local-pair "do" "end"
+                   :when '(("SPC" "RET"))
+                   :post-handlers '(:add my/elixir-do-end-close-action)
+                   :actions '(insert)))
   )
 
 (leaf flycheck-elixir
