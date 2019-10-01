@@ -184,13 +184,18 @@
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
 
+(leaf minions
+  :straight t
+  :config
+  (minions-mode t))
+
 (leaf doom-modeline
   :straight t
   :require t
   :hook (after-init-hook . doom-modeline-mode)
   :custom
   (doom-modeline-height . 20)
-  (doom-modeline-major-mode-color-icon . t)
+  (doom-modeline-major-mode-color-icon . nil)
   (doom-modeline-minor-modes . t)
   (doom-modeline-github . nil))
 
