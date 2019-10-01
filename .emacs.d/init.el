@@ -574,29 +574,41 @@ _G_
 
 (leaf lsp-mode
   :straight t
+  :require t
   :commands lsp
   :hook
-  (go-mode-hook . lsp)
-  (python-mode-hook . lsp)
-  (web-mod-hook . lsp)
-  (js2-mode-hook . lsp)
-  (elixir-mode-hook . lsp))
+  (go-mode-hook . lsp-deferred)
+  (web-mod-hook . lsp-mode)
+  (js2-mode-hook . lsp-mode)
+  (elixir-mode-hook . lsp-mode))
 
 (leaf lsp-ui
   :straight t
-  :commands lsp-ui-mode
+  :require t
+  :hook
+  (lsp-mode-hook . lsp-ui-mode)
+  :custom
+  (lsp-ui-sideline-enable . nil)
   :config
   (define-key lsp-ui-mode-map [remap xref-find-definitions] 'lsp-ui-peek-find-definitions)
   (define-key lsp-ui-mode-map [remap xref-find-references] 'lsp-ui-peek-find-references)
-  (define-key lsp-ui-mode-map (kbd "C-c r") 'lsp-ui-peek-find-references)
   (define-key lsp-ui-mode-map (kbd "C-c i") 'lsp-ui-imenu)
   (setq lsp-ui-doc-position 'bottom))
 
 (leaf company-lsp
   :straight t
+  :require t
   :commands company-lsp
   :config
   (push 'company-lsp company-backends))
+
+(leaf company-tabnine
+  :straight t
+  :after company
+  :require t
+  :config
+  (add-to-list 'company-backends #'company-tabnine))
+  
 
 (leaf go-mode
   :straight t
@@ -706,7 +718,7 @@ _G_
 
 (leaf elixir-mode
   :straight t
-  :leaf-defer t
+  :after smartparens
   :config
   ;; Create a buffer-local hook to run elixir-format on save, only when we enable elixir-mode.
   (add-hook 'elixir-mode-hook
@@ -753,10 +765,10 @@ _G_
 
 (leaf smartparens
   :straight t
-  :leaf-defer t
+  :require t
   :diminish smartparens-mode)
 (leaf smartparens-config
-  :leaf-defer t
+  :require t
   :after smartparens
   :hook
   (prog-mode-hook . smartparens-mode))
