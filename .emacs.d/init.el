@@ -387,6 +387,11 @@ _G_
   :config
   (smooth-scroll-mode t))
 
+(leaf auto-revert
+  :diminish auto-revert-mode
+  :config
+  (global-auto-revert-mode t))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -766,12 +771,13 @@ _G_
 (leaf smartparens
   :straight t
   :require t
-  :diminish smartparens-mode)
-(leaf smartparens-config
-  :require t
-  :after smartparens
-  :hook
-  (prog-mode-hook . smartparens-mode))
+  :diminish smartparens-mode
+  :config
+  (leaf smartparens-config
+    :require t
+    :after smartparens
+    :hook
+    (prog-mode-hook . smartparens-mode)))
 
 (leaf rainbow-delimiters
   :straight t
