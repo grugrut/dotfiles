@@ -90,58 +90,61 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; 色をつける
-(global-font-lock-mode t)
-
-;; GC
-(setq gc-cons-threshold (* 256 1024 1024))
-(setq garbage-collection-messages t)
-
-;; バッファの自動掃除
-(leaf midnight
+(leaf general-setting
   :config
-  (midnight-mode))
+  ;; 色をつける
+  (global-font-lock-mode t)
 
-;; 大きなファイルを開くときの警告を出にくくする
-(setq large-file-warning-threshold (* 25 1024 1024))
+  ;; GC
+  (setq gc-cons-threshold (* 256 1024 1024))
+  (setq garbage-collection-messages t)
+  
+  ;; バッファの自動掃除
+  (leaf midnight
+    :config
+    (midnight-mode))
+  
+  ;; 大きなファイルを開くときの警告を出にくくする
+  (setq large-file-warning-threshold (* 25 1024 1024))
+  
+  ;; ファイルを開く際の大文字小文字を区別しない
+  (setq read-file-name-completion-ignore-case t)
 
-;; ファイルを開く際の大文字小文字を区別しない
-(setq read-file-name-completion-ignore-case t)
+  ;; yes-or-no-pをy/nで選択できるようにする
+  (defalias 'yes-or-no-p 'y-or-n-p)
+  (setq use-dialog-box nil)
+  
+  ;; history
+  (setq history-length 500
+        history-delete-duplicates t)
+  
+  ;; recentf
+  (defvar recentf-max-saved-items 1000)
+  (defvar recentf-auto-cleanup 'never)
+  
+  ;; move physical line
+  (setq line-move-visual nil)
 
-;; yes-or-no-pをy/nで選択できるようにする
-(defalias 'yes-or-no-p 'y-or-n-p)
-(setq use-dialog-box nil)
+  ;; マウスでコピーできるように
+  (setq mouse-drag-copy-region t)
+  (global-set-key [mouse-2] 'mouse-yank-at-click)
 
-;; history
-(setq history-length 500
-      history-delete-duplicates t)
+  ;; ベルを鳴らさない
+  (setq ring-bell-function (lambda()))
 
-;; recentf
-(defvar recentf-max-saved-items 1000)
-(defvar recentf-auto-cleanup 'never)
+  ;; タブはスペースで
+  (setq-default indent-tabs-mode nil
+                tab-width 2)
 
-;; move physical line
-(setq line-move-visual nil)
+  ;; バックアップを作成しない
+  (setq backup-inhibited t)
+  ;; 初期画面を表示しない
+  (setq inhibit-startup-message t)
 
-;; マウスでコピーできるように
-(setq mouse-drag-copy-region t)
-(global-set-key [mouse-2] 'mouse-yank-at-click)
-
-;; ベルを鳴らさない
-(setq ring-bell-function (lambda()))
-
-;; タブはスペースで
-(setq-default indent-tabs-mode nil)
-
-;; バックアップを作成しない
-(setq backup-inhibited t)
-;; 初期画面を表示しない
-(setq inhibit-startup-message t)
-
-;; ブラウザ設定 WSL限定
-(setq browse-url-browser-function 'browse-url-generic)
-(defvar browse-url-generic-program  (executable-find (getenv "BROWSER")))
-
+  ;; ブラウザ設定 WSL限定
+  (setq browse-url-browser-function 'browse-url-generic)
+  (defvar browse-url-generic-program  (executable-find (getenv "BROWSER")))
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
