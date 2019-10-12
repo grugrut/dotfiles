@@ -125,14 +125,16 @@ umask 022
 
 export GOROOT=/usr/local/go
 export GOPATH=~/
+export GO111MODULE=on
 export PATH=${GOROOT}/bin:${GOPATH}/bin:~/.local/bin:${PATH}
 export DISPLAY=localhost:0.0
+export DOCKER_HOST="tcp://0.0.0.0:2375"
 export LIBGL_ALWAYS_INDIRECT=1
 export BROWSER=~/bin/browser
-export EDOTOR=vim
+export EDITOR=vim
 
 gcd () {
-  cd $(ghq list --full-path | eval percol)
+    cd $(ghq list --full-path | eval percol)
 }
 
 source ~/.cargo/env
