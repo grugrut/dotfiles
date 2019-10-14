@@ -608,10 +608,9 @@ _G_
   :require t
   :commands lsp
   :hook
-  (go-mode-hook . lsp-deferred)
-  (web-mod-hook . lsp-mode)
-  (js2-mode-hook . lsp-mode)
-  (elixir-mode-hook . lsp-mode))
+  (go-mode-hook . lsp)
+  (web-mode-hook . lsp)
+  (elixir-mode-hook . lsp))
 
 (leaf lsp-ui
   :straight t
