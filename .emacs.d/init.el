@@ -249,6 +249,24 @@
   :custom
   (popwin:popup-window-position . 'bottom))
 
+(leaf treemacs
+  :straight t
+  :require t
+  :bind (("H-t" . treemacs-select-window)
+         ("H-T" . treemacs))
+  :config
+  (treemacs-follow-mode t)
+  (treemacs-filewatch-mode t)
+  (treemacs-fringe-indicator-mode t))
+(leaf treemacs-projectile
+  :straight t
+  :require t
+  :after (treemacs projectile))
+(leaf treemacs-magit
+  :straight t
+  :require t
+  :after (treemacs magit))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
