@@ -170,6 +170,16 @@
  nil 'japanese-jisx0208
  (font-spec :family "Migu 1M"))
 
+(leaf text-scale
+  :hydra (hydra-zoom ()
+                     "Zoom"
+                     ("g" text-scale-increase "in")
+                     ("l" text-scale-decrease "out")
+                     ("r" (text-scale-set 0) "reset")
+                     ("0" (text-scale-set 0) :bind nil :exit t)
+                     ("1" (text-scale-set 0) nil :bind nil :exit t))
+  :bind ("<f2>" . hydra-zoom/body))
+
 ;; 絵文字
 ;; (unicode-fonts-setup) ; 最初に本コマンドの実行が必要
 ;; (all-the-icons-install-fonts)
@@ -623,7 +633,31 @@ _G_
   (define-key lsp-ui-mode-map [remap xref-find-definitions] 'lsp-ui-peek-find-definitions)
   (define-key lsp-ui-mode-map [remap xref-find-references] 'lsp-ui-peek-find-references)
   (define-key lsp-ui-mode-map (kbd "C-c i") 'lsp-ui-imenu)
-  (setq lsp-ui-doc-position 'bottom))
+  (define-key lsp-ui-mode-map (kbd "s-l") 'hydra-lsp/body)
+  (setq lsp-ui-doc-position 'bottom)
+  :hydra (hydra-lsp (:exit t :hint nil)
+                    "
+ Buffer^^               Server^^                   Symbol
+-------------------------------------------------------------------------------------
+ [_f_] format           [_M-r_] restart            [_d_] declaration  [_i_] implementation  [_o_] documentation
+ [_m_] imenu            [_S_]   shutdown           [_D_] definition   [_t_] type            [_r_] rename
+ [_x_] execute action   [_M-s_] describe session   [_R_] references   [_s_] signature"
+                    ("d" lsp-find-declaration)
+                    ("D" lsp-ui-peek-find-definitions)
+                    ("R" lsp-ui-peek-find-references)
+                    ("i" lsp-ui-peek-find-implementation)
+                    ("t" lsp-find-type-definition)
+                    ("s" lsp-signature-help)
+                    ("o" lsp-describe-thing-at-point)
+                    ("r" lsp-rename)
+
+                    ("f" lsp-format-buffer)
+                    ("m" lsp-ui-imenu)
+                    ("x" lsp-execute-code-action)
+
+                    ("M-s" lsp-describe-session)
+                    ("M-r" lsp-restart-workspace)
+                    ("S" lsp-shutdown-workspace)))
 
 (leaf company-lsp
   :straight t
@@ -997,9 +1031,27 @@ _G_
   :custom
   (git-gutter:lighter . "")
   (global-git-gutter-mode . t)
-  :bind (("s-n" . git-gutter:next-hunk)
-         ("s-p" . git-gutter:previous-hunk)
-         ("s-d" . git-gutter:popup-hunk)))
+  :bind ("C-x C-g" . hydra-git-gutter/body)
+  :hydra (hydra-git-gutter (:body-pre (git-gutter-mode 1)
+                                      :hint nil)
+                           "
+Git gutter:
+  _j_: next hunk     _s_tage hunk   _q_uit
+  _k_: previous hunk _r_evert hunk
+  _h_: first hunk    _p_opup hunk
+  _l_: last hunk     set _R_evision
+"
+                           ("j" git-gutter:next-hunk)
+                           ("k" git-gutter:previous-hunk)
+                           ("h" (progn (goto-char (point-min))
+                                       (git-gutter:next-hunk 1)))
+                           ("l" (progn (goto-char (point-min))
+                                       (git-gutter:previous-hunk 1)))
+                           ("s" git-gutter:stage-hunk)
+                           ("r" git-gutter:revert-hunk)
+                           ("p" git-gutter:popup-hunk)
+                           ("R" git-gutter:set-start-revision)
+                           ("q" nil :color blue)))
 
 (leaf helm
   :diminish helm-mode
