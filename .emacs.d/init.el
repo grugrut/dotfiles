@@ -829,14 +829,12 @@ _G_
 
 (leaf smartparens
   :straight t
-  :require t
+  :require smartparens-config
   :diminish smartparens-mode
+  :hook
+  (prog-mode-hook . turn-on-smartparens-mode)
   :config
-  (leaf smartparens-config
-    :require t
-    :after smartparens
-    :hook
-    (prog-mode-hook . smartparens-mode)))
+  (show-smartparens-global-mode t))
 
 (leaf rainbow-delimiters
   :straight t
