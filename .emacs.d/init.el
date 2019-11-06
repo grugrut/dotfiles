@@ -338,7 +338,6 @@ _G_
 
 (leaf ddskk
   :straight t
-  :require t
   :bind
   (("C-x C-j" . skk-mode)
    ("C-x j"   . skk-mode))
@@ -359,7 +358,15 @@ _G_
   (skk-show-tooltip . nil)               ; 変換候補をインライン表示しない
   (skk-isearch-start-mode . 'latin)      ; isearch時にSKKをオフ
   (skk-henkan-okuri-strictly . nil)      ; 送り仮名を考慮した変換候補
-  (skk-process-okuri-early . nil))
+  (skk-process-okuri-early . nil)
+  :hook
+  (skk-azik-load-hook . my/skk-azik-disable-tU)
+  :preface
+  (defun my/skk-azik-disable-tU ()
+    "ddskkのazikモードが`tU'を`つ'として扱うのを抑制する."
+    (setq skk-rule-tree (skk-compile-rule-list
+                         skk-rom-kana-base-rule-list
+                         (skk-del-alist "tU" skk-rom-kana-rule-list)))))
 
 ;; 操作した際に、操作箇所を強調表示する
 (leaf volatile-highlights
@@ -565,8 +572,8 @@ _G_
   :straight t
   :require t
   :diminish aggressive-indent-mode
-  :hook
-  (prog-mode-hook . aggressive-indent-mode))
+	:config
+  (global-aggressive-indent-mode 1))
 
 (leaf minimap
   :disabled t
@@ -682,6 +689,9 @@ _G_
   (add-hook 'before-save-hook 'gofmt-before-save)
   (setq tab-width 4))
 
+(leaf protobuf-mode
+  :straight t)
+
 (leaf go-impl
   :straight t
   :leaf-defer t
@@ -689,7 +699,6 @@ _G_
 
 (leaf web-mode
   :straight t
-  :leaf-defer t
   :after flycheck
   :defun flycheck-add-mode
   :mode (("\\.html?\\'" . web-mode)
@@ -827,6 +836,9 @@ _G_
   :leaf-defer t
   :mode ("\\.md\\'" . gfm-mode))
 
+(leaf dockerfile-mode
+  :straight t)
+
 (leaf smartparens
   :straight t
   :require smartparens-config
@@ -919,7 +931,7 @@ _G_
   ;; :hook  (org-mode . (lambda ()
   ;;                      (set (make-local-variable 'system-time-locale) "C")))
   :custom
-  (org-directory . "~/org/")
+  (org-directory . "~/src/github.com/grugrut/PersonalProject/")
   ;; TODO状態の設定
   (org-todo-keywords . '((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d)")
                          (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "MEETING")))
@@ -944,31 +956,22 @@ _G_
   :config
   (setq org-capture-templates `(
                                 ("t" "Todo" entry
-                                 (file ,(concat org-directory "todo.org"))
-                                 "* TODO %?\n %i\n %a\n"
+                                 (file ,(concat org-directory "index.org"))
+                                 "* TODO %?\n %i\n"
                                  :prepend nil
                                  :unnarrowed nil
                                  :kill-buffer t
                                  )
-                                ("m" "Memo" entry
-                                 (file+datetree ,(concat org-directory "diary.org"))
-                                 "* %?\n %a"
+                                ("d" "Diary" entry
+                                 (file+olp+datetree ,(concat org-directory "diary.org"))
+                                 "* Activeties\n ** Meals%?"
                                  :prepend t
                                  :unnarrowed nil
                                  :kill-buffer t
-                                 )
-                                ("i" "interrupt" entry
-                                 (file+datetree ,(concat org-directory "diary.org"))
-                                 "* PHONE %?\n %a"
-                                 :prepend t
-                                 :unnarrowed nil
-                                 :kill-buffer t
-                                 :clock-in t
-                                 :clock-resume t
                                  )
                                 ("b" "blog" entry
-                                 (file+headline "~/src/github.com/grugrut/til/draft/blog.org" ,(format-time-string "%Y"))
-                                 "** TODO %?\n:PROPERTIES:\n:EXPORT_HUGO_SECTION: %(format-time-string \"%Y/%m\")\n:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :archives '(%(format-time-string \"%Y\") %(format-time-string \"%Y/%m\"))\n:EXPORT_FILE_NAME: %(format-time-string \"%Y%m%d%H%M%S\")\n:END:\n")
+                                 (file+headline "~/src/github.com/grugrut/blog/draft/blog.org" ,(format-time-string "%Y"))
+                                 "** TODO %?\n:PROPERTIES:\n:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :archives '(\\\"%(format-time-string \"%Y\")\\\" \\\"%(format-time-string \"%Y/%m\")\\\")\n:EXPORT_FILE_NAME: %(format-time-string \"%Y%m%d%H%M\")\n:END:\n\n")
                                 )))
 
 ;;; TODOの場合だけSTARTEDに変更する

@@ -39,6 +39,7 @@
 
 ;; 行番号表示(Emacs26以降)
 (global-display-line-numbers-mode t)
+(custom-set-variables '(display-line-numbers-width-start t))
 
 (setq default-frame-alist
       (append '((width                . 100)  ; フレーム幅
