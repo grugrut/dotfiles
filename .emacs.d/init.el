@@ -956,7 +956,7 @@ _G_
   :config
   (setq org-capture-templates `(
                                 ("t" "Todo" entry
-                                 (file ,(concat org-directory "index.org"))
+                                 (file ,(concat org-directory "inbox.org"))
                                  "* TODO %?\n %i\n"
                                  :prepend nil
                                  :unnarrowed nil
