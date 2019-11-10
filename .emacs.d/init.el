@@ -160,15 +160,19 @@
       '((width . 180)
         (height . 50)))
 
-
 ;; フォント設定
 ;;
-;; abcdefghi
-;; 012345678
+;; abcdefghik
+;; 0123456789
 ;; あいうえお
-(set-fontset-font
- nil 'japanese-jisx0208
- (font-spec :family "Migu 1M"))
+(let* ((family "Cica")
+       (fontspec (font-spec :family family :weight 'normal)))
+  (set-face-attribute 'default nil :family family :height 140)
+  (set-face-attribute 'fixed-pitch nil :family family :height 140)
+  (set-fontset-font nil 'japanese-jisx0213.2004-1 fontspec))
+
+(add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.9))
+(add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.9))
 
 (leaf text-scale
   :hydra (hydra-zoom ()

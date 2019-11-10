@@ -59,18 +59,6 @@
               default-frame-alist))
 (setq initial-frame-alist default-frame-alist)
 
-;; フォント設定
-;;
-;; abcdefghi
-;; 012345678
-;; あいうえお
-(set-face-attribute 'default nil
-                    :family "Migu 1M"
-                    :height 110)
-
-(add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.9))
-(add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.9))
-
 (modify-frame-parameters nil '((sticky . t) (width . 100) (height . 40))) ; Xを使う場合の高速化設定らしい
 
 ;; (defun reset-frame-parameter (frame)
