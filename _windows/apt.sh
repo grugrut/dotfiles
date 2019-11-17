@@ -21,6 +21,7 @@ cmigemo
 kubectl
 python3-pip
 x11-xserver-utils
+jq
 "
 
 apt update

@@ -17,6 +17,9 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; for debug leaf.el
+;; (add-to-list 'load-path "~/src/github.com/grugrut/leaf.el/")
+;; (require 'leaf)
 
 ;; straight.el
 (defvar bootstrap-version)
@@ -57,8 +60,7 @@
 ;; ベンチマーク
 (leaf benchmark-init
   :straight t
-  :config
-  (benchmark-init/activate)
+  :leaf-defer nil
   :hook
   (after-init-hook . benchmark-init/deactivate))
 
@@ -211,10 +213,13 @@
   :require t
   :hook (after-init-hook . doom-modeline-mode)
   :custom
+  (doom-modeline-bar-width . 0)
   (doom-modeline-height . 20)
   (doom-modeline-major-mode-color-icon . nil)
   (doom-modeline-minor-modes . t)
-  (doom-modeline-github . nil))
+  (doom-modeline-github . nil)
+  (doom-modeline-mu4e . nil)
+  (doom-modeline-irc . nil))
 
 ;; ツールバーを表示しない
 (tool-bar-mode 0)
@@ -411,21 +416,21 @@ _G_
   :config
   (global-unset-key (kbd "C-t"))
   (smartrep-define-key global-map "C-t"
-    '(("C-t" . 'mc/mark-next-like-this)
-      ("n"   . 'mc/mark-next-like-this)
-      ("p"   . 'mc/mark-previous-like-this)
-      ("m"   . 'mc/mark-more-like-this-extended)
-      ("u"   . 'mc/unmark-next-like-this)
-      ("U"   . 'mc/unmark-previous-like-this)
-      ("s"   . 'mc/skip-to-next-like-this)
-      ("S"   . 'mc/skip-to-previous-like-this)
-      ("*"   . 'mc/mark-all-like-this)
-      ("a"   . 'mc/mark-all-like-this)
-      ("d"   . 'mc/mark-all-like-this-dwim)
-      ("i"   . 'mc/insert-numbers)
-      ("l"   . 'mc/insert-letters)
-      ("o"   . 'mc/sort-regions)
-      ("O"   . 'mc/reverse-regions))))
+                       '(("C-t" . 'mc/mark-next-like-this)
+                         ("n"   . 'mc/mark-next-like-this)
+                         ("p"   . 'mc/mark-previous-like-this)
+                         ("m"   . 'mc/mark-more-like-this-extended)
+                         ("u"   . 'mc/unmark-next-like-this)
+                         ("U"   . 'mc/unmark-previous-like-this)
+                         ("s"   . 'mc/skip-to-next-like-this)
+                         ("S"   . 'mc/skip-to-previous-like-this)
+                         ("*"   . 'mc/mark-all-like-this)
+                         ("a"   . 'mc/mark-all-like-this)
+                         ("d"   . 'mc/mark-all-like-this-dwim)
+                         ("i"   . 'mc/insert-numbers)
+                         ("l"   . 'mc/insert-letters)
+                         ("o"   . 'mc/sort-regions)
+                         ("O"   . 'mc/reverse-regions))))
 
 (leaf smooth-scroll
   :straight t
@@ -934,8 +939,9 @@ _G_
   :mode ("\\.org$'" . org-mode)
   ;; :hook  (org-mode . (lambda ()
   ;;                      (set (make-local-variable 'system-time-locale) "C")))
+  :config
+  (setq org-directory "~/src/github.com/grugrut/PersonalProject/")
   :custom
-  (org-directory . "~/src/github.com/grugrut/PersonalProject/")
   ;; TODO状態の設定
   (org-todo-keywords . '((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d)")
                          (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "MEETING")))
@@ -959,19 +965,36 @@ _G_
   :commands (org-capture)
   :config
   (setq org-capture-templates `(
-                                ("t" "Todo" entry
-                                 (file ,(concat org-directory "inbox.org"))
+                                ("t" "Todo")
+                                ("te" "Engineering" entry
+                                 (file+olp ,(concat org-directory "inbox.org") "Engineering")
                                  "* TODO %?\n %i\n"
                                  :prepend nil
                                  :unnarrowed nil
                                  :kill-buffer t
                                  )
+                                ("tw" "Work" entry
+                                 (file+olp ,(concat org-directory "inbox.org") "Work")
+                                 "* TODO %?\n %i\n"
+                                 :prepend nil
+                                 :unnarrowed nil
+                                 :kill-buffer t
+                                 )
+                                ("th" "House" entry
+                                 (file+olp ,(concat org-directory "inbox.org") "House")
+                                 "* TODO %?\n %i\n"
+                                 :prepend nil
+                                 :unnarrowed nil
+                                 :kill-buffer t
+                                 )
+
                                 ("d" "Diary" entry
                                  (file+olp+datetree ,(concat org-directory "diary.org"))
-                                 "* Activeties\n ** Meals%?"
+                                 "** Activeties\n** Meals%?"
                                  :prepend t
                                  :unnarrowed nil
                                  :kill-buffer t
+                                 :time-prompt t
                                  )
                                 ("b" "blog" entry
                                  (file+headline "~/src/github.com/grugrut/blog/draft/blog.org" ,(format-time-string "%Y"))
@@ -1036,7 +1059,7 @@ _G_
   :custom
   (git-gutter:lighter . "")
   (global-git-gutter-mode . t)
-  :bind ("C-x C-g" . hydra-git-gutter/body)
+  :bind ("C-x G" . hydra-git-gutter/body)
   :hydra (hydra-git-gutter (:body-pre (git-gutter-mode 1)
                                       :hint nil)
                            "
