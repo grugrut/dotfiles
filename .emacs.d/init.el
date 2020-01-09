@@ -552,6 +552,7 @@ _G_
 (leaf quickrun
   :straight t
   :leaf-defer t
+  :after bind-key
   :commands (quickrun)
   :init
   (bind-key "C-c C-c" 'quickrun prog-mode-map))
@@ -894,6 +895,7 @@ _G_
   :require t
   :diminish company-box-mode
   :hook (company-mode-hook . company-box-mode)
+  :after all-the-icons
   :init
   (setq company-box-icons-elisp
         (list
