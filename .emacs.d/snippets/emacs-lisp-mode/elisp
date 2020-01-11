@@ -2,7 +2,7 @@
 # name: Elisp Template
 # key: elisp
 # --
-;;; `(file-name-nondirectory (buffer-file-name))` ---
+;;; `(file-name-nondirectory (buffer-file-name))` ---    -*- lexical-binding: t -*-
 ;; Author: grugrut <grugruglut+github@gmail.com>
 ;; URL:
 ;; Version: 1.00
