@@ -993,7 +993,7 @@ _G_
 
                                 ("d" "Diary" entry
                                  (file+olp+datetree ,(concat org-directory "diary.org"))
-                                 "** Activeties\n** Meals%?"
+                                 "** Activeties\n- %?\n** Meals\n- "
                                  :prepend t
                                  :unnarrowed nil
                                  :kill-buffer t
