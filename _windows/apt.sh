@@ -3,6 +3,7 @@
 INSTALL_PACKAGES="
 build-essential
 fonts-migmix
+fonts-powerline
 autoconf
 texi2html
 texinfo
