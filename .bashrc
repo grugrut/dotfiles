@@ -138,3 +138,5 @@ gcd () {
 }
 
 source ~/.cargo/env
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
