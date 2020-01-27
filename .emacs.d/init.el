@@ -35,19 +35,25 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-(straight-use-package 'leaf)
-(leaf leaf
-  :custom
-  (leaf-enable-imenu-support . t))
-(straight-use-package 'leaf-keywords)
-(leaf leaf-keywords
-  :config
-  (leaf-keywords-init))
+(prog1 "leaf"
+  (prog1 "install leaf"
+    (unless (package-installed-p 'leaf)
+      (package-refresh-contents)
+      (package-install 'leaf)))
+
+  (leaf leaf-keywords
+    :ensure t
+    :config
+    ;; optional packages if you want to use :hydra, :el-get,,,
+    (leaf hydra :ensure t)
+
+    ;; initialize leaf-keywords.el
+    (leaf-keywords-init)))
 
 ;;; diminishが付属しなくなったので手動で入れる
 (leaf leaf-util-packages
   :config
-  (leaf diminish :straight t :require t)
+  (leaf diminish :ensure t :require t)
   (leaf bind-key)
   (leaf key-chord
     :straight (key-chord :host github :repo "zk-phi/key-chord" :branch "master")
@@ -55,11 +61,11 @@
     :config
     (key-chord-mode t))
   (leaf hydra
-    :straight t))
+    :ensure t))
 
 ;; ベンチマーク
 (leaf benchmark-init
-  :straight t
+  :ensure t
   :leaf-defer nil
   :hook
   (after-init-hook . benchmark-init/deactivate))
@@ -70,19 +76,19 @@
   (leaf cl-lib
     :leaf-defer t)
   (leaf dash
-    :straight t
+    :ensure t
     :leaf-defer t)
   (leaf s
-    :straight t
+    :ensure t
     :leaf-defer t)
   (leaf f
-    :straight t
+    :ensure t
     :leaf-defer t)
   (leaf ht
-    :straight t
+    :ensure t
     :leaf-defer t)
   (leaf posframe
-    :straight t
+    :ensure t
     :leaf-defer t))
 
 
@@ -190,26 +196,26 @@
 ;; (unicode-fonts-setup) ; 最初に本コマンドの実行が必要
 ;; (all-the-icons-install-fonts)
 (leaf unicode-fonts
-  :straight t)
+  :ensure t)
 (leaf all-the-icons
-  :straight t)
+  :ensure t)
 
 (add-to-list 'custom-theme-load-path "~/src/github.com/grugrut/doom-manoj-dark-theme.el/")
 
 (leaf doom-themes
-  :straight t
+  :ensure t
   :config
   (load-theme 'doom-manoj-dark t)
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
 
 (leaf minions
-  :straight t
+  :ensure t
   :config
   (minions-mode t))
 
 (leaf doom-modeline
-  :straight t
+  :ensure t
   :require t
   :hook (after-init-hook . doom-modeline-mode)
   :custom
@@ -232,7 +238,7 @@
 (column-number-mode +1)
 
 (leaf beacon
-  :straight t
+  :ensure t
   :diminish beacon-mode
   :require t
   :config
@@ -264,12 +270,12 @@
   (uniquify-ignore-buffers-re . "*[^*]+*"))
 
 (leaf popwin
-  :straight t
+  :ensure t
   :custom
   (popwin:popup-window-position . 'bottom))
 
 (leaf treemacs
-  :straight t
+  :ensure t
   :require t
   :bind (("H-t" . treemacs-select-window)
          ("H-T" . treemacs))
@@ -278,11 +284,11 @@
   (treemacs-filewatch-mode t)
   (treemacs-fringe-indicator-mode t))
 (leaf treemacs-projectile
-  :straight t
+  :ensure t
   :require t
   :after (treemacs projectile))
 (leaf treemacs-magit
-  :straight t
+  :ensure t
   :require t
   :after (treemacs magit))
 
@@ -294,18 +300,18 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (leaf backward-forward
-  :straight t
+  :ensure t
   :config
   (backward-forward-mode 1))
 
 (leaf avy
-  :straight t
+  :ensure t
   :bind
   (("C-:" . avy-goto-char-timer)
    ("M-g M-g" . avy-goto-line)))
 
 (leaf ace-window
-  :straight t
+  :ensure t
   :bind
   (("C-x o" . ace-window))
   :config
@@ -314,7 +320,7 @@
   (aw-leading-char-face . '((t (:height 2.0)))))
 
 (leaf bm
-  :straight t
+  :ensure t
   :leaf-defer t
   :commands (bm-toggle
              bm-next
@@ -346,7 +352,7 @@ _G_
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (leaf ddskk
-  :straight t
+  :ensure t
   :bind
   (("C-x C-j" . skk-mode)
    ("C-x j"   . skk-mode))
@@ -379,7 +385,7 @@ _G_
 
 ;; 操作した際に、操作箇所を強調表示する
 (leaf volatile-highlights
-  :straight t
+  :ensure t
   :require t
   :diminish volatile-highlights-mode
   :config
@@ -395,23 +401,23 @@ _G_
 (delete-selection-mode t)
 
 (leaf highlight-symbol
-  :straight t
+  :ensure t
   :leaf-defer t
   :bind
   (("C-." . highlight-symbol-at-point)))
 
 (leaf expand-region
-  :straight t
+  :ensure t
   :leaf-defer t
   :bind
   (("C-," . er/expand-region)
    ("C-M-," . er/contract-region)))
 
 (leaf smartrep
-  :straight t)
+  :ensure t)
 
 (leaf multiple-cursors
-  :straight t
+  :ensure t
   :after smartrep
   :config
   (global-unset-key (kbd "C-t"))
@@ -433,7 +439,7 @@ _G_
                          ("O"   . 'mc/reverse-regions))))
 
 (leaf smooth-scroll
-  :straight t
+  :ensure t
   :require t
   :diminish smooth-scroll-mode
   :config
@@ -452,12 +458,12 @@ _G_
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (leaf google-this
-  :straight t
+  :ensure t
   :leaf-defer t
   :bind (("M-s g" . google-this-noconfirm)))
 
 (leaf anzu
-  :straight t
+  :ensure t
   :bind
   (("M-%" . anzu-query-replace))
   :config
@@ -465,7 +471,7 @@ _G_
   )
 
 (leaf migemo
-  :straight t
+  :ensure t
   :require t
   :custom
   (migemo-command . "cmigemo")
@@ -478,7 +484,7 @@ _G_
   (migemo-init))
 
 (leaf ripgrep
-  :straight t
+  :ensure t
   :leaf-defer t
   :bind (("M-s r" . ripgrep-regexp))
   :config
@@ -536,13 +542,13 @@ _G_
 (setq comment-style 'extra-line)
 
 (leaf yafolding
-  :straight t
+  :ensure t
   :leaf-defer t
   :hook
   (prog-mode-hook . yafolding-mode))
 
 (leaf projectile
-  :straight t t
+  :ensure t t
   :init
   :config
   (setq projectile-mode-line-prefix " Prj")
@@ -550,7 +556,7 @@ _G_
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
 (leaf quickrun
-  :straight t
+  :ensure t
   :leaf-defer t
   :after bind-key
   :commands (quickrun)
@@ -558,7 +564,7 @@ _G_
   (bind-key "C-c C-c" 'quickrun prog-mode-map))
 
 (leaf highlight-indent-guides
-  :straight t
+  :ensure t
   :require t
   :diminish highlight-indent-guides-mode
   :custom
@@ -570,7 +576,7 @@ _G_
 
 ;; vi風に空行に~を表示する
 (leaf vi-tilde-fringe
-  :straight t
+  :ensure t
   :require t
   :leaf-defer t
   :commands vi-tilde-fringe-mode
@@ -579,7 +585,7 @@ _G_
   (prog-mode-hook . vi-tilde-fringe-mode))
 
 (leaf aggressive-indent
-  :straight t
+  :ensure t
   :require t
   :diminish aggressive-indent-mode
 	:config
@@ -587,7 +593,7 @@ _G_
 
 (leaf minimap
   :disabled t
-  :straight t
+  :ensure t
   :leaf-defer t
   :config
   (setq minimap-window-location 'right
@@ -597,22 +603,22 @@ _G_
   (prog-mode-hook . minimap-mode))
 
 (leaf rainbow-mode
-  :straight t
+  :ensure t
   :leaf-defer t
   :hook
   (web-mode-hook . rainbow-mode))
 
 (leaf neotree
-  :straight t)
+  :ensure t)
 
 (leaf flycheck
-  :straight t
+  :ensure t
   :leaf-defer t
   :diminish flycheck-mode
   :hook (prog-mode-hook . flycheck-mode))
 
 ;; (leaf eglot
-;;   :straight t
+;;   :ensure t
 ;;   :leaf-defer t
 ;;   :config
 ;;   (add-to-list 'eglot-server-programs '(go-mode . ("go-langserver"
@@ -631,7 +637,7 @@ _G_
 ;;   (elixir-mode . eglot-ensure))
 
 (leaf lsp-mode
-  :straight t
+  :ensure t
   :require t
   :commands lsp
   :hook
@@ -640,7 +646,7 @@ _G_
   (elixir-mode-hook . lsp))
 
 (leaf lsp-ui
-  :straight t
+  :ensure t
   :require t
   :hook
   (lsp-mode-hook . lsp-ui-mode)
@@ -678,14 +684,14 @@ _G_
                     ("S" lsp-shutdown-workspace)))
 
 (leaf company-lsp
-  :straight t
+  :ensure t
   :require t
   :commands company-lsp
   :config
   (push 'company-lsp company-backends))
 
 (leaf company-tabnine
-  :straight t
+  :ensure t
   :after company
   :require t
   :config
@@ -693,7 +699,7 @@ _G_
   
 
 (leaf go-mode
-  :straight t
+  :ensure t
   :leaf-defer t
   :commands (gofmt-before-save)
   :init
@@ -701,15 +707,15 @@ _G_
   (setq tab-width 4))
 
 (leaf protobuf-mode
-  :straight t)
+  :ensure t)
 
 (leaf go-impl
-  :straight t
+  :ensure t
   :leaf-defer t
   :commands go-impl)
 
 (leaf web-mode
-  :straight t
+  :ensure t
   :after flycheck
   :defun flycheck-add-mode
   :mode (("\\.html?\\'" . web-mode)
@@ -731,14 +737,14 @@ _G_
   )
 
 (leaf emmet-mode
-  :straight t
+  :ensure t
   :leaf-defer t
   :commands (emmet-mode)
   :hook
   (web-mode-hook . emmet-mode))
 
 (leaf js2-mode
-  :straight t
+  :ensure t
   :disabled t
   :leaf-defer t
   :mode ("\\.js\\'" . js2-mode)
@@ -747,40 +753,40 @@ _G_
   )
 
 (leaf coffee-mode
-  :straight t
+  :ensure t
   :leaf-defer t
   :config
   (setq coffee-tab-width 2))
 
 (leaf php-mode
-  :straight t
+  :ensure t
   :leaf-defer t
   :mode ("\\.php\\'" . php-mode))
 
 (leaf web-beautify
-  :straight t
+  :ensure t
   :leaf-defer t)
 
 (leaf groovy-mode
-  :straight t
+  :ensure t
   :leaf-defer t
   :mode (("Jenkinsfile" . groovy-mode)))
 
 (leaf rust-mode
-  :straight t
+  :ensure t
   :leaf-defer t
   :config
   (setq-default rust-format-on-save t))
 
 (leaf racer
-  :straight t
+  :ensure t
   :leaf-defer t
   :hook
   (rust-mode-hook . racer-mode)
   (racer-mode-hook . eldoc-mode))
 
 (leaf flycheck-rust
-  :straight t
+  :ensure t
   :leaf-defer t
   :after racer
   :init
@@ -789,7 +795,7 @@ _G_
                               (flycheck-rust-setup))))
 
 (leaf alchemist
-  :straight t
+  :ensure t
   :leaf-defer t
   :config
   (setq alchemist-hooks-compile-on-save t))
@@ -801,7 +807,7 @@ _G_
     (indent-according-to-mode)))
 
 (leaf elixir-mode
-  :straight t
+  :ensure t
   :after smartparens
   :config
   ;; Create a buffer-local hook to run elixir-format on save, only when we enable elixir-mode.
@@ -820,17 +826,17 @@ _G_
   )
 
 (leaf flycheck-elixir
-  :straight t
+  :ensure t
   :leaf-defer t
   :after elixir-mode)
 
 (leaf elixir-yasnippets
-  :straight t
+  :ensure t
   :leaf-defer t
   :after elixir-mode)
 
 (leaf python-mode
-  :straight t
+  :ensure t
   :leaf-defer t
   :mode (("\\.py\\'" . python-mode))
   :config
@@ -838,20 +844,20 @@ _G_
   )
 
 (leaf yaml-mode
-  :straight t
+  :ensure t
   :leaf-defer t
   :mode ("\\.yaml\\'" . yaml-mode))
 
 (leaf markdown-mode
-  :straight t
+  :ensure t
   :leaf-defer t
   :mode ("\\.md\\'" . gfm-mode))
 
 (leaf dockerfile-mode
-  :straight t)
+  :ensure t)
 
 (leaf smartparens
-  :straight t
+  :ensure t
   :require smartparens-config
   :diminish smartparens-mode
   :hook
@@ -860,24 +866,24 @@ _G_
   (show-smartparens-global-mode t))
 
 (leaf rainbow-delimiters
-  :straight t
+  :ensure t
   :leaf-defer t
   :hook
   (prog-mode-hook . rainbow-delimiters-mode))
 
 (leaf fontawesome
-  :straight t)
+  :ensure t)
 
 (leaf codic
-  :straight t
+  :ensure t
   :leaf-defer t)
 
 (leaf pocket-reader
-  :straight t
+  :ensure t
   :leaf-defer t)
 
 (leaf company
-  :straight t
+  :ensure t
   :require t
   :diminish company-mode
   :defun (global-company-mode
@@ -892,7 +898,7 @@ _G_
         company-show-numbers t))
 
 (leaf company-box
-  :straight t
+  :ensure t
   :require t
   :diminish company-box-mode
   :hook (company-mode-hook . company-box-mode)
@@ -909,7 +915,7 @@ _G_
   (setq company-box-icons-alist 'company-box-icons-all-the-icons))
 
 (leaf company-posframe
-  :straight t
+  :ensure t
   :require t
   :diminish company-posframe-mode
   :after company
@@ -917,7 +923,7 @@ _G_
   (company-posframe-mode 1))
 
 (leaf yasnippet
-  :straight t
+  :ensure t
   :diminish yas-minor-mode
   :require t
   :defun yas-global-mode
@@ -1012,7 +1018,7 @@ _G_
 
 (leaf org-bullets
   :disabled t
-  :straight t
+  :ensure t
   :hook
   (org-mode-hook (lambda () (org-bullets-mode 1))))
 
@@ -1029,7 +1035,7 @@ _G_
         time-stamp-end "$"))
 
 (leaf ox-hugo
-  :straight t
+  :ensure t
   :after ox
   :mode ("\\.org$'" . org-hugo-auto-export-mode))
 
@@ -1039,11 +1045,11 @@ _G_
   :defun org-babel-do-load-languages
   :config
   (leaf ob-elixir
-    :straight t)
+    :ensure t)
   (leaf ob-go
-    :straight t)
+    :ensure t)
   (leaf ob-rust
-    :straight t)
+    :ensure t)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
@@ -1052,12 +1058,12 @@ _G_
      (rust . t))))
 
 (leaf magit
-  :straight t
+  :ensure t
   :bind (("C-x g" . magit-status)))
 
 ;; gitの差分を表示する
 (leaf git-gutter-fringe
-  :straight t
+  :ensure t
   :require t
   :custom
   (git-gutter:lighter . "")
@@ -1087,7 +1093,7 @@ Git gutter:
 (leaf helm
   :diminish helm-mode
   :require t
-  :straight t
+  :ensure t
   :init
   (global-unset-key (kbd "C-z"))
   (leaf helm-config
@@ -1095,31 +1101,31 @@ Git gutter:
     :init
     (setq helm-command-prefix-key "C-z"))
   (leaf helm-descbinds
-    :straight t
+    :ensure t
     :bind
     (("C-z d" . helm-descbinds))
     :config
     (helm-descbinds-mode))
   (leaf helm-swoop
-    :straight t
+    :ensure t
     :bind
     (("C-z w" . helm-swoop)))
   (leaf helm-ghq
-    :straight t
+    :ensure t
     :bind
     (("C-z g" . helm-ghq)))
   (leaf helm-ag
-    :straight t
+    :ensure t
     :bind
     (("C-z ;" . helm-ag))
     :config
     (setq helm-ag-base-command "rg -S --no-heading"))
   (leaf helm-projectile
-    :straight t
+    :ensure t
     :config
     (helm-projectile-on))
   (leaf helm-git-grep
-    :straight t
+    :ensure t
     :bind
     (("C-z s" . helm-git-grep)))
   :bind
@@ -1134,7 +1140,7 @@ Git gutter:
   (helm-mode t))
 
 (leaf helm-posframe
-  :straight t
+  :ensure t
   :disabled t
   :config
   (helm-posframe-enable)
@@ -1146,14 +1152,14 @@ Git gutter:
 
 ;; which-key
 (leaf which-key
-  :straight t
+  :ensure t
   :require t
   :diminish which-key-mode
   :config
   (which-key-mode)
   (which-key-setup-side-window-right-bottom))
 (leaf which-key-posframe
-  :straight t
+  :ensure t
   :disabled t
   :config
   (which-key-posframe-mode)
@@ -1161,7 +1167,7 @@ Git gutter:
   (which-key-posframe-border-width . 2))
 
 (leaf keyfreq
-  :straight t
+  :ensure t
   :config
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
