@@ -21,7 +21,8 @@ go get -u github.com/golang/dep/cmd/dep
 ## tools
 go get -u github.com/motemen/ghq
 git config --global ghq.root ~/src
-pip3 install percol
+ghq get https://github.com/junegunn/fzf.git
+~/src/github.com/junegunn/fzf/install
 
 # Using Ubuntu
 curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
