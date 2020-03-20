@@ -9,34 +9,18 @@
 
 (prefer-coding-system 'utf-8-unix)
 
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; パッケージ
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; leaf.el
 
 ;; for debug leaf.el
 ;; (add-to-list 'load-path "~/src/github.com/grugrut/leaf.el/")
 ;; (require 'leaf)
 
-;; straight.el
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-
 (prog1 "leaf"
   (prog1 "install leaf"
+    (custom-set-variables
+     '(package-archives '(("org"   . "https://orgmode.org/elpa/")
+                          ("melpa" . "https://melpa.org/packages/")
+                          ("gnu"   . "https://elpa.gnu.org/packages/"))))
     (unless (package-installed-p 'leaf)
       (package-refresh-contents)
       (package-install 'leaf)))
@@ -46,7 +30,9 @@
     :config
     ;; optional packages if you want to use :hydra, :el-get,,,
     (leaf hydra :ensure t)
-
+    (leaf el-get :ensure t
+      :custom ((el-get-git-shallow-clone . t)))
+    
     ;; initialize leaf-keywords.el
     (leaf-keywords-init)))
 
@@ -56,12 +42,17 @@
   (leaf diminish :ensure t :require t)
   (leaf bind-key)
   (leaf key-chord
-    :straight (key-chord :host github :repo "zk-phi/key-chord" :branch "master")
+    :el-get (key-chord
+             :url "https://raw.githubusercontent.com/zk-phi/key-chord/master/key-chord.el")
     :require t
-    :config
-    (key-chord-mode t))
-  (leaf hydra
-    :ensure t))
+    :config (key-chord-mode 1)))
+
+;; emacs26以前はearly-init.elが使えないので手動で読みこむ
+(leaf
+  :when (< emacs-major-version 27)
+  :config
+  (load (concat user-emacs-directory "early-init.el"))
+  )
 
 ;; ベンチマーク
 (leaf benchmark-init
