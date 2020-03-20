@@ -22,7 +22,6 @@
 
 (message "Early-init start")
 
-
 ;; GC
 (custom-set-variables '(gc-cons-threshold (* 2048 1024 1024))
                       '(gc-cons-percentage 0.6)
@@ -43,7 +42,7 @@
 (custom-set-variables '(display-line-numbers-width-start t))
 
 (setq default-frame-alist
-      (append '((width                . 100)  ; フレーム幅
+      (append '((width                . 140)  ; フレーム幅
                 (height               . 40 ) ; フレーム高
                 (left                 . 170 ) ; 配置左位置
                 (top                  . 30 ) ; 配置上位置
@@ -68,11 +67,7 @@
 ;;   (message "Set frame height to 32"))
 ;; (add-hook 'after-make-frame-functions #'reset-frame-parameter)
 
-(custom-set-variables
- '(package-archives '(("org"   . "https://orgmode.org/elpa/")
-                      ("melpa" . "https://melpa.org/packages/")
-                      ("gnu"   . "https://elpa.gnu.org/packages/"))))
-(package-initialize)
+(load (setq custom-file (expand-file-name "custom.el" user-emacs-directory)))
 
 (message "Early-init end")
 

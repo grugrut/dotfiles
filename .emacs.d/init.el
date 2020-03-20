@@ -21,6 +21,7 @@
      '(package-archives '(("org"   . "https://orgmode.org/elpa/")
                           ("melpa" . "https://melpa.org/packages/")
                           ("gnu"   . "https://elpa.gnu.org/packages/"))))
+    (package-initialize)
     (unless (package-installed-p 'leaf)
       (package-refresh-contents)
       (package-install 'leaf)))
@@ -48,8 +49,8 @@
     :config (key-chord-mode 1)))
 
 ;; emacs26以前はearly-init.elが使えないので手動で読みこむ
-(leaf
-  :when (< emacs-major-version 27)
+(leaf early-init
+  :unless (version<= "27.1" emacs-version)
   :config
   (load (concat user-emacs-directory "early-init.el"))
   )
@@ -94,10 +95,6 @@
   ;; 色をつける
   (global-font-lock-mode t)
 
-  ;; GC
-  (setq gc-cons-threshold (* 256 1024 1024))
-  (setq garbage-collection-messages t)
-  
   ;; バッファの自動掃除
   (leaf midnight
     :config
@@ -151,14 +148,6 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(setq default-frame-alist
-      '((width . 180)
-        (height . 50)))
-
-(setq initial-frame-alist
-      '((width . 180)
-        (height . 50)))
-
 ;; フォント設定
 ;;
 ;; abcdefghik
@@ -191,13 +180,12 @@
 (leaf all-the-icons
   :ensure t)
 
-(add-to-list 'custom-theme-load-path "~/src/github.com/grugrut/doom-manoj-dark-theme.el/")
-
 (leaf doom-themes
   :ensure t
   :config
-  (load-theme 'doom-manoj-dark t)
+  (load-theme 'doom-vibrant t)
   (doom-themes-visual-bell-config)
+  (doom-themes-neotree-config)
   (doom-themes-org-config))
 
 (leaf minions
@@ -217,16 +205,6 @@
   (doom-modeline-github . nil)
   (doom-modeline-mu4e . nil)
   (doom-modeline-irc . nil))
-
-;; ツールバーを表示しない
-(tool-bar-mode 0)
-
-;; スクロールバーを表示しない
-(set-scroll-bar-mode nil)
-
-;; 行番号を表示
-(line-number-mode +1)
-(column-number-mode +1)
 
 (leaf beacon
   :ensure t
@@ -265,24 +243,6 @@
   :custom
   (popwin:popup-window-position . 'bottom))
 
-(leaf treemacs
-  :ensure t
-  :require t
-  :bind (("H-t" . treemacs-select-window)
-         ("H-T" . treemacs))
-  :config
-  (treemacs-follow-mode t)
-  (treemacs-filewatch-mode t)
-  (treemacs-fringe-indicator-mode t))
-(leaf treemacs-projectile
-  :ensure t
-  :require t
-  :after (treemacs projectile))
-(leaf treemacs-magit
-  :ensure t
-  :require t
-  :after (treemacs magit))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -320,20 +280,6 @@
   (("C-S-SPC" . bm-toggle)
    ("C-}" . bm-previous)
    ("C-]" . bm-next)))
-
-(leaf move-with-hydra
-  :chord (("jk" . hydra-move/body))
-  :hydra (hydra-move
-          (:hint nil)
-          "
-          ^move^
--------------------------------------
-_gg_
-_G_
-"
-          ("gg" (goto-char (point-min)))
-          ("G" (goto-line (point-max)))
-          ("q" nil)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -607,25 +553,6 @@ _G_
   :leaf-defer t
   :diminish flycheck-mode
   :hook (prog-mode-hook . flycheck-mode))
-
-;; (leaf eglot
-;;   :ensure t
-;;   :leaf-defer t
-;;   :config
-;;   (add-to-list 'eglot-server-programs '(go-mode . ("go-langserver"
-;;                                                    "-mode=stdio"
-;;                                                    "-gocodecompletion"
-;;                                                    "-diagnostics"
-;;                                                    "-lint-tool=golint")))
-;;   (add-to-list 'eglot-server-programs '(elixir-mode . ("language_server.sh")))
-;;   ;; (elixir-mode . ("language_server.sh"))))
-;;   (define-key eglot-mode-map (kbd "C-c h") 'eglot-help-at-point)
-;;   :hook
-;;   (go-mode . eglot-ensure)
-;;   (python-mode . eglot-ensure)
-;;   (web-mode . eglot-ensure)
-;;   (js2-mode . eglot-ensure)
-;;   (elixir-mode . eglot-ensure))
 
 (leaf lsp-mode
   :ensure t
@@ -1163,16 +1090,7 @@ Git gutter:
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
-(defun my/copy-now-line ()
-  "現在ファイルと行をコピーする."
-  (interactive)
-  (let ((text (format "%s L%d" (buffer-name) (line-number-at-pos))))
-    (message text)
-    (kill-new text)))
-
 ;;; サスペンドさせない
 (global-unset-key (kbd "C-x C-z"))
-
-(load (setq custom-file (expand-file-name "custom.el" user-emacs-directory)))
 
 ;;; init.el ends here
