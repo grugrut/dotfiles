@@ -37,8 +37,8 @@
     ;; initialize leaf-keywords.el
     (leaf-keywords-init)))
 
-;;; diminishが付属しなくなったので手動で入れる
 (leaf leaf-util-packages
+  :doc "diminishが付属しなくなったので手動で入れる"
   :config
   (leaf diminish :ensure t :require t)
   (leaf bind-key)
@@ -48,15 +48,15 @@
     :require t
     :config (key-chord-mode 1)))
 
-;; emacs26以前はearly-init.elが使えないので手動で読みこむ
 (leaf early-init
+  :doc "emacs26以前はearly-init.elが使えないので手動で読みこむ"
   :emacs< "27.1"
   :config
   (load (concat user-emacs-directory "early-init.el"))
   )
 
-;;; ライブラリ群
 (leaf libraries
+  :doc "ライブラリ群"
   :config
   (leaf cl-lib
     :leaf-defer t)
@@ -83,49 +83,35 @@
   :config
   ;; 色をつける
   (global-font-lock-mode t)
-
   ;; バッファの自動掃除
   (leaf midnight
     :config
     (midnight-mode))
-  
-  ;; 大きなファイルを開くときの警告を出にくくする
-  (setq large-file-warning-threshold (* 25 1024 1024))
-  
-  ;; ファイルを開く際の大文字小文字を区別しない
-  (setq read-file-name-completion-ignore-case t)
-
   ;; yes-or-no-pをy/nで選択できるようにする
   (defalias 'yes-or-no-p 'y-or-n-p)
-  (setq use-dialog-box nil)
-  
-  ;; history
-  (setq history-length 500
-        history-delete-duplicates t)
-  
   ;; recentf
   (defvar recentf-max-saved-items 1000)
   (defvar recentf-auto-cleanup 'never)
-  
-  ;; move physical line
-  (setq line-move-visual nil)
-
-  ;; マウスでコピーできるように
-  (setq mouse-drag-copy-region t)
   (global-set-key [mouse-2] 'mouse-yank-at-click)
-
-  ;; タブはスペースで
-  (setq-default indent-tabs-mode nil
-                tab-width 2)
-
-  ;; バックアップを作成しない
-  (setq backup-inhibited t)
-  ;; 初期画面を表示しない
-  (setq inhibit-startup-message t)
-
-  ;; ブラウザ設定 WSL限定
-  (setq browse-url-browser-function 'browse-url-generic)
-  (defvar browse-url-generic-program  (executable-find (getenv "BROWSER")))
+  (leaf web-browser-for-wsl
+    :doc "ブラウザ設定 WSL限定"
+    :unless (getenv "BROWSER")
+    :config
+    (setq browse-url-browser-function 'browse-url-generic)
+    (defvar browse-url-generic-program  (executable-find (getenv "BROWSER"))))
+  :setq
+  `((large-file-warning-threshold	   . ,(* 25 1024 1024))
+    (read-file-name-completion-ignore-case . t)
+    (use-dialog-box                        . nil)
+    (history-length                        . 500)
+    (history-delete-duplicates             . t)
+    (line-move-visual                      . nil)
+    (mouse-drag-copy-region                . t)
+    (backup-inhibited                      . t)
+    (inhibit-startup-message               . t))
+  :setq-default
+  (indent-tabs-mode . nil) ; タブはスペースで
+  (tab-width        . 2)
   )
 
 (leaf font
