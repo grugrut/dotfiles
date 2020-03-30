@@ -50,17 +50,10 @@
 
 ;; emacs26以前はearly-init.elが使えないので手動で読みこむ
 (leaf early-init
-  :unless (version<= "27.1" emacs-version)
+  :emacs< "27.1"
   :config
   (load (concat user-emacs-directory "early-init.el"))
   )
-
-;; ベンチマーク
-(leaf benchmark-init
-  :ensure t
-  :leaf-defer nil
-  :hook
-  (after-init-hook . benchmark-init/deactivate))
 
 ;;; ライブラリ群
 (leaf libraries
@@ -81,14 +74,10 @@
     :leaf-defer t)
   (leaf posframe
     :ensure t
+    :leaf-defer t)
+  (leaf smartrep
+    :ensure t
     :leaf-defer t))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; 全般
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (leaf general-setting
   :config
@@ -125,9 +114,6 @@
   (setq mouse-drag-copy-region t)
   (global-set-key [mouse-2] 'mouse-yank-at-click)
 
-  ;; ベルを鳴らさない
-  (setq ring-bell-function (lambda()))
-
   ;; タブはスペースで
   (setq-default indent-tabs-mode nil
                 tab-width 2)
@@ -141,44 +127,39 @@
   (setq browse-url-browser-function 'browse-url-generic)
   (defvar browse-url-generic-program  (executable-find (getenv "BROWSER")))
   )
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; 画面
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; フォント設定
-;;
-;; abcdefghik
-;; 0123456789
-;; あいうえお
-(let* ((family "Cica")
-       (fontspec (font-spec :family family :weight 'normal)))
-  (set-face-attribute 'default nil :family family :height 140)
-  (set-face-attribute 'fixed-pitch nil :family family :height 140)
-  (set-fontset-font nil 'japanese-jisx0213.2004-1 fontspec))
+(leaf font
+  :config
+  ;; フォント設定
+  ;;
+  ;; abcdefghik
+  ;; 0123456789
+  ;; あいうえお
+  (let* ((family "Cica")
+         (fontspec (font-spec :family family :weight 'normal)))
+    (set-face-attribute 'default nil :family family :height 140)
+    (set-face-attribute 'fixed-pitch nil :family family :height 140)
+    (set-fontset-font nil 'japanese-jisx0213.2004-1 fontspec))
+  
+  (add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.9))
+  (add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.9))
 
-(add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.9))
-(add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.9))
+  ;; 絵文字
+  ;; (unicode-fonts-setup) ; 最初に本コマンドの実行が必要
+  ;; (all-the-icons-install-fonts)
+  (leaf unicode-fonts
+    :ensure t)
+  (leaf all-the-icons
+    :ensure t)
 
-(leaf text-scale
-  :hydra (hydra-zoom ()
-                     "Zoom"
-                     ("g" text-scale-increase "in")
-                     ("l" text-scale-decrease "out")
-                     ("r" (text-scale-set 0) "reset")
-                     ("0" (text-scale-set 0) :bind nil :exit t)
-                     ("1" (text-scale-set 0) nil :bind nil :exit t))
-  :bind ("<f2>" . hydra-zoom/body))
-
-;; 絵文字
-;; (unicode-fonts-setup) ; 最初に本コマンドの実行が必要
-;; (all-the-icons-install-fonts)
-(leaf unicode-fonts
-  :ensure t)
-(leaf all-the-icons
-  :ensure t)
+  (leaf text-scale
+    :hydra (hydra-zoom ()
+                       "Zoom"
+                       ("g" text-scale-increase "in")
+                       ("l" text-scale-decrease "out")
+                       ("r" (text-scale-set 0) "reset")
+                       ("0" (text-scale-set 0) :bind nil :exit t))
+    :bind ("<f2>" . hydra-zoom/body)))
 
 (leaf doom-themes
   :ensure t
@@ -198,9 +179,10 @@
   :require t
   :hook (after-init-hook . doom-modeline-mode)
   :custom
-  (doom-modeline-bar-width . 0)
-  (doom-modeline-height . 20)
-  (doom-modeline-major-mode-color-icon . nil)
+  (doom-modeline-bar-width . 3)
+  (doom-modeline-height . 25)
+  (doom-modeline-major-mode-color-icon . t)
+  (doom-modeline-window-width-limit fill-column)
   (doom-modeline-minor-modes . t)
   (doom-modeline-github . nil)
   (doom-modeline-mu4e . nil)
@@ -243,13 +225,6 @@
   :custom
   (popwin:popup-window-position . 'bottom))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; 移動
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (leaf backward-forward
   :ensure t
   :config
@@ -280,13 +255,6 @@
   (("C-S-SPC" . bm-toggle)
    ("C-}" . bm-previous)
    ("C-]" . bm-next)))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; 入力・編集
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (leaf ddskk
   :ensure t
@@ -350,30 +318,27 @@
   (("C-," . er/expand-region)
    ("C-M-," . er/contract-region)))
 
-(leaf smartrep
-  :ensure t)
-
 (leaf multiple-cursors
   :ensure t
   :after smartrep
   :config
   (global-unset-key (kbd "C-t"))
   (smartrep-define-key global-map "C-t"
-                       '(("C-t" . 'mc/mark-next-like-this)
-                         ("n"   . 'mc/mark-next-like-this)
-                         ("p"   . 'mc/mark-previous-like-this)
-                         ("m"   . 'mc/mark-more-like-this-extended)
-                         ("u"   . 'mc/unmark-next-like-this)
-                         ("U"   . 'mc/unmark-previous-like-this)
-                         ("s"   . 'mc/skip-to-next-like-this)
-                         ("S"   . 'mc/skip-to-previous-like-this)
-                         ("*"   . 'mc/mark-all-like-this)
-                         ("a"   . 'mc/mark-all-like-this)
-                         ("d"   . 'mc/mark-all-like-this-dwim)
-                         ("i"   . 'mc/insert-numbers)
-                         ("l"   . 'mc/insert-letters)
-                         ("o"   . 'mc/sort-regions)
-                         ("O"   . 'mc/reverse-regions))))
+    '(("C-t" . 'mc/mark-next-like-this)
+      ("n"   . 'mc/mark-next-like-this)
+      ("p"   . 'mc/mark-previous-like-this)
+      ("m"   . 'mc/mark-more-like-this-extended)
+      ("u"   . 'mc/unmark-next-like-this)
+      ("U"   . 'mc/unmark-previous-like-this)
+      ("s"   . 'mc/skip-to-next-like-this)
+      ("S"   . 'mc/skip-to-previous-like-this)
+      ("*"   . 'mc/mark-all-like-this)
+      ("a"   . 'mc/mark-all-like-this)
+      ("d"   . 'mc/mark-all-like-this-dwim)
+      ("i"   . 'mc/insert-numbers)
+      ("l"   . 'mc/insert-letters)
+      ("o"   . 'mc/sort-regions)
+      ("O"   . 'mc/reverse-regions))))
 
 (leaf smooth-scroll
   :ensure t
@@ -386,13 +351,6 @@
   :diminish auto-revert-mode
   :config
   (global-auto-revert-mode t))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; 検索
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (leaf google-this
   :ensure t
@@ -468,14 +426,6 @@
           (lambda ()
             (deactivate-input-method)))
 
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; コーディング
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (setq comment-style 'extra-line)
 
 (leaf yafolding
@@ -529,15 +479,13 @@
   (global-aggressive-indent-mode 1))
 
 (leaf minimap
-  :disabled t
   :ensure t
   :leaf-defer t
   :config
   (setq minimap-window-location 'right
         minimap-update-delay 0.2
         minimap-minimum-width 20)
-  :hook
-  (prog-mode-hook . minimap-mode))
+  :bind ("s-m" . minimap-mode))
 
 (leaf rainbow-mode
   :ensure t
@@ -546,7 +494,8 @@
   (web-mode-hook . rainbow-mode))
 
 (leaf neotree
-  :ensure t)
+  :ensure t
+  :bind ("H-t" . neotree-toggle))
 
 (leaf flycheck
   :ensure t
@@ -554,83 +503,79 @@
   :diminish flycheck-mode
   :hook (prog-mode-hook . flycheck-mode))
 
-(leaf lsp-mode
-  :ensure t
-  :require t
-  :commands lsp
-  :hook
-  (go-mode-hook . lsp)
-  (web-mode-hook . lsp)
-  (elixir-mode-hook . lsp))
-
-(leaf lsp-ui
-  :ensure t
-  :require t
-  :hook
-  (lsp-mode-hook . lsp-ui-mode)
-  :custom
-  (lsp-ui-sideline-enable . nil)
-  (lsp-prefer-flymake . nil)
+(leaf lsp
   :config
-  (define-key lsp-ui-mode-map [remap xref-find-definitions] 'lsp-ui-peek-find-definitions)
-  (define-key lsp-ui-mode-map [remap xref-find-references] 'lsp-ui-peek-find-references)
-  (define-key lsp-ui-mode-map (kbd "C-c i") 'lsp-ui-imenu)
-  (define-key lsp-ui-mode-map (kbd "s-l") 'hydra-lsp/body)
-  (setq lsp-ui-doc-position 'bottom)
-  :hydra (hydra-lsp (:exit t :hint nil)
-                    "
+  (leaf lsp-mode
+    :ensure t
+    :require t
+    :commands lsp
+    :hook
+    (go-mode-hook . lsp)
+    (web-mode-hook . lsp)
+    (elixir-mode-hook . lsp))
+
+  (leaf lsp-ui
+    :ensure t
+    :require t
+    :hook
+    (lsp-mode-hook . lsp-ui-mode)
+    :custom
+    (lsp-ui-sideline-enable . nil)
+    (lsp-prefer-flymake . nil)
+    :config
+    (define-key lsp-ui-mode-map [remap xref-find-definitions] 'lsp-ui-peek-find-definitions)
+    (define-key lsp-ui-mode-map [remap xref-find-references] 'lsp-ui-peek-find-references)
+    (define-key lsp-ui-mode-map (kbd "C-c i") 'lsp-ui-imenu)
+    (define-key lsp-ui-mode-map (kbd "s-l") 'hydra-lsp/body)
+    (setq lsp-ui-doc-position 'bottom)
+    :hydra (hydra-lsp (:exit t :hint nil)
+                      "
  Buffer^^               Server^^                   Symbol
 -------------------------------------------------------------------------------------
  [_f_] format           [_M-r_] restart            [_d_] declaration  [_i_] implementation  [_o_] documentation
  [_m_] imenu            [_S_]   shutdown           [_D_] definition   [_t_] type            [_r_] rename
  [_x_] execute action   [_M-s_] describe session   [_R_] references   [_s_] signature"
-                    ("d" lsp-find-declaration)
-                    ("D" lsp-ui-peek-find-definitions)
-                    ("R" lsp-ui-peek-find-references)
-                    ("i" lsp-ui-peek-find-implementation)
-                    ("t" lsp-find-type-definition)
-                    ("s" lsp-signature-help)
-                    ("o" lsp-describe-thing-at-point)
-                    ("r" lsp-rename)
+                      ("d" lsp-find-declaration)
+                      ("D" lsp-ui-peek-find-definitions)
+                      ("R" lsp-ui-peek-find-references)
+                      ("i" lsp-ui-peek-find-implementation)
+                      ("t" lsp-find-type-definition)
+                      ("s" lsp-signature-help)
+                      ("o" lsp-describe-thing-at-point)
+                      ("r" lsp-rename)
 
-                    ("f" lsp-format-buffer)
-                    ("m" lsp-ui-imenu)
-                    ("x" lsp-execute-code-action)
+                      ("f" lsp-format-buffer)
+                      ("m" lsp-ui-imenu)
+                      ("x" lsp-execute-code-action)
 
-                    ("M-s" lsp-describe-session)
-                    ("M-r" lsp-restart-workspace)
-                    ("S" lsp-shutdown-workspace)))
+                      ("M-s" lsp-describe-session)
+                      ("M-r" lsp-restart-workspace)
+                      ("S" lsp-shutdown-workspace)))
+  (leaf company-lsp
+    :ensure t
+    :require t
+    :commands company-lsp
+    :config
+    (push 'company-lsp company-backends)))
 
-(leaf company-lsp
-  :ensure t
-  :require t
-  :commands company-lsp
+
+(leaf golang
   :config
-  (push 'company-lsp company-backends))
+  (leaf go-mode
+    :ensure t
+    :leaf-defer t
+    :commands (gofmt-before-save)
+    :init
+    (add-hook 'before-save-hook 'gofmt-before-save)
+    (setq tab-width 4))
 
-(leaf company-tabnine
-  :ensure t
-  :after company
-  :require t
-  :config
-  (add-to-list 'company-backends #'company-tabnine))
-  
+  (leaf protobuf-mode
+    :ensure t)
 
-(leaf go-mode
-  :ensure t
-  :leaf-defer t
-  :commands (gofmt-before-save)
-  :init
-  (add-hook 'before-save-hook 'gofmt-before-save)
-  (setq tab-width 4))
-
-(leaf protobuf-mode
-  :ensure t)
-
-(leaf go-impl
-  :ensure t
-  :leaf-defer t
-  :commands go-impl)
+  (leaf go-impl
+    :ensure t
+    :leaf-defer t
+    :commands go-impl))
 
 (leaf web-mode
   :ensure t
@@ -669,12 +614,6 @@
   :bind (:js2-mode-map
          ("C-c b" . web-beautify-js))
   )
-
-(leaf coffee-mode
-  :ensure t
-  :leaf-defer t
-  :config
-  (setq coffee-tab-width 2))
 
 (leaf php-mode
   :ensure t
@@ -796,49 +735,54 @@
   :ensure t
   :leaf-defer t)
 
-(leaf pocket-reader
-  :ensure t
-  :leaf-defer t)
-
-(leaf company
-  :ensure t
-  :require t
-  :diminish company-mode
-  :defun (global-company-mode
-              company-abort
-              company-complete-number)
+(leaf code-completion
   :config
-  (global-company-mode)
-  (setq company-idle-delay 0.3
-        company-minimum-prefix-length 1
-        company-begin-commands '(self-insert-command)
-        company-selection-wrap-around t
-        company-show-numbers t))
+  (leaf company
+    :ensure t
+    :require t
+    :diminish company-mode
+    :defun (global-company-mode
+            company-abort
+            company-complete-number)
+    :config
+    (global-company-mode)
+    (setq company-idle-delay 0.3
+          company-minimum-prefix-length 1
+          company-begin-commands '(self-insert-command)
+          company-selection-wrap-around t
+          company-show-numbers t))
 
-(leaf company-box
-  :ensure t
-  :require t
-  :diminish company-box-mode
-  :hook (company-mode-hook . company-box-mode)
-  :after all-the-icons
-  :init
-  (setq company-box-icons-elisp
-        (list
-         (concat (all-the-icons-material "functions") " ")
-         (concat (all-the-icons-material "check_circle") " ")
-         (concat (all-the-icons-material "stars") " ")
-         (concat (all-the-icons-material "format_paint") " ")))
-  (setq company-box-icons-unknown (concat (all-the-icons-material "find_in_page") " "))
-  (setq company-box-backends-colors nil)
-  (setq company-box-icons-alist 'company-box-icons-all-the-icons))
+  (leaf company-box
+    :ensure t
+    :require t
+    :diminish company-box-mode
+    :hook (company-mode-hook . company-box-mode)
+    :after all-the-icons
+    :init
+    (setq company-box-icons-elisp
+          (list
+           (concat (all-the-icons-material "functions") " ")
+           (concat (all-the-icons-material "check_circle") " ")
+           (concat (all-the-icons-material "stars") " ")
+           (concat (all-the-icons-material "format_paint") " ")))
+    (setq company-box-icons-unknown (concat (all-the-icons-material "find_in_page") " "))
+    (setq company-box-backends-colors nil)
+    (setq company-box-icons-alist 'company-box-icons-all-the-icons))
 
-(leaf company-posframe
-  :ensure t
-  :require t
-  :diminish company-posframe-mode
-  :after company
-  :config
-  (company-posframe-mode 1))
+  (leaf company-posframe
+    :ensure t
+    :require t
+    :diminish company-posframe-mode
+    :after company
+    :config
+    (company-posframe-mode 1))
+
+  (leaf company-tabnine
+    :ensure t
+    :after company
+    :require t
+    :config
+    (add-to-list 'company-backends #'company-tabnine)))
 
 (leaf yasnippet
   :ensure t
@@ -859,154 +803,135 @@
   :config
   (setq view-read-only t))
 
-(leaf org
-  :leaf-defer t
-  :bind (("C-c c" . org-capture)
-         ("C-c a" . org-agenda))
-  :mode ("\\.org$'" . org-mode)
-  ;; :hook  (org-mode . (lambda ()
-  ;;                      (set (make-local-variable 'system-time-locale) "C")))
+(leaf org-mode-settings
   :config
-  (setq org-directory "~/src/github.com/grugrut/PersonalProject/")
-  :custom
-  ;; TODO状態の設定
-  (org-todo-keywords . '((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d)")
-                         (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "MEETING")))
-  (org-todo-keyword-faces . '(("TODO" :foreground "red" :weight bold)
-                              ("STARTED" :foreground "cornflower blue" :weight bold)
-                              ("DONE" :foreground "green" :weight bold)
-                              ("WAITING" :foreground "orange" :weight bold)
-                              ("HOLD" :foreground "magenta" :weight bold)
-                              ("CANCELLED" :foreground "green" :weight bold)
-                              ("MEETING" :foreground "gren" :weight bold)))
-  ;; 時間計測を開始したらSTARTED状態に
-  (org-clock-in-switch-to-state . 'my-org-clock-in-switch-to-state)
-  (org-log-done . 'time)                
-  (org-clock-persist . t)
-  (org-clock-out-when-done . t)
-  )
+  (leaf org
+    :leaf-defer t
+    :bind (("C-c c" . org-capture)
+           ("C-c a" . org-agenda))
+    :mode ("\\.org$'" . org-mode)
+    ;; :hook  (org-mode . (lambda ()
+    ;;                      (set (make-local-variable 'system-time-locale) "C")))
+    :config
+    (setq org-directory "~/src/github.com/grugrut/PersonalProject/")
+    :custom
+    ;; TODO状態の設定
+    (org-todo-keywords . '((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d)")
+                           (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "MEETING")))
+    (org-todo-keyword-faces . '(("TODO" :foreground "red" :weight bold)
+                                ("STARTED" :foreground "cornflower blue" :weight bold)
+                                ("DONE" :foreground "green" :weight bold)
+                                ("WAITING" :foreground "orange" :weight bold)
+                                ("HOLD" :foreground "magenta" :weight bold)
+                                ("CANCELLED" :foreground "green" :weight bold)
+                                ("MEETING" :foreground "gren" :weight bold)))
+    (org-log-done . 'time)                
+    (org-clock-persist . t)
+    (org-clock-out-when-done . t)
+    )
+  (leaf org-capture
+    :leaf-defer t
+    :after org
+    :commands (org-capture)
+    :config
+    (setq org-capture-templates `(
+                                  ("t" "Todo")
+                                  ("te" "Engineering" entry
+                                   (file+olp ,(concat org-directory "inbox.org") "Engineering")
+                                   "* TODO %?\n %i\n"
+                                   :prepend nil
+                                   :unnarrowed nil
+                                   :kill-buffer t
+                                   )
+                                  ("tw" "Work" entry
+                                   (file+olp ,(concat org-directory "inbox.org") "Work")
+                                   "* TODO %?\n %i\n"
+                                   :prepend nil
+                                   :unnarrowed nil
+                                   :kill-buffer t
+                                   )
+                                  ("th" "House" entry
+                                   (file+olp ,(concat org-directory "inbox.org") "House")
+                                   "* TODO %?\n %i\n"
+                                   :prepend nil
+                                   :unnarrowed nil
+                                   :kill-buffer t
+                                   )
 
-(leaf org-capture
-  :leaf-defer t
-  :after org
-  :commands (org-capture)
+                                  ("d" "Diary" entry
+                                   (file+olp+datetree ,(concat org-directory "diary.org"))
+                                   "** Activeties\n- %?\n** Meals\n- "
+                                   :prepend t
+                                   :unnarrowed nil
+                                   :kill-buffer t
+                                   :time-prompt t
+                                   )
+                                  ("b" "blog" entry
+                                   (file+headline "~/src/github.com/grugrut/blog/draft/blog.org" ,(format-time-string "%Y"))
+                                   "** TODO %?\n:PROPERTIES:\n:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :archives '(\\\"%(format-time-string \"%Y\")\\\" \\\"%(format-time-string \"%Y-%m\")\\\")\n:EXPORT_FILE_NAME: %(format-time-string \"%Y%m%d%H%M\")\n:END:\n\n")
+                                  )))
+  (leaf org-bullets
+    :ensure t
+    :hook
+    (org-mode-hook (lambda () (org-bullets-mode 1))))
+
+  (leaf ox-hugo
+    :ensure t
+    :after ox
+    :mode ("\\.org$'" . org-hugo-auto-export-mode))
+
+  (leaf ob
+    :leaf-defer t
+    :after org
+    :defun org-babel-do-load-languages
+    :config
+    (leaf ob-elixir
+      :ensure t)
+    (leaf ob-go
+      :ensure t)
+    (leaf ob-rust
+      :ensure t)
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((emacs-lisp . t)
+       (elixir . t)
+       (go . t)
+       (rust . t)))))
+
+(leaf git
   :config
-  (setq org-capture-templates `(
-                                ("t" "Todo")
-                                ("te" "Engineering" entry
-                                 (file+olp ,(concat org-directory "inbox.org") "Engineering")
-                                 "* TODO %?\n %i\n"
-                                 :prepend nil
-                                 :unnarrowed nil
-                                 :kill-buffer t
-                                 )
-                                ("tw" "Work" entry
-                                 (file+olp ,(concat org-directory "inbox.org") "Work")
-                                 "* TODO %?\n %i\n"
-                                 :prepend nil
-                                 :unnarrowed nil
-                                 :kill-buffer t
-                                 )
-                                ("th" "House" entry
-                                 (file+olp ,(concat org-directory "inbox.org") "House")
-                                 "* TODO %?\n %i\n"
-                                 :prepend nil
-                                 :unnarrowed nil
-                                 :kill-buffer t
-                                 )
+  (leaf magit
+    :ensure t
+    :bind (("C-x g" . magit-status)))
 
-                                ("d" "Diary" entry
-                                 (file+olp+datetree ,(concat org-directory "diary.org"))
-                                 "** Activeties\n- %?\n** Meals\n- "
-                                 :prepend t
-                                 :unnarrowed nil
-                                 :kill-buffer t
-                                 :time-prompt t
-                                 )
-                                ("b" "blog" entry
-                                 (file+headline "~/src/github.com/grugrut/blog/draft/blog.org" ,(format-time-string "%Y"))
-                                 "** TODO %?\n:PROPERTIES:\n:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :archives '(\\\"%(format-time-string \"%Y\")\\\" \\\"%(format-time-string \"%Y-%m\")\\\")\n:EXPORT_FILE_NAME: %(format-time-string \"%Y%m%d%H%M\")\n:END:\n\n")
-                                )))
-
-;;; TODOの場合だけSTARTEDに変更する
-(defun my-org-clock-in-switch-to-state (state)
-  "Change state to STRTED when previous STATE is only TODO."
-  (when (string-equal state "TODO")
-    "STARTED"))
-
-(leaf org-bullets
-  :disabled t
-  :ensure t
-  :hook
-  (org-mode-hook (lambda () (org-bullets-mode 1))))
-
-;;; #+UPDATE:を保存時に更新
-(leaf time-stamp
-  :disabled t
-  :init
-  (add-hook 'before-save-hook 'time-stamp)
-  :config
-  (setq time-stamp-active t
-        time-stamp-line 10
-        time-stamp-start "^#\\+LASTMOD:"
-        time-stamp-format " %:y-%02m-%02d"
-        time-stamp-end "$"))
-
-(leaf ox-hugo
-  :ensure t
-  :after ox
-  :mode ("\\.org$'" . org-hugo-auto-export-mode))
-
-(leaf ob
-  :leaf-defer t
-  :after org
-  :defun org-babel-do-load-languages
-  :config
-  (leaf ob-elixir
-    :ensure t)
-  (leaf ob-go
-    :ensure t)
-  (leaf ob-rust
-    :ensure t)
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)
-     (elixir . t)
-     (go . t)
-     (rust . t))))
-
-(leaf magit
-  :ensure t
-  :bind (("C-x g" . magit-status)))
-
-;; gitの差分を表示する
-(leaf git-gutter-fringe
-  :ensure t
-  :require t
-  :custom
-  (git-gutter:lighter . "")
-  (global-git-gutter-mode . t)
-  :bind ("C-x G" . hydra-git-gutter/body)
-  :hydra (hydra-git-gutter (:body-pre (git-gutter-mode 1)
-                                      :hint nil)
-                           "
+  ;; gitの差分を表示する
+  (leaf git-gutter-fringe
+    :ensure t
+    :require t
+    :custom
+    (git-gutter:lighter . "")
+    (global-git-gutter-mode . t)
+    :bind ("C-x G" . hydra-git-gutter/body)
+    :hydra (hydra-git-gutter (:body-pre (git-gutter-mode 1)
+                                        :hint nil)
+                             "
 Git gutter:
   _j_: next hunk     _s_tage hunk   _q_uit
   _k_: previous hunk _r_evert hunk
   _h_: first hunk    _p_opup hunk
   _l_: last hunk     set _R_evision
 "
-                           ("j" git-gutter:next-hunk)
-                           ("k" git-gutter:previous-hunk)
-                           ("h" (progn (goto-char (point-min))
-                                       (git-gutter:next-hunk 1)))
-                           ("l" (progn (goto-char (point-min))
-                                       (git-gutter:previous-hunk 1)))
-                           ("s" git-gutter:stage-hunk)
-                           ("r" git-gutter:revert-hunk)
-                           ("p" git-gutter:popup-hunk)
-                           ("R" git-gutter:set-start-revision)
-                           ("q" nil :color blue)))
+                             ("j" git-gutter:next-hunk)
+                             ("k" git-gutter:previous-hunk)
+                             ("h" (progn (goto-char (point-min))
+                                         (git-gutter:next-hunk 1)))
+                             ("l" (progn (goto-char (point-min))
+                                         (git-gutter:previous-hunk 1)))
+                             ("s" git-gutter:stage-hunk)
+                             ("r" git-gutter:revert-hunk)
+                             ("p" git-gutter:popup-hunk)
+                             ("R" git-gutter:set-start-revision)
+                             ("q" nil :color blue))))
 
 (leaf helm
   :diminish helm-mode
