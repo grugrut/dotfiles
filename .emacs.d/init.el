@@ -33,7 +33,7 @@
     (leaf hydra :ensure t)
     (leaf el-get :ensure t
       :custom ((el-get-git-shallow-clone . t)))
-    
+
     ;; initialize leaf-keywords.el
     (leaf-keywords-init)))
 
@@ -93,6 +93,8 @@
   (defvar recentf-max-saved-items 1000)
   (defvar recentf-auto-cleanup 'never)
   (global-set-key [mouse-2] 'mouse-yank-at-click)
+  ;; リージョン選択時にリージョンまるごと削除
+  (delete-selection-mode t)
   (leaf web-browser-for-wsl
     :doc "ブラウザ設定 WSL限定"
     :unless (getenv "BROWSER")
@@ -108,7 +110,9 @@
     (line-move-visual                      . nil)
     (mouse-drag-copy-region                . t)
     (backup-inhibited                      . t)
-    (inhibit-startup-message               . t))
+    (inhibit-startup-message               . t)
+    (require-final-newline                 . t)
+    (next-line-add-newlines                . nil))
   :setq-default
   (indent-tabs-mode . nil) ; タブはスペースで
   (tab-width        . 2)
@@ -126,10 +130,8 @@
     (set-face-attribute 'default nil :family family :height 140)
     (set-face-attribute 'fixed-pitch nil :family family :height 140)
     (set-fontset-font nil 'japanese-jisx0213.2004-1 fontspec))
-  
   (add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.9))
   (add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.9))
-
   ;; 絵文字
   ;; (unicode-fonts-setup) ; 最初に本コマンドの実行が必要
   ;; (all-the-icons-install-fonts)
@@ -174,12 +176,14 @@
   (doom-modeline-mu4e . nil)
   (doom-modeline-irc . nil))
 
-(leaf beacon
-  :ensure t
-  :diminish beacon-mode
-  :require t
+(leaf display-buffer
   :config
-  (beacon-mode 1))
+  (leaf beacon
+    :ensure t
+    :diminish beacon-mode
+    :require t
+    :config
+    (beacon-mode 1)))
 
 ;; タイトルバーにファイル名を表示
 (setq frame-title-format "%f")
@@ -282,14 +286,6 @@
   :config
   (volatile-highlights-mode t))
 
-;; 最終行には必ず1行挿入
-(setq require-final-newline t)
-
-;; バッファの最後の改行を抑制
-(setq next-line-add-newlines nil)
-
-;; リージョン選択時にリージョンまるごと削除
-(delete-selection-mode t)
 
 (leaf highlight-symbol
   :ensure t
@@ -462,7 +458,8 @@
   :require t
   :diminish aggressive-indent-mode
 	:config
-  (global-aggressive-indent-mode 1))
+  (global-aggressive-indent-mode 1)
+  (add-to-list 'aggressive-indent-excluded-modes 'dockerfile-mode))
 
 (leaf minimap
   :ensure t
@@ -489,17 +486,15 @@
   :diminish flycheck-mode
   :hook (prog-mode-hook . flycheck-mode))
 
-(leaf lsp
+(leaf lsp-mode
+  :ensure t
+  :require t
+  :commands lsp
+  :hook
+  (go-mode-hook . lsp)
+  (web-mode-hook . lsp)
+  (elixir-mode-hook . lsp)
   :config
-  (leaf lsp-mode
-    :ensure t
-    :require t
-    :commands lsp
-    :hook
-    (go-mode-hook . lsp)
-    (web-mode-hook . lsp)
-    (elixir-mode-hook . lsp))
-
   (leaf lsp-ui
     :ensure t
     :require t
@@ -698,6 +693,10 @@
 
 (leaf dockerfile-mode
   :ensure t)
+
+(leaf plantuml-mode
+  :ensure t
+  :mode ("\\.uml\\'" . plantuml-mode))
 
 (leaf smartparens
   :ensure t
@@ -1000,6 +999,11 @@ Git gutter:
   :config
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
+
+(leaf atomic-chrome
+  :ensure t
+  :config
+  (atomic-chrome-start-server))
 
 ;;; サスペンドさせない
 (global-unset-key (kbd "C-x C-z"))
