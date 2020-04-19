@@ -55,6 +55,11 @@
   (load (concat user-emacs-directory "early-init.el"))
   )
 
+(leaf paradox
+  :ensure t
+  :config
+  (paradox-enable))
+
 (leaf libraries
   :doc "ライブラリ群"
   :config
@@ -83,26 +88,38 @@
   :config
   ;; 色をつける
   (global-font-lock-mode t)
-  ;; バッファの自動掃除
   (leaf midnight
+    :doc "バッファの自動掃除"
     :config
     (midnight-mode))
-  ;; yes-or-no-pをy/nで選択できるようにする
-  (defalias 'yes-or-no-p 'y-or-n-p)
+  (defalias 'yes-or-no-p 'y-or-n-p) ; yes-or-no-pをy/nで選択できるようにする
   ;; recentf
   (defvar recentf-max-saved-items 1000)
   (defvar recentf-auto-cleanup 'never)
   (global-set-key [mouse-2] 'mouse-yank-at-click)
-  ;; リージョン選択時にリージョンまるごと削除
-  (delete-selection-mode t)
+  (delete-selection-mode t) ; リージョン選択時にリージョンまるごと削除
+  (leaf exec-path-from-shell
+    :ensure t
+    :config
+    (exec-path-from-shell-initialize))
   (leaf web-browser-for-wsl
     :doc "ブラウザ設定 WSL限定"
     :unless (getenv "BROWSER")
     :config
     (setq browse-url-browser-function 'browse-url-generic)
     (defvar browse-url-generic-program  (executable-find (getenv "BROWSER"))))
+  ;; 対応する括弧を光らせる
+  (show-paren-mode t)
+  (defvar show-paren-style 'mixed)
+  ;; カーソルを点滅させない
+  (blink-cursor-mode 0)
+  ;; 単語での折り返し
+  (global-visual-line-mode t)
+  ;; マウスを避けさせる
+  (mouse-avoidance-mode 'jump)
+  (setq frame-title-format "%f")
   :setq
-  `((large-file-warning-threshold	   . ,(* 25 1024 1024))
+  `((large-file-warning-threshold	         . ,(* 25 1024 1024))
     (read-file-name-completion-ignore-case . t)
     (use-dialog-box                        . nil)
     (history-length                        . 500)
@@ -112,7 +129,9 @@
     (backup-inhibited                      . t)
     (inhibit-startup-message               . t)
     (require-final-newline                 . t)
-    (next-line-add-newlines                . nil))
+    (next-line-add-newlines                . nil)
+    (frame-title-format                    . "%f")
+    (truncate-lines                        . t))
   :setq-default
   (indent-tabs-mode . nil) ; タブはスペースで
   (tab-width        . 2)
@@ -120,18 +139,6 @@
 
 (leaf font
   :config
-  ;; フォント設定
-  ;;
-  ;; abcdefghik
-  ;; 0123456789
-  ;; あいうえお
-  (let* ((family "Cica")
-         (fontspec (font-spec :family family :weight 'normal)))
-    (set-face-attribute 'default nil :family family :height 140)
-    (set-face-attribute 'fixed-pitch nil :family family :height 140)
-    (set-fontset-font nil 'japanese-jisx0213.2004-1 fontspec))
-  (add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.9))
-  (add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.9))
   ;; 絵文字
   ;; (unicode-fonts-setup) ; 最初に本コマンドの実行が必要
   ;; (all-the-icons-install-fonts)
@@ -139,7 +146,25 @@
     :ensure t)
   (leaf all-the-icons
     :ensure t)
-
+  ;; フォント設定
+  ;;
+  ;; abcdefghik
+  ;; 0123456789
+  ;; あいうえお
+  (let* ((family "Cica")
+         (fontspec (font-spec :family family :weight 'normal)))
+    (set-face-attribute 'default nil :family family :height 120)
+    (set-face-attribute 'fixed-pitch nil :family family :height 120)
+    (set-fontset-font t 'japanese-jisx0213.2004-1 fontspec)
+    (set-fontset-font nil 'unicode fontspec nil 'append)
+    (set-fontset-font nil 'unicode (font-spec :family "file-icons") nil 'append)
+    (set-fontset-font nil 'unicode (font-spec :family "github-octicons") nil 'append)
+    (set-fontset-font nil 'unicode (font-spec :family "FontAwesome") nil 'append)
+    (set-fontset-font nil 'unicode (font-spec :family "all-the-icons") nil 'append)
+    (set-fontset-font nil 'unicode (font-spec :family "Weather Icons") nil 'append)
+    (set-fontset-font nil 'unicode (font-spec :family "Material Icons") nil 'append))
+  (add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.9))
+  (add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.9))
   (leaf text-scale
     :hydra (hydra-zoom ()
                        "Zoom"
@@ -159,6 +184,7 @@
 
 (leaf minions
   :ensure t
+  :disabled t
   :config
   (minions-mode t))
 
@@ -185,25 +211,6 @@
     :config
     (beacon-mode 1)))
 
-;; タイトルバーにファイル名を表示
-(setq frame-title-format "%f")
-
-;; 対応する括弧を光らせる
-(show-paren-mode t)
-(defvar show-paren-style 'mixed)
-
-;; カーソルを点滅させない
-(blink-cursor-mode 0)
-
-;; 単語での折り返し
-(global-visual-line-mode t)
-
-;; バッファ画面外文字の切り詰め表示（有効：t、無効：nil）
-(setq truncate-lines nil)
-
-;; マウスを避けさせる
-(mouse-avoidance-mode 'jump)
-
 ;; 同一バッファ名にディレクトリ付与
 (leaf uniquify
   :custom
@@ -224,7 +231,13 @@
   :ensure t
   :bind
   (("C-:" . avy-goto-char-timer)
-   ("M-g M-g" . avy-goto-line)))
+   ("C-*" . avy-resume)
+   ("M-g M-g" . avy-goto-line))
+  :config
+  (leaf avy-zap
+    :ensure t
+    :bind
+    ([remap zap-to-char] . avy-zap-to-char)))
 
 (leaf ace-window
   :ensure t
@@ -254,26 +267,26 @@
   :init
   (defvar dired-bind-jump nil)  ; dired-xがC-xC-jを奪うので対処しておく
   :custom
-  (skk-use-azik . t)                     ; AZIKを使用する
-  (skk-azik-keyboard-type . 'jp106)      ;
-  (skk-tut-file . nil)                   ;
-  (skk-server-host . "localhost")        ;
-  (skk-server-portnum . 1178)            ;
-  (skk-egg-like-newline . t)             ; 変換時にリターンでは改行しない
-  (skk-japanese-message-and-error . t)   ; メッセージを日本語にする
-  (skk-auto-insert-paren . t)            ; 対応する括弧を自動挿入
-  (skk-check-okurigana-on-touroku . t)   ;
-  (skk-show-annotation . t)              ; アノテーションを表示
-  (skk-anotation-show-wikipedia-url . t) ;
-  (skk-show-tooltip . nil)               ; 変換候補をインライン表示しない
-  (skk-isearch-start-mode . 'latin)      ; isearch時にSKKをオフ
-  (skk-henkan-okuri-strictly . nil)      ; 送り仮名を考慮した変換候補
-  (skk-process-okuri-early . nil)
+  (skk-use-azik                     . t)      ; AZIKを使用する
+  (skk-azik-keyboard-type           . 'jp106)
+  (skk-tut-file                     . nil)
+  (skk-server-host                  . "localhost")
+  (skk-server-portnum               . 1178)   ;
+  (skk-egg-like-newline             . t)      ; 変換時にリターンでは改行しない
+  (skk-japanese-message-and-error   . t)      ; メッセージを日本語にする
+  (skk-auto-insert-paren            . t)      ; 対応する括弧を自動挿入
+  (skk-check-okurigana-on-touroku   . t)      ;
+  (skk-show-annotation              . t)      ; アノテーションを表示
+  (skk-anotation-show-wikipedia-url . t)      ;
+  (skk-show-tooltip                 . nil)    ; 変換候補をインライン表示しない
+  (skk-isearch-start-mode           . 'latin) ; isearch時にSKKをオフ
+  (skk-henkan-okuri-strictly        . nil)    ; 送り仮名を考慮した変換候補
+  (skk-process-okuri-early          . nil)
   :hook
   (skk-azik-load-hook . my/skk-azik-disable-tU)
   :preface
   (defun my/skk-azik-disable-tU ()
-    "ddskkのazikモードが`tU'を`つ'として扱うのを抑制する."
+    "ddskkのazikモードが`tU'を`っ'として扱うのを抑制する."
     (setq skk-rule-tree (skk-compile-rule-list
                          skk-rom-kana-base-rule-list
                          (skk-del-alist "tU" skk-rom-kana-rule-list)))))
@@ -779,7 +792,7 @@
                                 ("HOLD" :foreground "magenta" :weight bold)
                                 ("CANCELLED" :foreground "green" :weight bold)
                                 ("MEETING" :foreground "gren" :weight bold)))
-    (org-log-done . 'time)                
+    (org-log-done . 'time)
     (org-clock-persist . t)
     (org-clock-out-when-done . t)
     )
@@ -826,6 +839,8 @@
                                   )))
   (leaf org-bullets
     :ensure t
+    :custom
+    (org-bullets-bullet-list . '("" "" "" "" "" "" ""))
     :hook
     (org-mode-hook (lambda () (org-bullets-mode 1))))
 
@@ -927,7 +942,7 @@ Git gutter:
     (("C-z s" . helm-git-grep)))
   :bind
   (("C-;" . helm-mini)
-   ("C-M-z" . helm-resume)
+   ("C-+" . helm-resume)
    ("C-x b" . helm-buffers-list)
    ("M-x" . helm-M-x)
    ("C-x C-f" . helm-find-files)
@@ -938,7 +953,6 @@ Git gutter:
 
 (leaf helm-posframe
   :ensure t
-  :disabled t
   :config
   (helm-posframe-enable)
   :custom
@@ -957,7 +971,6 @@ Git gutter:
   (which-key-setup-side-window-right-bottom))
 (leaf which-key-posframe
   :ensure t
-  :disabled t
   :config
   (which-key-posframe-mode)
   :custom

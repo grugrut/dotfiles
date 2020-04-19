@@ -67,7 +67,7 @@
 ;;   (message "Set frame height to 32"))
 ;; (add-hook 'after-make-frame-functions #'reset-frame-parameter)
 
-(load (setq custom-file (expand-file-name "custom.el" user-emacs-directory)))
+(custom-set-variables '(custom-file (expand-file-name "custom.el" user-emacs-directory)))
 
 (message "Early-init end")
 
