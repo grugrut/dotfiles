@@ -104,10 +104,13 @@
     (exec-path-from-shell-initialize))
   (leaf web-browser-for-wsl
     :doc "ブラウザ設定 WSL限定"
-    :unless (getenv "BROWSER")
     :config
-    (setq browse-url-browser-function 'browse-url-generic)
-    (defvar browse-url-generic-program  (executable-find (getenv "BROWSER"))))
+    (let ((cmd-exe "/mnt/c/Windows/System32/cmd.exe")
+          (cmd-args '("/c" "start")))
+      (when (file-exists-p cmd-exe)
+        (setq browse-url-browser-function 'browse-url-generic
+              browse-url-generic-program cmd-exe
+              browse-url-generic-args cmd-args))))
   ;; 対応する括弧を光らせる
   (show-paren-mode t)
   (defvar show-paren-style 'mixed)
@@ -668,10 +671,17 @@
   :leaf-defer t
   :mode ("\\.yaml\\'" . yaml-mode))
 
-(leaf markdown-mode
-  :ensure t
-  :leaf-defer t
-  :mode ("\\.md\\'" . gfm-mode))
+(leaf markdown
+  :config
+  (leaf markdown-mode
+    :ensure t
+    :leaf-defer t
+    :mode ("\\.md\\'" . gfm-mode)
+    :custom
+    (markdown-command . "github-markup")
+    (markdown-command-needs-filename . t))
+  (leaf markdown-preview-mode
+    :ensure t))
 
 (leaf dockerfile-mode
   :ensure t)

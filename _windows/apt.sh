@@ -23,6 +23,8 @@ kubectl
 python3-pip
 x11-xserver-utils
 jq
+ruby
+ruby-dev
 "
 
 apt update

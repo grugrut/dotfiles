@@ -24,7 +24,11 @@ git config --global ghq.root ~/src
 ghq get https://github.com/junegunn/fzf.git
 ~/src/github.com/junegunn/fzf/install
 
-# Using Ubuntu
+gem install github-markup
+gem install commonmarker
+gem install asciidoctor
+
+# Using npm
 curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
