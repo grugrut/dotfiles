@@ -975,36 +975,43 @@ Git gutter:
   :custom
   (helm-posframe-poshandler . 'posframe-poshandler-frame-center))
 
-;; C-hをバックスペース
-(keyboard-translate ?\C-h ?\C-?)
-
-;; which-key
-(leaf which-key
-  :ensure t
-  :require t
-  :diminish which-key-mode
-  :config
-  (which-key-mode)
-  (which-key-setup-side-window-right-bottom))
-(leaf which-key-posframe
-  :ensure t
-  :config
-  (which-key-posframe-mode)
-  :custom
-  (which-key-posframe-border-width . 2))
-
-(leaf keyfreq
-  :ensure t
-  :config
-  (keyfreq-mode 1)
-  (keyfreq-autosave-mode 1))
-
 (leaf atomic-chrome
   :ensure t
   :config
   (atomic-chrome-start-server))
 
-;;; サスペンドさせない
-(global-unset-key (kbd "C-x C-z"))
+(leaf key-settings
+  :doc "キー入力設定"
+  :config
+  (global-unset-key (kbd "C-x C-z"))
+  ;; C-hをバックスペース
+  (keyboard-translate ?\C-h ?\C-?)
+  ;; which-key
+  (leaf which-key
+    :ensure t
+    :require t
+    :diminish which-key-mode
+    :config
+    (which-key-mode)
+    (which-key-setup-side-window-right-bottom))
+  (leaf which-key-posframe
+    :ensure t
+    :after '(which-key posframe)
+    :config
+    (which-key-posframe-mode)
+    :custom
+    (which-key-posframe-border-width . 2))
+  (leaf keyfreq
+    :ensure t
+    :config
+    (keyfreq-mode 1)
+    (keyfreq-autosave-mode 1))
+  (leaf free-keys
+    :doc "利用していないキーマップを教えてくれる"
+    :ensure t)
+  )
+
+
+
 
 ;;; init.el ends here
