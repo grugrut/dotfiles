@@ -84,6 +84,13 @@
     :ensure t
     :leaf-defer t))
 
+(leaf gcmh
+  :ensure t
+  :custom
+  (gcmh-verbose . t)
+  :config
+  (gcmh-mode 1))
+
 (leaf general-setting
   :config
   ;; 色をつける

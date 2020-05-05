@@ -22,11 +22,6 @@
 
 (message "Early-init start")
 
-;; GC
-(custom-set-variables '(gc-cons-threshold (* 2048 1024 1024))
-                      '(gc-cons-percentage 0.6)
-                      '(garbage-collection-messages t))
-
 ;; ツールバーを表示しない
 (tool-bar-mode 0)
 
