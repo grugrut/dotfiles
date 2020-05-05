@@ -86,6 +86,7 @@
 
 (leaf gcmh
   :ensure t
+  :diminish gcmh
   :custom
   (gcmh-verbose . t)
   :config
@@ -124,7 +125,12 @@
   ;; カーソルを点滅させない
   (blink-cursor-mode 0)
   ;; 単語での折り返し
-  (global-visual-line-mode t)
+  (leaf visual-line-mode
+    :require simple
+    :config
+    (global-visual-line-mode t)
+    (diminish 'visual-line-mode nil))
+  
   ;; マウスを避けさせる
   (mouse-avoidance-mode 'jump)
   (setq frame-title-format "%f")
@@ -197,6 +203,9 @@
   :disabled t
   :config
   (minions-mode t))
+
+(leaf eldoc
+  :diminish eldoc-mode)
 
 (leaf doom-modeline
   :ensure t
@@ -292,6 +301,7 @@
   (skk-isearch-start-mode           . 'latin) ; isearch時にSKKをオフ
   (skk-henkan-okuri-strictly        . nil)    ; 送り仮名を考慮した変換候補
   (skk-process-okuri-early          . nil)
+  (skk-status-indicator             . 'minor-mode)
   :hook
   (skk-azik-load-hook . my/skk-azik-disable-tU)
   :preface
@@ -715,6 +725,14 @@
 (leaf fontawesome
   :ensure t)
 
+(leaf prettier-js
+  :ensure t
+  :hook ((js2-mode-hook . prettier-js-mode)
+         (web-mode-hook . prettier-js-mode)
+         (markdown-mode-hook . prettier-js-mode)
+         (yaml-mode-hook . prettier-js-mode))
+  )
+
 (leaf codic
   :ensure t
   :leaf-defer t)
@@ -920,7 +938,6 @@ Git gutter:
                              ("q" nil :color blue))))
 
 (leaf helm
-  :diminish helm-mode
   :require t
   :ensure t
   :init
@@ -966,7 +983,8 @@ Git gutter:
    (helm-map
     ("C-z" . helm-execute-persistent-action)))
   :config
-  (helm-mode t))
+  (helm-mode t)
+  (diminish 'helm-mode nil))
 
 (leaf helm-posframe
   :ensure t
@@ -1010,8 +1028,5 @@ Git gutter:
     :doc "利用していないキーマップを教えてくれる"
     :ensure t)
   )
-
-
-
 
 ;;; init.el ends here

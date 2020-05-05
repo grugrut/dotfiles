@@ -21,6 +21,7 @@
 ;;; Code:
 
 (message "Early-init start")
+(setq debug-on-error t)
 
 ;; ツールバーを表示しない
 (tool-bar-mode 0)
