@@ -20,7 +20,6 @@
 
 ;;; Code:
 
-(message "Early-init start")
 (setq debug-on-error t)
 
 ;; ツールバーを表示しない
@@ -57,14 +56,6 @@
 
 (modify-frame-parameters nil '((sticky . t) (width . 100) (height . 40))) ; Xを使う場合の高速化設定らしい
 
-;; (defun reset-frame-parameter (frame)
-;;   (sleep-for 0.1)
-;;   (set-frame-parameter frame 'height 32)
-;;   (message "Set frame height to 32"))
-;; (add-hook 'after-make-frame-functions #'reset-frame-parameter)
-
 (custom-set-variables '(custom-file (expand-file-name "custom.el" user-emacs-directory)))
-
-(message "Early-init end")
 
 ;;; early-init.el ends here

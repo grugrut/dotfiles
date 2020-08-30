@@ -11,10 +11,6 @@
 
 ;; leaf.el
 
-;; for debug leaf.el
-;; (add-to-list 'load-path "~/src/github.com/grugrut/leaf.el/")
-;; (require 'leaf)
-
 (prog1 "leaf"
   (prog1 "install leaf"
     (custom-set-variables
@@ -79,6 +75,12 @@
     :leaf-defer t)
   (leaf posframe
     :ensure t
+    :preface
+    (defun my-posframe-arghandler (buffer-or-name arg-name value)
+      (let ((info '(:internal-border-width 1 :internal-border-color "gray80")))
+        (or (plist-get info arg-name) value)))
+    :custom
+    (posframe-arghandler . #'my-posframe-arghandler)
     :leaf-defer t)
   (leaf smartrep
     :ensure t
@@ -130,7 +132,7 @@
     :config
     (global-visual-line-mode t)
     (diminish 'visual-line-mode nil))
-  
+
   ;; マウスを避けさせる
   (mouse-avoidance-mode 'jump)
   (setq frame-title-format "%f")
@@ -147,7 +149,8 @@
     (require-final-newline                 . t)
     (next-line-add-newlines                . nil)
     (frame-title-format                    . "%f")
-    (truncate-lines                        . t))
+    (truncate-lines                        . t)
+    (read-process-output-max               . ,(* 1024 1024)))
   :setq-default
   (indent-tabs-mode . nil) ; タブはスペースで
   (tab-width        . 2)
@@ -170,15 +173,14 @@
   (let* ((family "Cica")
          (fontspec (font-spec :family family :weight 'normal)))
     (set-face-attribute 'default nil :family family :height 120)
-    (set-face-attribute 'fixed-pitch nil :family family :height 120)
-    (set-fontset-font t 'japanese-jisx0213.2004-1 fontspec)
-    (set-fontset-font nil 'unicode fontspec nil 'append)
-    (set-fontset-font nil 'unicode (font-spec :family "file-icons") nil 'append)
-    (set-fontset-font nil 'unicode (font-spec :family "github-octicons") nil 'append)
-    (set-fontset-font nil 'unicode (font-spec :family "FontAwesome") nil 'append)
+    (set-fontset-font nil 'japanese-jisx0208 fontspec nil 'append)
+    (set-fontset-font nil 'jisx0201 fontspec nil 'append)
     (set-fontset-font nil 'unicode (font-spec :family "all-the-icons") nil 'append)
-    (set-fontset-font nil 'unicode (font-spec :family "Weather Icons") nil 'append)
-    (set-fontset-font nil 'unicode (font-spec :family "Material Icons") nil 'append))
+    (set-fontset-font nil 'unicode (font-spec :family "Material Icons") nil 'append)
+    (set-fontset-font nil 'unicode (font-spec :family "file-icons") nil 'append)
+    (set-fontset-font nil 'unicode (font-spec :family "FontAwesome") nil 'append)
+    (set-fontset-font nil 'unicode (font-spec :family "github-octicons") nil 'append)
+    (set-fontset-font nil 'unicode (font-spec :family "Weather Icons") nil 'append))
   (add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.9))
   (add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.9))
   (leaf text-scale
@@ -266,6 +268,17 @@
   (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
   :custom-face
   (aw-leading-char-face . '((t (:height 2.0)))))
+
+(leaf imenu-list
+  :ensure t
+  :bind (("s-i" . imenu-list-smart-toggle))
+  :custom
+  (imenu-list-focus-after-activation . t)
+  :config
+  (leaf leaf-tree
+    :doc "leafのブロックを意識して表示"
+    :diminish leaf-tree
+    :ensure t))
 
 (leaf bm
   :ensure t
@@ -455,14 +468,6 @@
   :hook
   (prog-mode-hook . vi-tilde-fringe-mode))
 
-(leaf aggressive-indent
-  :ensure t
-  :require t
-  :diminish aggressive-indent-mode
-	:config
-  (global-aggressive-indent-mode 1)
-  (add-to-list 'aggressive-indent-excluded-modes 'dockerfile-mode))
-
 (leaf minimap
   :ensure t
   :leaf-defer t
@@ -496,6 +501,7 @@
   (go-mode-hook . lsp)
   (web-mode-hook . lsp)
   (elixir-mode-hook . lsp)
+  (typescript-mode-hook . lsp)
   :config
   (leaf lsp-ui
     :ensure t
@@ -505,6 +511,7 @@
     :custom
     (lsp-ui-sideline-enable . nil)
     (lsp-prefer-flymake . nil)
+    (lsp-print-performance . t)
     :config
     (define-key lsp-ui-mode-map [remap xref-find-definitions] 'lsp-ui-peek-find-definitions)
     (define-key lsp-ui-mode-map [remap xref-find-references] 'lsp-ui-peek-find-references)
@@ -533,14 +540,7 @@
 
                       ("M-s" lsp-describe-session)
                       ("M-r" lsp-restart-workspace)
-                      ("S" lsp-shutdown-workspace)))
-  (leaf company-lsp
-    :ensure t
-    :require t
-    :commands company-lsp
-    :config
-    (push 'company-lsp company-backends)))
-
+                      ("S" lsp-shutdown-workspace))))
 
 (leaf golang
   :config
@@ -578,9 +578,10 @@
         web-mode-comment-style 2
         web-mode-style-padding 1
         web-mode-script-padding 1)
-  (define-key web-mode-map (kbd "C-c b") 'web-beautify-html)
-  (define-key web-mode-map (kbd "C-c b") 'web-beautify-css)
   )
+
+(leaf typescript-mode
+  :ensure t)
 
 (leaf emmet-mode
   :ensure t
@@ -589,23 +590,10 @@
   :hook
   (web-mode-hook . emmet-mode))
 
-(leaf js2-mode
-  :ensure t
-  :disabled t
-  :leaf-defer t
-  :mode ("\\.js\\'" . js2-mode)
-  :bind (:js2-mode-map
-         ("C-c b" . web-beautify-js))
-  )
-
 (leaf php-mode
   :ensure t
   :leaf-defer t
   :mode ("\\.php\\'" . php-mode))
-
-(leaf web-beautify
-  :ensure t
-  :leaf-defer t)
 
 (leaf groovy-mode
   :ensure t
@@ -705,7 +693,11 @@
 
 (leaf plantuml-mode
   :ensure t
-  :mode ("\\.uml\\'" . plantuml-mode))
+  :mode ("\\.puml\\'" . plantuml-mode)
+  :custom
+  (plantuml-default-exec-mode . 'jar)
+  (plantuml-jar-path . "~/bin/plantuml.jar")
+  )
 
 (leaf smartparens
   :ensure t
@@ -727,9 +719,10 @@
 
 (leaf prettier-js
   :ensure t
-  :hook ((js2-mode-hook . prettier-js-mode)
+  :disabled t
+  :custom (prettier-js-args . '("--prose-wrap" "never"))
+  :hook ((typescript-mode-hook . prettier-js-mode)
          (web-mode-hook . prettier-js-mode)
-         (markdown-mode-hook . prettier-js-mode)
          (yaml-mode-hook . prettier-js-mode))
   )
 
@@ -889,6 +882,7 @@
     :after org
     :defun org-babel-do-load-languages
     :config
+    (setq org-plantuml-jar-path "~/bin/plantuml.jar")
     (leaf ob-elixir
       :ensure t)
     (leaf ob-go
@@ -900,7 +894,8 @@
      '((emacs-lisp . t)
        (elixir . t)
        (go . t)
-       (rust . t)))))
+       (rust . t)
+       (plantuml . t)))))
 
 (leaf git
   :config
