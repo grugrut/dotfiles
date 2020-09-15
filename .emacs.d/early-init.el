@@ -45,9 +45,6 @@
                 (left-fringe          . 12 ) ; 左フリンジ幅
                 (right-fringe         . 12 ) ; 右フリンジ幅
                 (menu-bar-lines       . 1  ) ; メニューバー
-                ;; (tool-bar-lines       . 1  ) ; ツールバー
-                ;; (vertical-scroll-bars . 1  ) ; スクロールバー
-                ;; (scroll-bar-width     . 17 ) ; スクロールバー幅
                 (cursor-type          . box) ; カーソル種別
                 (alpha                . 100) ; 透明度
                 )

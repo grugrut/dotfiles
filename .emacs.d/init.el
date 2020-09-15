@@ -7,8 +7,6 @@
 
 ;;; Code:
 
-(prefer-coding-system 'utf-8-unix)
-
 ;; leaf.el
 
 (prog1 "leaf"
@@ -34,7 +32,6 @@
     (leaf-keywords-init)))
 
 (leaf leaf-util-packages
-  :doc "diminishが付属しなくなったので手動で入れる"
   :config
   (leaf diminish :ensure t :require t)
   (leaf bind-key)
@@ -44,6 +41,11 @@
     :require t
     :config (key-chord-mode 1)))
 
+(leaf paradox
+  :ensure t
+  :config
+  (paradox-enable))
+
 (leaf early-init
   :doc "emacs26以前はearly-init.elが使えないので手動で読みこむ"
   :emacs< "27.1"
@@ -51,10 +53,13 @@
   (load (concat user-emacs-directory "early-init.el"))
   )
 
-(leaf paradox
+(leaf gcmh
   :ensure t
+  :diminish gcmh
+  :custom
+  (gcmh-verbose . t)
   :config
-  (paradox-enable))
+  (gcmh-mode 1))
 
 (leaf libraries
   :doc "ライブラリ群"
@@ -86,22 +91,9 @@
     :ensure t
     :leaf-defer t))
 
-(leaf gcmh
-  :ensure t
-  :diminish gcmh
-  :custom
-  (gcmh-verbose . t)
-  :config
-  (gcmh-mode 1))
-
 (leaf general-setting
   :config
-  ;; 色をつける
-  (global-font-lock-mode t)
-  (leaf midnight
-    :doc "バッファの自動掃除"
-    :config
-    (midnight-mode))
+  (prefer-coding-system 'utf-8-unix)
   (defalias 'yes-or-no-p 'y-or-n-p) ; yes-or-no-pをy/nで選択できるようにする
   ;; recentf
   (defvar recentf-max-saved-items 1000)
@@ -173,14 +165,8 @@
   (let* ((family "Cica")
          (fontspec (font-spec :family family :weight 'normal)))
     (set-face-attribute 'default nil :family family :height 120)
-    (set-fontset-font nil 'japanese-jisx0208 fontspec nil 'append)
-    (set-fontset-font nil 'jisx0201 fontspec nil 'append)
-    (set-fontset-font nil 'unicode (font-spec :family "all-the-icons") nil 'append)
-    (set-fontset-font nil 'unicode (font-spec :family "Material Icons") nil 'append)
-    (set-fontset-font nil 'unicode (font-spec :family "file-icons") nil 'append)
-    (set-fontset-font nil 'unicode (font-spec :family "FontAwesome") nil 'append)
-    (set-fontset-font nil 'unicode (font-spec :family "github-octicons") nil 'append)
-    (set-fontset-font nil 'unicode (font-spec :family "Weather Icons") nil 'append))
+    (set-fontset-font nil 'ascii fontspec nil 'append)
+    (set-fontset-font nil 'japanese-jisx0208 fontspec nil 'append))
   (add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.9))
   (add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.9))
   (leaf text-scale
@@ -217,20 +203,17 @@
   (doom-modeline-bar-width . 3)
   (doom-modeline-height . 25)
   (doom-modeline-major-mode-color-icon . t)
-  (doom-modeline-window-width-limit fill-column)
   (doom-modeline-minor-modes . t)
   (doom-modeline-github . nil)
   (doom-modeline-mu4e . nil)
   (doom-modeline-irc . nil))
 
-(leaf display-buffer
+(leaf beacon
+  :ensure t
+  :diminish beacon-mode
+  :require t
   :config
-  (leaf beacon
-    :ensure t
-    :diminish beacon-mode
-    :require t
-    :config
-    (beacon-mode 1)))
+  (beacon-mode 1))
 
 ;; 同一バッファ名にディレクトリ付与
 (leaf uniquify
@@ -331,7 +314,6 @@
   :diminish volatile-highlights-mode
   :config
   (volatile-highlights-mode t))
-
 
 (leaf highlight-symbol
   :ensure t
@@ -798,104 +780,108 @@
   :config
   (setq view-read-only t))
 
-(leaf org-mode-settings
+(leaf org
+  :leaf-defer t
+  :bind (("C-c c" . org-capture)
+         ("C-c a" . org-agenda)
+         (:org-mode-map
+          ("C-c C-;" . org-edit-special))
+         (:org-src-mode-map
+          ("C-c C-;" . org-edit-src-exit)))
+  :mode ("\\.org$'" . org-mode)
+  ;; :hook  (org-mode . (lambda ()
+  ;;                      (set (make-local-variable 'system-time-locale) "C")))
   :config
-  (leaf org
-    :leaf-defer t
-    :bind (("C-c c" . org-capture)
-           ("C-c a" . org-agenda))
-    :mode ("\\.org$'" . org-mode)
-    ;; :hook  (org-mode . (lambda ()
-    ;;                      (set (make-local-variable 'system-time-locale) "C")))
-    :config
-    (setq org-directory "~/src/github.com/grugrut/PersonalProject/")
-    :custom
-    ;; TODO状態の設定
-    (org-todo-keywords . '((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d)")
-                           (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "MEETING")))
-    (org-todo-keyword-faces . '(("TODO" :foreground "red" :weight bold)
-                                ("STARTED" :foreground "cornflower blue" :weight bold)
-                                ("DONE" :foreground "green" :weight bold)
-                                ("WAITING" :foreground "orange" :weight bold)
-                                ("HOLD" :foreground "magenta" :weight bold)
-                                ("CANCELLED" :foreground "green" :weight bold)
-                                ("MEETING" :foreground "gren" :weight bold)))
-    (org-log-done . 'time)
-    (org-clock-persist . t)
-    (org-clock-out-when-done . t)
-    )
-  (leaf org-capture
-    :leaf-defer t
-    :after org
-    :commands (org-capture)
-    :config
-    (setq org-capture-templates `(
-                                  ("t" "Todo")
-                                  ("te" "Engineering" entry
-                                   (file+olp ,(concat org-directory "inbox.org") "Engineering")
-                                   "* TODO %?\n %i\n"
-                                   :prepend nil
-                                   :unnarrowed nil
-                                   :kill-buffer t
-                                   )
-                                  ("tw" "Work" entry
-                                   (file+olp ,(concat org-directory "inbox.org") "Work")
-                                   "* TODO %?\n %i\n"
-                                   :prepend nil
-                                   :unnarrowed nil
-                                   :kill-buffer t
-                                   )
-                                  ("th" "House" entry
-                                   (file+olp ,(concat org-directory "inbox.org") "House")
-                                   "* TODO %?\n %i\n"
-                                   :prepend nil
-                                   :unnarrowed nil
-                                   :kill-buffer t
-                                   )
+  (setq org-directory "~/src/github.com/grugrut/PersonalProject/")
+  :custom
+  ;; TODO状態の設定
+  (org-todo-keywords . '((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d)")
+                         (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "MEETING")))
+  (org-todo-keyword-faces . '(("TODO" :foreground "red" :weight bold)
+                              ("STARTED" :foreground "cornflower blue" :weight bold)
+                              ("DONE" :foreground "green" :weight bold)
+                              ("WAITING" :foreground "orange" :weight bold)
+                              ("HOLD" :foreground "magenta" :weight bold)
+                              ("CANCELLED" :foreground "green" :weight bold)
+                              ("MEETING" :foreground "gren" :weight bold)))
+  (org-log-done . 'time)
+  (org-clock-persist . t)
+  (org-clock-out-when-done . t)
+  )
+(leaf org-capture
+  :leaf-defer t
+  :after org
+  :commands (org-capture)
+  :config
+  (setq org-capture-templates `(
+                                p                                  ("t" "Todo")
+                                ("te" "Engineering" entry
+                                 (file+olp ,(concat org-directory "inbox.org") "Engineering")
+                                 "* TODO %?\n %i\n"
+                                 :prepend nil
+                                 :unnarrowed nil
+                                 :kill-buffer t
+                                 )
+                                ("tw" "Work" entry
+                                 (file+olp ,(concat org-directory "inbox.org") "Work")
+                                 "* TODO %?\n %i\n"
+                                 :prepend nil
+                                 :unnarrowed nil
+                                 :kill-buffer t
+                                 )
+                                ("th" "House" entry
+                                 (file+olp ,(concat org-directory "inbox.org") "House")
+                                 "* TODO %?\n %i\n"
+                                 :prepend nil
+                                 :unnarrowed nil
+                                 :kill-buffer t
+                                 )
 
-                                  ("d" "Diary" entry
-                                   (file+olp+datetree ,(concat org-directory "diary.org"))
-                                   "** Activeties\n- %?\n** Meals\n- "
-                                   :prepend t
-                                   :unnarrowed nil
-                                   :kill-buffer t
-                                   :time-prompt t
-                                   )
-                                  ("b" "blog" entry
-                                   (file+headline "~/src/github.com/grugrut/blog/draft/blog.org" ,(format-time-string "%Y"))
-                                   "** TODO %?\n:PROPERTIES:\n:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :archives '(\\\"%(format-time-string \"%Y\")\\\" \\\"%(format-time-string \"%Y-%m\")\\\")\n:EXPORT_FILE_NAME: %(format-time-string \"%Y%m%d%H%M\")\n:END:\n\n")
-                                  )))
-  (leaf org-bullets
-    :ensure t
-    :custom
-    (org-bullets-bullet-list . '("" "" "" "" "" "" ""))
-    :hook
-    (org-mode-hook (lambda () (org-bullets-mode 1))))
+                                ("d" "Diary" entry
+                                 (file+olp+datetree ,(concat org-directory "diary.org"))
+                                 "** Activeties\n- %?\n** Meals\n- "
+                                 :prepend t
+                                 :unnarrowed nil
+                                 :kill-buffer t
+                                 :time-prompt t
+                                 )
+                                ("b" "blog" entry
+                                 (file+headline "~/src/github.com/grugrut/blog/draft/blog.org" ,(format-time-string "%Y"))
+                                 "** TODO %?\n:PROPERTIES:\n:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :archives '(\\\"%(format-time-string \"%Y\")\\\" \\\"%(format-time-string \"%Y-%m\")\\\")\n:EXPORT_FILE_NAME: %(format-time-string \"%Y%m%d%H%M\")\n:END:\n\n")
+                                )))
 
-  (leaf ox-hugo
-    :ensure t
-    :after ox
-    :mode ("\\.org$'" . org-hugo-auto-export-mode))
+(leaf org-superstar
+  :ensure t
+  :custom
+  (org-superstar-headline-bullets-list . '("󿕸" "󿖀" "󿕾" "󿕼" "󿕺" "󿖍"))
+  :hook
+  (org-mode-hook (lambda () (org-superstar-mode 1)))
+  )
 
-  (leaf ob
-    :leaf-defer t
-    :after org
-    :defun org-babel-do-load-languages
-    :config
-    (setq org-plantuml-jar-path "~/bin/plantuml.jar")
-    (leaf ob-elixir
-      :ensure t)
-    (leaf ob-go
-      :ensure t)
-    (leaf ob-rust
-      :ensure t)
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((emacs-lisp . t)
-       (elixir . t)
-       (go . t)
-       (rust . t)
-       (plantuml . t)))))
+(leaf ox-hugo
+  :ensure t
+  :after ox
+  :mode ("\\.org$'" . org-hugo-auto-export-mode))
+
+(leaf ob
+  :leaf-defer t
+  :after org
+  :defun org-babel-do-load-languages
+  :config
+  (setq org-plantuml-jar-path "~/bin/plantuml.jar")
+  (leaf ob-elixir
+    :ensure t)
+  (leaf ob-go
+    :ensure t)
+  (leaf ob-rust
+    :ensure t)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (elixir . t)
+     (go . t)
+     (rust . t)
+     (plantuml . t))))
 
 (leaf git
   :config
@@ -932,66 +918,56 @@ Git gutter:
                              ("R" git-gutter:set-start-revision)
                              ("q" nil :color blue))))
 
-(leaf helm
-  :require t
+(leaf counsel
   :ensure t
+  :require t
   :init
   (global-unset-key (kbd "C-z"))
-  (leaf helm-config
-    :require t
-    :init
-    (setq helm-command-prefix-key "C-z"))
-  (leaf helm-descbinds
-    :ensure t
-    :bind
-    (("C-z d" . helm-descbinds))
-    :config
-    (helm-descbinds-mode))
-  (leaf helm-swoop
-    :ensure t
-    :bind
-    (("C-z w" . helm-swoop)))
-  (leaf helm-ghq
-    :ensure t
-    :bind
-    (("C-z g" . helm-ghq)))
-  (leaf helm-ag
-    :ensure t
-    :bind
-    (("C-z ;" . helm-ag))
-    :config
-    (setq helm-ag-base-command "rg -S --no-heading"))
-  (leaf helm-projectile
-    :ensure t
-    :config
-    (helm-projectile-on))
-  (leaf helm-git-grep
-    :ensure t
-    :bind
-    (("C-z s" . helm-git-grep)))
-  :bind
-  (("C-;" . helm-mini)
-   ("C-+" . helm-resume)
-   ("C-x b" . helm-buffers-list)
-   ("M-x" . helm-M-x)
-   ("C-x C-f" . helm-find-files)
-   (helm-map
-    ("C-z" . helm-execute-persistent-action)))
   :config
-  (helm-mode t)
-  (diminish 'helm-mode nil))
-
-(leaf helm-posframe
-  :ensure t
-  :config
-  (helm-posframe-enable)
+  (ivy-mode 1)
   :custom
-  (helm-posframe-poshandler . 'posframe-poshandler-frame-center))
+  (ivy-use-virtual-buffers . t)
+  (ivy-wrap . t)
+  (ivy-count-format . "(%d/%d) ")
+  :bind
+  (("C-;" . ivy-switch-buffer)
+   ("C-x C-f" . counsel-find-file)
+   ("M-x" . counsel-M-x)
+   (ivy-minibuffer-map
+    ("C-z" . grugrut/ivy-partial))
+   (counsel-find-file-map
+    ("C-l" . counsel-up-directory)))
+  :preface
+  (defun grugrut/ivy-partial ()
+    "helmの `helm-execute-persistent-action' に近いものを実現する.
+完全に同じものは無理だったので、ディレクトリなら入る、それ以外はできるだけ補完しバッファは抜けない動作をおこなう."
+    (interactive)
+    (cond
+     ((eq (ivy-state-collection ivy-last) #'read-file-name-internal)
+      ;; ファイルオープン
+      (let (dir)
+        (cond
+         ((setq dir (ivy-expand-file-if-directory (ivy-state-current ivy-last)))
+          ;; ディレクトリなら入る
+          (ivy--cd dir))
+         (t
+          ;; それ以外ならチラ見アクション
+          (ivy-call)))))
+     (t
+      (ivy-call)))))
 
 (leaf atomic-chrome
   :ensure t
   :config
   (atomic-chrome-start-server))
+
+(defun grugrut/export-my-init-to-blog ()
+  ""
+  (interactive)
+  (require 'ox-hugo)
+  (let ((file "~/src/github.com/grugrut/blog/content/posts/my-emacs-init-el.md"))
+    (org-hugo-export-as-md)
+    (write-file file t)))
 
 (leaf key-settings
   :doc "キー入力設定"
