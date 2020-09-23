@@ -1,0 +1,1360 @@
+#+title: My Emacs Config
+#+date: 2020-09-07
+#+options: author:nil
+#+hugo_tags: emacs config
+
+* Early Init
+Emacs 27から =early-init.el= が追加された。
+正直、速度的な効果は感じられないが、せっかくなので追加している。
+
+** ヘッダ
+#+begin_src emacs-lisp :tangle early-init.el
+ ;;; early-init.el --- My early-init script -*- coding: utf-8 ; lexical-binding: t -*-
+ ;; Author: grugrut <grugruglut+github@gmail.com>
+ ;; URL:
+ ;; Version: 1.00
+
+ ;; This program is free software: you can redistribute it and/or modify
+ ;; it under the terms of the GNU General Public License as published by
+ ;; the Free Software Foundation, either version 3 of the License, or
+ ;; (at your option) any later version.
+
+ ;; This program is distributed in the hope that it will be useful,
+ ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+ ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ ;; GNU General Public License for more details.
+
+ ;; You should have received a copy of the GNU General Public License
+ ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+ ;;; Commentary:
+
+ ;;; Code:
+
+#+end_src
+
+** init処理中に問題があれば気付けるように
+エラーがおきたときに、ログだけだと問題がどこにあるのかデバッグが大変なので、
+ちゃんとわかるようにしている。
+#+begin_src emacs-lisp :tangle early-init.el
+ (setq debug-on-error t)
+#+end_src
+
+** init.orgだけ編集してたら警告
+init.elを直接編集するのではなく、init.org経由で管理するようにしてみたが、
+ついorg編集完了後にinit.elに反映するのを忘れがちになってしまう。
+
+そのため、起動時にチェックしてinit.orgの方が新しかったら警告する。
+本来は、保存時に自動でこの辺やってくれたほうがよい気はする。
+#+begin_src emacs-lisp :tangle early-init.el
+  (let ((my-init-org (concat user-emacs-directory "init.org"))
+        (my-init-el (concat user-emacs-directory "init.el"))
+        (my-early-init-el (concat user-emacs-directory "early-init.el")))
+    (when (or (file-newer-than-file-p my-init-org my-init-el)
+              (file-newer-than-file-p my-init-org my-early-init-el))
+      (message "WARN: init.el is old.\n")))
+#+end_src
+** GUIの見た目設定
+ツールバーは使わないので消している。
+メニューバーはときどき使うので残している。
+
+Emacs26から登場したネイティブの行番号表示は、ddskkと相性が悪く
+入力中に行がガタガタとずれてつらいので抑制している。
+
+https://www.grugrut.net/posts/201910202227/
+
+#+begin_src emacs-lisp :tangle early-init.el
+ ;; ツールバーを表示しない
+ (tool-bar-mode 0)
+
+ ;; スクロールバーを表示しない
+ (set-scroll-bar-mode nil)
+
+ ;; 行番号を表示
+ (line-number-mode +1)
+ (column-number-mode +1)
+
+ ;; 行番号表示(Emacs26以降)
+ (global-display-line-numbers-mode t)
+ (custom-set-variables '(display-line-numbers-width-start t))
+#+end_src
+
+** フレームサイズ
+#+begin_src emacs-lisp :tangle early-init.el
+ (setq default-frame-alist
+       (append '((width                . 140)  ; フレーム幅
+                 (height               . 40 ) ; フレーム高
+                 (left                 . 170 ) ; 配置左位置
+                 (top                  . 30 ) ; 配置上位置
+                 (line-spacing         . 0  ) ; 文字間隔
+                 (left-fringe          . 12 ) ; 左フリンジ幅
+                 (right-fringe         . 12 ) ; 右フリンジ幅
+                 (menu-bar-lines       . 1  ) ; メニューバー
+                 (cursor-type          . box) ; カーソル種別
+                 (alpha                . 100) ; 透明度
+                 )
+               default-frame-alist))
+ (setq initial-frame-alist default-frame-alist)
+
+ (modify-frame-parameters nil '((sticky . t) (width . 100) (height . 40))) ; Xを使う場合の高速化設定らしい
+#+end_src
+
+** カスタムファイル
+=custom-set-variables= を利用すると、 =custom-file= に設定内容が書かれる。
+しかしこれをロードしてしまうと、 =custom-file= に残ったゴミのせいで、=init.el= を修正したつもりなのに
+昔の設定で動いてしまうことがある。
+
+しかし、定義はしておかないと起動時に文句を言われてしまうので設定だけして読まずに捨ててる。
+
+#+begin_src emacs-lisp :tangle early-init.el
+ (custom-set-variables '(custom-file (expand-file-name "custom.el" user-emacs-directory)))
+#+end_src
+
+** フッタ
+#+begin_src emacs-lisp :tangle early-init.el
+ ;;; early-init.el ends here
+
+ #+end_src
+
+* init.el本体
+** ヘッダ
+ #+begin_src emacs-lisp :tangle yes
+ ;;; init.el --- My init script -*- coding: utf-8 ; lexical-binding: t -*-
+
+ ;; Author: grugrut
+ ;; URL: https://github.com/grugrut/.emacs.d/init.el
+
+ ;;; Commentary:
+
+ ;;; Code:
+
+#+end_src
+
+** パッケージ読込
+*** leaf.el
+以前は =use-package= + =straight.el= を使っていたが、
+ =straight.el= は、会社のプロキシ環境下での相性が悪く、
+パッケージ取得に失敗してしまうことが多くあきらめた。
+
+ 現在は、 =leaf.el= を使っていて、
+ 一部 =packages= だけでは対応しきれないものについては、 =el-get= を使っている。
+
+ #+begin_src emacs-lisp :tangle yes
+  ;; leaf.el
+
+  (prog1 "leaf"
+    (prog1 "install leaf"
+      (custom-set-variables
+       '(package-archives '(("org"   . "https://orgmode.org/elpa/")
+                            ("melpa" . "https://melpa.org/packages/")
+                            ("gnu"   . "https://elpa.gnu.org/packages/"))))
+      (package-initialize)
+      (unless (package-installed-p 'leaf)
+        (package-refresh-contents)
+        (package-install 'leaf)))
+
+    (leaf leaf-keywords
+      :ensure t
+      :config
+      ;; optional packages if you want to use :hydra, :el-get,,,
+      (leaf hydra :ensure t)
+      (leaf el-get :ensure t
+        :custom ((el-get-git-shallow-clone . t)))
+
+      ;; initialize leaf-keywords.el
+      (leaf-keywords-init)))
+
+ #+end_src
+
+表示するマイナーモードはできるだけ小さくしたいので、 =diminish= で抑制している。
+今のところは制御できているが、 =diminish= はモードの実装によっては適用するのが難しく、
+blackoutの方が簡単らしく、ちょっと気にはなっている。
+
+ #+begin_src emacs-lisp :tangle yes
+  (leaf leaf-util-packages
+    :config
+    (leaf diminish :ensure t :require t)
+    (leaf bind-key)
+    (leaf key-chord
+      :el-get (key-chord
+               :url "https://raw.githubusercontent.com/zk-phi/key-chord/master/key-chord.el")
+      :require t
+      :config (key-chord-mode 1)))
+ #+end_src
+
+*** Paradox
+ =package.el= のラッパーとして、 paradoxを使っている。
+ 表示内容を拡張してわかりやすくしてくれたり、アップデート時に並列で処理をしてくれたりと便利。
+ #+begin_src emacs-lisp :tangle yes
+  (leaf paradox
+    :ensure t
+    :config
+    (paradox-enable))
+ #+end_src
+
+** early-init.elの読みこみ
+Emacs27がリリースされる前に、一部の環境では26.3を利用していたので、
+early-init.elに逃した設定を読みこむために入れていた。
+
+今は、Windowsの27バイナリもリリースされたので不要かも。
+#+begin_src emacs-lisp :tangle yes
+ (leaf early-init
+   :doc "emacs26以前はearly-init.elが使えないので手動で読みこむ"
+   :emacs< "27.1"
+   :config
+   (load (concat user-emacs-directory "early-init.el"))
+   )
+#+end_src
+
+** 全体設定
+*** gcmh
+アイドル状態のときに、ガベージコレクトしてくれるらしい。
+
+https://github.com/emacsmirror/gcmh
+ #+begin_src emacs-lisp :tangle yes
+  (leaf gcmh
+    :ensure t
+    :diminish gcmh
+    :custom
+    (gcmh-verbose . t)
+    :config
+    (gcmh-mode 1))
+ #+end_src
+*** ライブラリ群
+ #+begin_src emacs-lisp :tangle yes
+  (leaf libraries
+    :doc "ライブラリ群"
+    :config
+    (leaf cl-lib
+      :leaf-defer t)
+    (leaf dash
+      :ensure t
+      :leaf-defer t)
+    (leaf s
+      :ensure t
+      :leaf-defer t)
+    (leaf f
+      :ensure t
+      :leaf-defer t)
+    (leaf ht
+      :ensure t
+      :leaf-defer t)
+    (leaf posframe
+      :ensure t
+      :preface
+      (defun my-posframe-arghandler (buffer-or-name arg-name value)
+        (let ((info '(:internal-border-width 1 :internal-border-color "gray80")))
+          (or (plist-get info arg-name) value)))
+      :custom
+      (posframe-arghandler . #'my-posframe-arghandler)
+      :leaf-defer t)
+    (leaf smartrep
+      :ensure t
+      :leaf-defer t))
+ #+end_src 
+*** popwin
+ #+begin_src emacs-lisp :tangle yes
+   (leaf popwin
+     :ensure t
+     :custom
+     (popwin:popup-window-position . 'bottom))
+ #+end_src
+*** 変数設定
+ #+begin_src emacs-lisp :tangle yes
+   (leaf general-setting
+     :config
+     (prefer-coding-system 'utf-8-unix)
+     (defalias 'yes-or-no-p 'y-or-n-p) ; yes-or-no-pをy/nで選択できるようにする
+     ;; recentf
+     (defvar recentf-max-saved-items 1000)
+     (defvar recentf-auto-cleanup 'never)
+     (global-set-key [mouse-2] 'mouse-yank-at-click)
+     (delete-selection-mode t) ; リージョン選択時にリージョンまるごと削除
+     (leaf exec-path-from-shell
+       :ensure t
+       :config
+       (exec-path-from-shell-initialize))
+     (leaf web-browser-for-wsl
+       :doc "ブラウザ設定 WSL限定"
+       :config
+       (let ((cmd-exe "/mnt/c/Windows/System32/cmd.exe")
+             (cmd-args '("/c" "start")))
+         (when (file-exists-p cmd-exe)
+           (setq browse-url-browser-function 'browse-url-generic
+                 browse-url-generic-program cmd-exe
+                 browse-url-generic-args cmd-args))))
+     ;; 対応する括弧を光らせる
+     (show-paren-mode t)
+     (defvar show-paren-style 'mixed)
+     ;; カーソルを点滅させない
+     (blink-cursor-mode 0)
+     ;; 単語での折り返し
+     (leaf visual-line-mode
+       :require simple
+       :config
+       (global-visual-line-mode t)
+       (diminish 'visual-line-mode nil))
+
+     ;; マウスを避けさせる
+     (mouse-avoidance-mode 'jump)
+     (setq frame-title-format "%f")
+     :setq
+     `((large-file-warning-threshold	         . ,(* 25 1024 1024))
+       (read-file-name-completion-ignore-case . t)
+       (use-dialog-box                        . nil)
+       (history-length                        . 500)
+       (history-delete-duplicates             . t)
+       (line-move-visual                      . nil)
+       (mouse-drag-copy-region                . t)
+       (backup-inhibited                      . t)
+       (inhibit-startup-message               . t)
+       (require-final-newline                 . t)
+       (next-line-add-newlines                . nil)
+       (frame-title-format                    . "%f")
+       (truncate-lines                        . t)
+       (read-process-output-max               . ,(* 1024 1024)))
+     :setq-default
+     (indent-tabs-mode . nil) ; タブはスペースで
+     (tab-width        . 2)
+     )
+ #+end_src
+*** uniquify
+ #+begin_src emacs-lisp :tangle yes
+   ;; 同一バッファ名にディレクトリ付与
+   (leaf uniquify
+     :custom
+     (uniquify-buffer-name-style . 'post-forward-angle-brackets)
+     (uniquify-ignore-buffers-re . "*[^*]+*"))
+ #+end_src
+** 外観設定
+*** フォント設定
+ 基本的にはCicaを使っているが、Cicaが独自の絵文字領域をもっていて、
+ unicodeの範囲全体を指定してしまうと、All-the-iconsで入れた絵文字が使われない問題があったので、
+ 範囲をしぼっている。
+ 不都合があれば、都度追加していく必要がある。
+
+ #+begin_src emacs-lisp :tangle yes
+   (leaf font
+     :config
+     ;; 絵文字
+     ;; (unicode-fonts-setup) ; 最初に本コマンドの実行が必要
+     ;; (all-the-icons-install-fonts)
+     (leaf unicode-fonts
+       :ensure t)
+     (leaf all-the-icons
+       :ensure t)
+     ;; フォント設定
+     ;;
+     ;; abcdefghik
+     ;; 0123456789
+     ;; あいうえお
+     (let* ((family "Cica")
+            (fontspec (font-spec :family family :weight 'normal)))
+       (set-face-attribute 'default nil :family family :height 120)
+       (set-fontset-font nil 'ascii fontspec nil 'append)
+       (set-fontset-font nil 'japanese-jisx0208 fontspec nil 'append))
+     (add-to-list 'face-font-rescale-alist '(".*icons.*" . 0.9))
+     (add-to-list 'face-font-rescale-alist '(".*FontAwesome.*" . 0.9))
+     (leaf text-scale
+       :hydra (hydra-zoom ()
+                          "Zoom"
+                          ("g" text-scale-increase "in")
+                          ("l" text-scale-decrease "out")
+                          ("r" (text-scale-set 0) "reset")
+                          ("0" (text-scale-set 0) :bind nil :exit t))
+       :bind ("<f2>" . hydra-zoom/body)))
+ #+end_src
+
+*** テーマ設定
+ #+begin_src emacs-lisp :tangle yes
+   (leaf doom-themes
+     :ensure t
+     :config
+     (load-theme 'doom-vibrant t)
+     (doom-themes-visual-bell-config)
+     (doom-themes-neotree-config)
+     (doom-themes-org-config))
+ #+end_src
+
+*** モードライン
+**** minions
+モードラインにマイナーモードが並んで圧迫されるのが嫌だったので、
+一時期は =minions= を使っていた。
+=ddskk= の状態表示もまとめられてしまって使い勝手が良くなかったので、
+今は無効化して、不要なマイナーモードは =diminish= で消すようにしている。
+  #+begin_src emacs-lisp :tangle yes
+    (leaf minions
+      :ensure t
+      :disabled t
+      :config
+      (minions-mode t))
+  #+end_src
+
+**** eldoc
+  #+begin_src emacs-lisp :tangle yes
+    (leaf eldoc
+      :diminish eldoc-mode)
+  #+end_src
+
+**** doom-modeline
+  #+begin_src emacs-lisp :tangle yes
+    (leaf doom-modeline
+      :ensure t
+      :require t
+      :hook (after-init-hook . doom-modeline-mode)
+      :custom
+      (doom-modeline-bar-width . 3)
+      (doom-modeline-height . 25)
+      (doom-modeline-major-mode-color-icon . t)
+      (doom-modeline-minor-modes . t)
+      (doom-modeline-github . nil)
+      (doom-modeline-mu4e . nil)
+      (doom-modeline-irc . nil))
+  #+end_src
+
+*** beacon
+バッファを移動したときに、カーソル位置を一瞬だけ強調してわかりやすくする。
+ #+begin_src emacs-lisp :tangle yes
+   (leaf beacon
+     :ensure t
+     :diminish beacon-mode
+     :require t
+     :config
+     (beacon-mode 1))
+ #+end_src
+
+*** volatile-highlights
+ヤンクした場合などに編集箇所を強調表示してわかりやすくする。
+#+begin_src emacs-lisp :tangle yes
+  ;; 操作した際に、操作箇所を強調表示する
+  (leaf volatile-highlights
+    :ensure t
+    :require t
+    :diminish volatile-highlights-mode
+    :config
+    (volatile-highlights-mode t))
+#+end_src
+*** インデント表示
+ #+begin_src emacs-lisp :tangle yes
+   (leaf highlight-indent-guides
+     :ensure t
+     :require t
+     :diminish highlight-indent-guides-mode
+     :custom
+     (highlight-indent-guides-method . 'character)
+     (highlight-indent-guides-auto-character-face-perc . 20)
+     (highlight-indent-guides-character . ?\|)
+     :hook
+     (prog-mode-hook . highlight-indent-guides-mode))
+ #+end_src
+*** ファイル最終行以降をわかりやすく
+vim風に、最終行以降に~を表示する。
+これはfringeに表示するので、行番号表示とずれてしまうのが難点。
+ #+begin_src emacs-lisp :tangle yes
+   ;; vi風に空行に~を表示する
+   (leaf vi-tilde-fringe
+     :ensure t
+     :require t
+     :leaf-defer t
+     :commands vi-tilde-fringe-mode
+     :diminish vi-tilde-fringe-mode
+     :config
+     (global-vi-tilde-fringe-mode))
+ #+end_src
+*** minimap
+ #+begin_src emacs-lisp :tangle yes
+   (leaf minimap
+     :ensure t
+     :leaf-defer t
+     :config
+     (setq minimap-window-location 'right
+           minimap-update-delay 0.2
+           minimap-minimum-width 20)
+     :bind ("s-m" . minimap-mode))
+ #+end_src
+*** rainbow-mode
+CSSなどのカラーコードを実際の色で表示してくれる。
+ #+begin_src emacs-lisp :tangle yes
+   (leaf rainbow-mode
+     :ensure t
+     :leaf-defer t
+     :hook
+     (web-mode-hook . rainbow-mode))
+ #+end_src
+
+** カーソル移動
+*** backward-forward
+~C-Left~ と ~C-Right~ でマークを行き来できる。あまり使いこなせてない。
+ #+begin_src emacs-lisp :tangle yes
+   (leaf backward-forward
+     :ensure t
+     :config
+     (backward-forward-mode 1))
+ #+end_src
+*** bookmark
+ #+begin_src emacs-lisp :tangle yes
+   (leaf bm
+     :ensure t
+     :leaf-defer t
+     :commands (bm-toggle
+                bm-next
+                bm-previous)
+     :bind
+     (("C-S-SPC" . bm-toggle)
+      ("C-}" . bm-previous)
+      ("C-]" . bm-next)))
+ #+end_src
+
+*** avy
+vimの ~f~ に相当する。zap-to-char( ~M-z~ )でもavyインタフェースで削除位置を指定できるようにしている。
+ #+begin_src emacs-lisp :tangle yes
+   (leaf avy
+     :ensure t
+     :bind
+     (("C-:" . avy-goto-char-timer)
+      ("C-*" . avy-resume)
+      ("M-g M-g" . avy-goto-line))
+     :config
+     (leaf avy-zap
+       :ensure t
+       :bind
+       ([remap zap-to-char] . avy-zap-to-char)))
+ #+end_src
+** ace-window
+#+begin_src emacs-lisp :tangle yes
+
+  (leaf ace-window
+    :ensure t
+    :bind
+    (("C-x o" . ace-window))
+    :config
+    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+    :custom-face
+    (aw-leading-char-face . '((t (:height 2.0)))))
+#+end_src
+
+** ddskk
+#+begin_src emacs-lisp :tangle yes
+  (leaf ddskk
+    :ensure t
+    :bind
+    (("C-x C-j" . skk-mode)
+     ("C-x j"   . skk-mode))
+    :init
+    (defvar dired-bind-jump nil)  ; dired-xがC-xC-jを奪うので対処しておく
+    :custom
+    (skk-use-azik                     . t)      ; AZIKを使用する
+    (skk-azik-keyboard-type           . 'jp106)
+    (skk-tut-file                     . nil)
+    (skk-server-host                  . "localhost")
+    (skk-server-portnum               . 1178)   ;
+    (skk-egg-like-newline             . t)      ; 変換時にリターンでは改行しない
+    (skk-japanese-message-and-error   . t)      ; メッセージを日本語にする
+    (skk-auto-insert-paren            . t)      ; 対応する括弧を自動挿入
+    (skk-check-okurigana-on-touroku   . t)      ;
+    (skk-show-annotation              . t)      ; アノテーションを表示
+    (skk-anotation-show-wikipedia-url . t)      ;
+    (skk-show-tooltip                 . nil)    ; 変換候補をインライン表示しない
+    (skk-isearch-start-mode           . 'latin) ; isearch時にSKKをオフ
+    (skk-henkan-okuri-strictly        . nil)    ; 送り仮名を考慮した変換候補
+    (skk-process-okuri-early          . nil)
+    (skk-status-indicator             . 'minor-mode)
+    :hook
+    (skk-azik-load-hook . my/skk-azik-disable-tU)
+    :preface
+    (defun my/skk-azik-disable-tU ()
+      "ddskkのazikモードが`tU'を`っ'として扱うのを抑制する."
+      (setq skk-rule-tree (skk-compile-rule-list
+                           skk-rom-kana-base-rule-list
+                           (skk-del-alist "tU" skk-rom-kana-rule-list)))))
+#+end_src
+** 操作
+#+begin_src emacs-lisp :tangle yes
+  (leaf highlight-symbol
+    :ensure t
+    :leaf-defer t
+    :bind
+    (("C-." . highlight-symbol-at-point)))
+#+end_src
+#+begin_src emacs-lisp :tangle yes
+
+  (leaf expand-region
+    :ensure t
+    :leaf-defer t
+    :bind
+    (("C-," . er/expand-region)
+     ("C-M-," . er/contract-region)))
+#+end_src
+#+begin_src emacs-lisp :tangle yes
+
+  (leaf multiple-cursors
+    :ensure t
+    :after smartrep
+    :config
+    (global-unset-key (kbd "C-t"))
+    (smartrep-define-key global-map "C-t"
+      '(("C-t" . 'mc/mark-next-like-this)
+        ("n"   . 'mc/mark-next-like-this)
+        ("p"   . 'mc/mark-previous-like-this)
+        ("m"   . 'mc/mark-more-like-this-extended)
+        ("u"   . 'mc/unmark-next-like-this)
+        ("U"   . 'mc/unmark-previous-like-this)
+        ("s"   . 'mc/skip-to-next-like-this)
+        ("S"   . 'mc/skip-to-previous-like-this)
+        ("*"   . 'mc/mark-all-like-this)
+        ("a"   . 'mc/mark-all-like-this)
+        ("d"   . 'mc/mark-all-like-this-dwim)
+        ("i"   . 'mc/insert-numbers)
+        ("l"   . 'mc/insert-letters)
+        ("o"   . 'mc/sort-regions)
+        ("O"   . 'mc/reverse-regions))))
+#+end_src
+#+begin_src emacs-lisp :tangle yes
+
+  (leaf smooth-scroll
+    :ensure t
+    :require t
+    :diminish smooth-scroll-mode
+    :config
+    (smooth-scroll-mode t))
+#+end_src
+#+begin_src emacs-lisp :tangle yes
+
+  (leaf auto-revert
+    :diminish auto-revert-mode
+    :config
+    (global-auto-revert-mode t))
+#+end_src
+** 検索処理
+#+begin_src emacs-lisp :tangle yes
+  (leaf search-functions
+    :setq
+    (case-fold-search . nil) ; 大文字・小文字を区別しないでサーチ（有効：t、無効：nil）
+    (isearch-allow-scroll . nil) ; インクリメント検索時に縦スクロールを有効化（有効：t、無効：nil）
+    :config
+    (leaf google-this
+      :ensure t
+      :leaf-defer t
+      :bind (("M-s g" . google-this-noconfirm)))
+
+    (leaf anzu
+      :ensure t
+      :bind
+      (("M-%" . anzu-query-replace))
+      :config
+      (global-anzu-mode +1)
+      )
+
+    (leaf migemo
+      :ensure t
+      :require t
+      :custom
+      (migemo-command . "cmigemo")
+      (migemo-options . '("-q" "--emacs"))
+      (migemo-dictionary . "/usr/share/cmigemo/utf-8/migemo-dict")
+      (migemo-user-dictionary . nil)
+      (migemo-regex-dictionary . nil)
+      (migemo-coding-system . 'utf-8-unix)
+      :config
+      (migemo-init))
+
+    (leaf ripgrep
+      :ensure t
+      :leaf-defer t
+      :bind (("M-s r" . ripgrep-regexp))
+      :config
+      (setq ripgrep-arguments '("-S")))
+    ;; minibufferのアクティブ時、IMEを無効化
+    (add-hook 'minibuffer-setup-hook
+              (lambda ()
+                (deactivate-input-method)))
+    )
+#+end_src
+** ソースコード編集
+*** コメントスタイル
+ #+begin_src emacs-lisp :tangle yes
+   (setq comment-style 'extra-line)
+ #+end_src
+
+*** imenu-list
+ #+begin_src emacs-lisp :tangle yes
+   (leaf imenu-list
+     :ensure t
+     :bind (("s-i" . imenu-list-smart-toggle))
+     :custom
+     (imenu-list-focus-after-activation . t)
+     :config
+     (leaf leaf-tree
+       :doc "leafのブロックを意識して表示"
+       :diminish leaf-tree
+       :ensure t))
+ #+end_src
+
+*** ソースコードの折り畳み
+ソースコードブロックの折り畳みには、yafolgindを使っている。
+ #+begin_src emacs-lisp :tangle yes
+
+   (leaf yafolding
+     :ensure t
+     :leaf-defer t
+     :hook
+     (prog-mode-hook . yafolding-mode))
+ #+end_src
+
+*** projectile
+プロジェクトの扱いにはprojectileを使っているが、正直モードライン表示で意識するぐらいにしか使えていない。
+ #+begin_src emacs-lisp :tangle yes
+   (leaf projectile
+     :ensure t t
+     :init
+     :config
+     (setq projectile-mode-line-prefix " Prj")
+     (projectile-mode +1)
+     (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+ #+end_src
+
+*** quickrun
+ #+begin_src emacs-lisp :tangle yes
+   (leaf quickrun
+     :ensure t
+     :leaf-defer t
+     :after bind-key
+     :commands (quickrun)
+     :init
+     (bind-key "C-c C-c" 'quickrun prog-mode-map))
+ #+end_src
+
+*** ファイルツリー
+ファイルツリーの表示にはneotreeを使っている。ほとんど使ってない。
+ #+begin_src emacs-lisp :tangle yes
+
+   (leaf neotree
+     :ensure t
+     :bind ("H-t" . neotree-toggle))
+ #+end_src
+
+*** エラーチェック
+ #+begin_src emacs-lisp :tangle yes
+   (leaf flycheck
+     :ensure t
+     :leaf-defer t
+     :diminish flycheck-mode
+     :hook (prog-mode-hook . flycheck-mode))
+ #+end_src
+
+*** lsp
+lspには、lsp-modeを使っている。
+ #+begin_src emacs-lisp :tangle yes
+
+   (leaf lsp-mode
+     :ensure t
+     :require t
+     :commands lsp
+     :hook
+     (go-mode-hook . lsp)
+     (web-mode-hook . lsp)
+     (elixir-mode-hook . lsp)
+     (typescript-mode-hook . lsp)
+     :config
+     (leaf lsp-ui
+       :ensure t
+       :require t
+       :hook
+       (lsp-mode-hook . lsp-ui-mode)
+       :custom
+       (lsp-ui-sideline-enable . nil)
+       (lsp-prefer-flymake . nil)
+       (lsp-print-performance . t)
+       :config
+       (define-key lsp-ui-mode-map [remap xref-find-definitions] 'lsp-ui-peek-find-definitions)
+       (define-key lsp-ui-mode-map [remap xref-find-references] 'lsp-ui-peek-find-references)
+       (define-key lsp-ui-mode-map (kbd "C-c i") 'lsp-ui-imenu)
+       (define-key lsp-ui-mode-map (kbd "s-l") 'hydra-lsp/body)
+       (setq lsp-ui-doc-position 'bottom)
+       :hydra (hydra-lsp (:exit t :hint nil)
+                         "
+    Buffer^^               Server^^                   Symbol
+   -------------------------------------------------------------------------------------
+    [_f_] format           [_M-r_] restart            [_d_] declaration  [_i_] implementation  [_o_] documentation
+    [_m_] imenu            [_S_]   shutdown           [_D_] definition   [_t_] type            [_r_] rename
+    [_x_] execute action   [_M-s_] describe session   [_R_] references   [_s_] signature"
+                         ("d" lsp-find-declaration)
+                         ("D" lsp-ui-peek-find-definitions)
+                         ("R" lsp-ui-peek-find-references)
+                         ("i" lsp-ui-peek-find-implementation)
+                         ("t" lsp-find-type-definition)
+                         ("s" lsp-signature-help)
+                         ("o" lsp-describe-thing-at-point)
+                         ("r" lsp-rename)
+
+                         ("f" lsp-format-buffer)
+                         ("m" lsp-ui-imenu)
+                         ("x" lsp-execute-code-action)
+
+                         ("M-s" lsp-describe-session)
+                         ("M-r" lsp-restart-workspace)
+                         ("S" lsp-shutdown-workspace))))
+ #+end_src
+
+*** Golang
+ #+begin_src emacs-lisp :tangle yes
+   (leaf golang
+     :config
+     (leaf go-mode
+       :ensure t
+       :leaf-defer t
+       :commands (gofmt-before-save)
+       :init
+       (add-hook 'before-save-hook 'gofmt-before-save)
+       (setq tab-width 4))
+
+     (leaf protobuf-mode
+       :ensure t)
+
+     (leaf go-impl
+       :ensure t
+       :leaf-defer t
+       :commands go-impl))
+ #+end_src
+
+*** Web-mode
+ #+begin_src emacs-lisp :tangle yes
+   (leaf web-mode
+     :ensure t
+     :after flycheck
+     :defun flycheck-add-mode
+     :mode (("\\.html?\\'" . web-mode)
+            ("\\.scss\\'" . web-mode)
+            ("\\.css\\'" . web-mode)
+            ("\\.twig\\'" . web-mode)
+            ("\\.vue\\'" . web-mode)
+            ("\\.js\\'" . web-mode))
+     :config
+     (flycheck-add-mode 'javascript-eslint 'web-mode)
+     (setq web-mode-markup-indent-offset 2
+           web-mode-css-indent-offset 2
+           web-mode-code-indent-offset 2
+           web-mode-comment-style 2
+           web-mode-style-padding 1
+           web-mode-script-padding 1)
+     )
+ #+end_src
+
+**** emmet
+HTMLタグを簡単に入力できる。
+  #+begin_src emacs-lisp :tangle yes
+    (leaf emmet-mode
+      :ensure t
+      :leaf-defer t
+      :commands (emmet-mode)
+      :hook
+      (web-mode-hook . emmet-mode))
+  #+end_src
+
+
+*** TypeScript
+ #+begin_src emacs-lisp :tangle yes
+
+   (leaf typescript-mode
+     :ensure t)
+ #+end_src
+
+*** Jenkinsfile編集
+ #+begin_src emacs-lisp :tangle yes
+   (leaf groovy-mode
+     :ensure t
+     :leaf-defer t
+     :mode (("Jenkinsfile" . groovy-mode)))
+ #+end_src
+
+*** rust
+ #+begin_src emacs-lisp :tangle yes
+   (leaf rust-mode
+     :ensure t
+     :leaf-defer t
+     :config
+     (setq-default rust-format-on-save t))
+ #+end_src
+ #+begin_src emacs-lisp :tangle yes
+   (leaf racer
+     :ensure t
+     :leaf-defer t
+     :hook
+     (rust-mode-hook . racer-mode)
+     (racer-mode-hook . eldoc-mode))
+ #+end_src
+ #+begin_src emacs-lisp :tangle yes
+   (leaf flycheck-rust
+     :ensure t
+     :leaf-defer t
+     :after racer
+     :init
+     (add-hook 'rust-mode-hook (lambda ()
+                                 (racer-mode)
+                                 (flycheck-rust-setup))))
+ #+end_src
+
+*** Elixir
+ #+begin_src emacs-lisp :tangle yes
+   (leaf alchemist
+     :ensure t
+     :leaf-defer t
+     :config
+     (setq alchemist-hooks-compile-on-save t))
+
+   (defun my/elixir-do-end-close-action (id action context)
+     (when (eq action 'insert)
+       (newline-and-indent)
+       (forward-line -1)
+       (indent-according-to-mode)))
+ #+end_src
+ #+begin_src emacs-lisp :tangle yes
+   (leaf elixir-mode
+     :ensure t
+     :after smartparens
+     :config
+     ;; Create a buffer-local hook to run elixir-format on save, only when we enable elixir-mode.
+     (add-hook 'elixir-mode-hook
+               (lambda () (add-hook 'before-save-hook 'elixir-format nil t)))
+     (sp-with-modes '(elixir-mode)
+       (sp-local-pair "->" "end"
+                      :when '(("RET"))
+                      :post-handlers '(:add my/elixir-do-end-close-action)
+                      :actions '(insert)))
+     (sp-with-modes '(elixir-mode)
+       (sp-local-pair "do" "end"
+                      :when '(("SPC" "RET"))
+                      :post-handlers '(:add my/elixir-do-end-close-action)
+                      :actions '(insert)))
+     )
+ #+end_src
+ #+begin_src emacs-lisp :tangle yes
+   (leaf flycheck-elixir
+     :ensure t
+     :leaf-defer t
+     :after elixir-mode)
+ #+end_src
+ #+begin_src emacs-lisp :tangle yes
+   (leaf elixir-yasnippets
+     :ensure t
+     :leaf-defer t
+     :after elixir-mode)
+ #+end_src
+
+*** python
+pythonのモード複数あってなにがよいのかよくわかっていない。
+ #+begin_src emacs-lisp :tangle yes
+   (leaf python-mode
+     :ensure t
+     :leaf-defer t
+     :mode (("\\.py\\'" . python-mode))
+     :config
+     (bind-key "C-c C-c" 'quickrun python-mode-map)
+     )
+ #+end_src
+
+*** yaml
+ #+begin_src emacs-lisp :tangle yes
+   (leaf yaml-mode
+     :ensure t
+     :leaf-defer t
+     :mode ("\\.yaml\\'" . yaml-mode))
+ #+end_src
+
+*** markdown
+ #+begin_src emacs-lisp :tangle yes
+   (leaf markdown
+     :config
+     (leaf markdown-mode
+       :ensure t
+       :leaf-defer t
+       :mode ("\\.md\\'" . gfm-mode)
+       :custom
+       (markdown-command . "github-markup")
+       (markdown-command-needs-filename . t))
+     (leaf markdown-preview-mode
+       :ensure t))
+ #+end_src
+
+*** dockerfile
+ #+begin_src emacs-lisp :tangle yes
+   (leaf dockerfile-mode
+     :ensure t)
+ #+end_src
+
+*** plantuml
+ #+begin_src emacs-lisp :tangle yes
+   (leaf plantuml-mode
+     :ensure t
+     :mode ("\\.puml\\'" . plantuml-mode)
+     :custom
+     (plantuml-default-exec-mode . 'jar)
+     (plantuml-jar-path . "~/bin/plantuml.jar")
+     )
+ #+end_src
+
+*** smartparens
+ #+begin_src emacs-lisp :tangle yes
+   (leaf smartparens
+     :ensure t
+     :require smartparens-config
+     :diminish smartparens-mode
+     :hook
+     (prog-mode-hook . turn-on-smartparens-mode)
+     :config
+     (show-smartparens-global-mode t))
+ #+end_src
+
+*** カッコの対応関係をわかりやすくする
+ #+begin_src emacs-lisp :tangle yes
+   (leaf rainbow-delimiters
+     :ensure t
+     :leaf-defer t
+     :hook
+     (prog-mode-hook . rainbow-delimiters-mode))
+ #+end_src
+ #+begin_src emacs-lisp :tangle yes
+   (leaf fontawesome
+     :ensure t)
+ #+end_src
+
+ #+begin_src emacs-lisp :tangle yes
+
+   (leaf codic
+     :ensure t
+     :leaf-defer t)
+ #+end_src
+*** 補完
+ #+begin_src emacs-lisp :tangle yes
+
+   (leaf code-completion
+     :config
+     (leaf company
+       :ensure t
+       :require t
+       :diminish company-mode
+       :defun (global-company-mode
+               company-abort
+               company-complete-number)
+       :config
+       (global-company-mode)
+       (setq company-idle-delay 0.3
+             company-minimum-prefix-length 1
+             company-begin-commands '(self-insert-command)
+             company-selection-wrap-around t
+             company-show-numbers t))
+
+     (leaf company-box
+       :ensure t
+       :require t
+       :diminish company-box-mode
+       :hook (company-mode-hook . company-box-mode)
+       :after all-the-icons
+       :init
+       (setq company-box-icons-elisp
+             (list
+              (concat (all-the-icons-material "functions") " ")
+              (concat (all-the-icons-material "check_circle") " ")
+              (concat (all-the-icons-material "stars") " ")
+              (concat (all-the-icons-material "format_paint") " ")))
+       (setq company-box-icons-unknown (concat (all-the-icons-material "find_in_page") " "))
+       (setq company-box-backends-colors nil)
+       (setq company-box-icons-alist 'company-box-icons-all-the-icons))
+
+     (leaf company-posframe
+       :ensure t
+       :require t
+       :diminish company-posframe-mode
+       :after company
+       :config
+       (company-posframe-mode 1))
+
+     (leaf company-tabnine
+       :ensure t
+       :after company
+       :require t
+       :config
+       (add-to-list 'company-backends #'company-tabnine)))
+ #+end_src
+ #+begin_src emacs-lisp :tangle yes
+
+   (leaf yasnippet
+     :ensure t
+     :diminish yas-minor-mode
+     :require t
+     :defun yas-global-mode
+     :config
+     (yas-global-mode 1))
+#+end_src
+#+begin_src emacs-lisp :tangle yes
+
+   (leaf view
+     :require t
+     :chord (("fj" . view-mode))
+     :bind  (:view-mode-map
+             ("j" . next-line)
+             ("k" . previous-line)
+             ("h" . backward-char)
+             ("l" . forward-char))
+     :config
+     (setq view-read-only t))
+ #+end_src
+
+** Org Mode
+#+begin_src emacs-lisp :tangle yes
+  (leaf org
+    :leaf-defer t
+    :bind (("C-c c" . org-capture)
+           ("C-c a" . org-agenda)
+           (:org-mode-map
+            ("C-c C-;" . org-edit-special))
+           (:org-src-mode-map
+            ("C-c C-;" . org-edit-src-exit)))
+    :mode ("\\.org$'" . org-mode)
+    ;; :hook  (org-mode . (lambda ()
+    ;;                      (set (make-local-variable 'system-time-locale) "C")))
+    :config
+    (setq org-directory "~/src/github.com/grugrut/PersonalProject/")
+    :custom
+    ;; TODO状態の設定
+    (org-todo-keywords . '((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d)")
+                           (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "MEETING")))
+    (org-todo-keyword-faces . '(("TODO" :foreground "red" :weight bold)
+                                ("STARTED" :foreground "cornflower blue" :weight bold)
+                                ("DONE" :foreground "green" :weight bold)
+                                ("WAITING" :foreground "orange" :weight bold)
+                                ("HOLD" :foreground "magenta" :weight bold)
+                                ("CANCELLED" :foreground "green" :weight bold)
+                                ("MEETING" :foreground "gren" :weight bold)))
+    (org-log-done . 'time)
+    (org-clock-persist . t)
+    (org-clock-out-when-done . t)
+    )
+  (leaf org-capture
+    :leaf-defer t
+    :after org
+    :commands (org-capture)
+    :config
+    (defvar grugrut/org-inbox-file (concat org-directory "inbox.org"))
+    (setq org-capture-templates `(
+                                  ("t" " Tasks" entry (file ,grugrut/org-inbox-file)
+                                   "* TODO %? %^G\n:PROPERTIES:\n:DEADLINE: %^{Deadline}T\n:EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}\n:END:\n")
+                                  ("e" " Event" entry (file ,grugrut/org-inbox-file)
+                                   "* TODO %? %^G\n:PROPERTIES:\n:SCHEDULED: %^{Scheduled}T\n:EFFORT:%^{effort|1:00|0:05|0:15|0:30|2:00|4:00}\n:END:\n")
+                                  ("b" " blog" entry
+                                   (file+headline "~/src/github.com/grugrut/blog/draft/blog.org" ,(format-time-string "%Y"))
+                                   "** TODO %?\n:PROPERTIES:\n:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :archives '(\\\"%(format-time-string \"%Y\")\\\" \\\"%(format-time-string \"%Y-%m\")\\\")\n:EXPORT_FILE_NAME: %(format-time-string \"%Y%m%d%H%M\")\n:END:\n\n")
+                                  )))
+
+  (leaf org-superstar
+    :ensure t
+    :custom
+    (org-superstar-headline-bullets-list . '("󿕸" "󿖀" "󿕾" "󿕼" "󿕺" "󿖍"))
+    :hook
+    (org-mode-hook (lambda () (org-superstar-mode 1)))
+    )
+
+  (leaf ox-hugo
+    :ensure t
+    :after ox
+    :mode ("\\.org$'" . org-hugo-auto-export-mode))
+
+  (leaf ob
+    :leaf-defer t
+    :after org
+    :defun org-babel-do-load-languages
+    :config
+    (setq org-plantuml-jar-path "~/bin/plantuml.jar")
+    (leaf ob-elixir
+      :ensure t)
+    (leaf ob-go
+      :ensure t)
+    (leaf ob-rust
+      :ensure t)
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((emacs-lisp . t)
+       (elixir . t)
+       (go . t)
+       (rust . t)
+       (plantuml . t))))
+#+end_src
+
+** Git操作
+#+begin_src emacs-lisp :tangle yes
+  (leaf git
+    :config
+    (leaf magit
+      :ensure t
+      :bind (("C-x g" . magit-status)))
+
+    ;; gitの差分を表示する
+    (leaf git-gutter-fringe
+      :ensure t
+      :require t
+      :custom
+      (git-gutter:lighter . "")
+      (global-git-gutter-mode . t)
+      :bind ("C-x G" . hydra-git-gutter/body)
+      :hydra (hydra-git-gutter (:body-pre (git-gutter-mode 1)
+                                          :hint nil)
+                               "
+  Git gutter:
+    _j_: next hunk     _s_tage hunk   _q_uit
+    _k_: previous hunk _r_evert hunk
+    _h_: first hunk    _p_opup hunk
+    _l_: last hunk     set _R_evision
+  "
+                               ("j" git-gutter:next-hunk)
+                               ("k" git-gutter:previous-hunk)
+                               ("h" (progn (goto-char (point-min))
+                                           (git-gutter:next-hunk 1)))
+                               ("l" (progn (goto-char (point-min))
+                                           (git-gutter:previous-hunk 1)))
+                               ("s" git-gutter:stage-hunk)
+                               ("r" git-gutter:revert-hunk)
+                               ("p" git-gutter:popup-hunk)
+                               ("R" git-gutter:set-start-revision)
+                               ("q" nil :color blue))))
+#+end_src
+
+** Ivy
+ivyに興味がでてきたことと、2020/9/12ごろからHelmの開発が終了しそうになったこととivyに移行中。
+#+begin_src emacs-lisp :tangle yes
+  (leaf counsel
+    :ensure t
+    :require t
+    :config
+    (leaf ivy-hydra :ensure t)
+    (ivy-mode 1)
+    :custom
+    (ivy-use-virtual-buffers . t)
+    (ivy-wrap . t)
+    (ivy-height . 15)
+    (ivy-count-format . "(%d/%d) ")
+    (ivy-truncate-lines . nil)
+    (ivy-initial-inputs-alist . '())
+    (ivy-format-functions-alist . '((t . grugrut/ivy-format-function)))
+    (ivy-re-builders-alist . '((t . ivy--regex-ignore-order)))
+    :bind
+    (("C-z" . nil)
+     ("C-;" . ivy-switch-buffer)
+     ("C-+" . ivy-resume)
+     ("C-x C-f" . counsel-find-file)
+     ("M-x" . counsel-M-x)
+     ("M-y" . counsel-yank-pop)
+     ("C-z w" . swiper-all-thing-at-point)
+     ("C-z s" . counsel-git-grep)
+     ("C-z d" . counsel-descbinds)
+     ("C-z i" . counsel-imenu)
+     (ivy-minibuffer-map
+      ("C-z" . grugrut/ivy-partial))
+     (counsel-find-file-map
+      ("C-l" . counsel-up-directory)))
+    :preface
+    (defun grugrut/ivy-partial ()
+      "helmの `helm-execute-persistent-action' に近いものを実現する.
+  完全に同じものは無理だったので、ディレクトリなら入る、それ以外はできるだけ補完しバッファは抜けない動作をおこなう."
+      (interactive)
+      (cond
+       ((eq (ivy-state-collection ivy-last) #'read-file-name-internal)
+        ;; ファイルオープン
+        (let (dir)
+          (cond
+           ((setq dir (ivy-expand-file-if-directory (ivy-state-current ivy-last)))
+            ;; ディレクトリなら入る
+            (ivy--cd dir))
+           (t
+            ;; それ以外ならチラ見アクション
+            (ivy-call)))))
+       (t
+        (ivy-call))))
+    (defun grugrut/ivy-format-function (cands)
+      "選択の行頭にアイコンを表示する."
+      (ivy--format-function-generic
+       (lambda (str)
+         (concat (all-the-icons-faicon "usb") " " (ivy--add-face str 'ivy-current-match)))
+       (lambda (str)
+         (concat "    " str))
+       cands
+       "\n"))
+    )
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+  (leaf all-the-icons-ivy-rich
+    :ensure t
+    :init (all-the-icons-ivy-rich-mode 1))
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+  (leaf ivy-rich
+    :ensure t
+    :init (ivy-rich-mode 1))
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+  (leaf ivy-posframe
+    :ensure t
+    :diminish t
+    :custom
+    (ivy-posframe-display-functions-alist . '((t . ivy-posframe-display-at-frame-center)))
+    :init (ivy-posframe-mode 1))
+#+end_src
+** 外部連携
+#+begin_src emacs-lisp :tangle yes
+  (leaf atomic-chrome
+    :ensure t
+    :config
+    (atomic-chrome-start-server))
+#+end_src
+** Utility
+*** markdownへの出力
+ #+begin_src emacs-lisp :tangle yes
+   (defun grugrut/export-my-init-to-blog ()
+     ""
+     (interactive)
+     (require 'ox-hugo)
+     (let ((file "~/src/github.com/grugrut/blog/content/posts/my-emacs-init-el.md"))
+       (org-hugo-export-as-md)
+       (write-file file t)))
+
+ #+end_src
+** キー設定
+#+begin_src emacs-lisp :tangle yes
+  (leaf key-settings
+    :doc "キー入力設定"
+    :config
+    (global-unset-key (kbd "C-x C-z"))
+    ;; C-hをバックスペース
+    (keyboard-translate ?\C-h ?\C-?)
+    ;; which-key
+    (leaf which-key
+      :ensure t
+      :require t
+      :diminish which-key-mode
+      :config
+      (which-key-mode)
+      (which-key-setup-side-window-right-bottom))
+    (leaf which-key-posframe
+      :ensure t
+      :after '(which-key posframe)
+      :config
+      (which-key-posframe-mode)
+      :custom
+      (which-key-posframe-border-width . 2))
+    (leaf keyfreq
+      :ensure t
+      :config
+      (keyfreq-mode 1)
+      (keyfreq-autosave-mode 1))
+    (leaf free-keys
+      :doc "利用していないキーマップを教えてくれる"
+      :ensure t)
+    )
+#+end_src
+** フッタ
+#+begin_src emacs-lisp :tangle yes
+  ;;; init.el ends here
+
+ #+end_src

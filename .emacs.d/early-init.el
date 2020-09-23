@@ -22,6 +22,13 @@
 
 (setq debug-on-error t)
 
+(let ((my-init-org (concat user-emacs-directory "init.org"))
+      (my-init-el (concat user-emacs-directory "init.el"))
+      (my-early-init-el (concat user-emacs-directory "early-init.el")))
+  (when (or (file-newer-than-file-p my-init-org my-init-el)
+            (file-newer-than-file-p my-init-org my-early-init-el))
+    (message "WARN: init.el is old.\n")))
+
 ;; ツールバーを表示しない
 (tool-bar-mode 0)
 

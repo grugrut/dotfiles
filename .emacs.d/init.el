@@ -91,6 +91,11 @@
     :ensure t
     :leaf-defer t))
 
+(leaf popwin
+  :ensure t
+  :custom
+  (popwin:popup-window-position . 'bottom))
+
 (leaf general-setting
   :config
   (prefer-coding-system 'utf-8-unix)
@@ -147,6 +152,12 @@
   (indent-tabs-mode . nil) ; タブはスペースで
   (tab-width        . 2)
   )
+
+;; 同一バッファ名にディレクトリ付与
+(leaf uniquify
+  :custom
+  (uniquify-buffer-name-style . 'post-forward-angle-brackets)
+  (uniquify-ignore-buffers-re . "*[^*]+*"))
 
 (leaf font
   :config
@@ -215,21 +226,65 @@
   :config
   (beacon-mode 1))
 
-;; 同一バッファ名にディレクトリ付与
-(leaf uniquify
-  :custom
-  (uniquify-buffer-name-style . 'post-forward-angle-brackets)
-  (uniquify-ignore-buffers-re . "*[^*]+*"))
-
-(leaf popwin
+;; 操作した際に、操作箇所を強調表示する
+(leaf volatile-highlights
   :ensure t
+  :require t
+  :diminish volatile-highlights-mode
+  :config
+  (volatile-highlights-mode t))
+
+(leaf highlight-indent-guides
+  :ensure t
+  :require t
+  :diminish highlight-indent-guides-mode
   :custom
-  (popwin:popup-window-position . 'bottom))
+  (highlight-indent-guides-method . 'character)
+  (highlight-indent-guides-auto-character-face-perc . 20)
+  (highlight-indent-guides-character . ?\|)
+  :hook
+  (prog-mode-hook . highlight-indent-guides-mode))
+
+;; vi風に空行に~を表示する
+(leaf vi-tilde-fringe
+  :ensure t
+  :require t
+  :leaf-defer t
+  :commands vi-tilde-fringe-mode
+  :diminish vi-tilde-fringe-mode
+  :config
+  (global-vi-tilde-fringe-mode))
+
+(leaf minimap
+  :ensure t
+  :leaf-defer t
+  :config
+  (setq minimap-window-location 'right
+        minimap-update-delay 0.2
+        minimap-minimum-width 20)
+  :bind ("s-m" . minimap-mode))
+
+(leaf rainbow-mode
+  :ensure t
+  :leaf-defer t
+  :hook
+  (web-mode-hook . rainbow-mode))
 
 (leaf backward-forward
   :ensure t
   :config
   (backward-forward-mode 1))
+
+(leaf bm
+  :ensure t
+  :leaf-defer t
+  :commands (bm-toggle
+             bm-next
+             bm-previous)
+  :bind
+  (("C-S-SPC" . bm-toggle)
+   ("C-}" . bm-previous)
+   ("C-]" . bm-next)))
 
 (leaf avy
   :ensure t
@@ -251,28 +306,6 @@
   (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
   :custom-face
   (aw-leading-char-face . '((t (:height 2.0)))))
-
-(leaf imenu-list
-  :ensure t
-  :bind (("s-i" . imenu-list-smart-toggle))
-  :custom
-  (imenu-list-focus-after-activation . t)
-  :config
-  (leaf leaf-tree
-    :doc "leafのブロックを意識して表示"
-    :diminish leaf-tree
-    :ensure t))
-
-(leaf bm
-  :ensure t
-  :leaf-defer t
-  :commands (bm-toggle
-             bm-next
-             bm-previous)
-  :bind
-  (("C-S-SPC" . bm-toggle)
-   ("C-}" . bm-previous)
-   ("C-]" . bm-next)))
 
 (leaf ddskk
   :ensure t
@@ -306,14 +339,6 @@
     (setq skk-rule-tree (skk-compile-rule-list
                          skk-rom-kana-base-rule-list
                          (skk-del-alist "tU" skk-rom-kana-rule-list)))))
-
-;; 操作した際に、操作箇所を強調表示する
-(leaf volatile-highlights
-  :ensure t
-  :require t
-  :diminish volatile-highlights-mode
-  :config
-  (volatile-highlights-mode t))
 
 (leaf highlight-symbol
   :ensure t
@@ -407,6 +432,17 @@
 
 (setq comment-style 'extra-line)
 
+(leaf imenu-list
+  :ensure t
+  :bind (("s-i" . imenu-list-smart-toggle))
+  :custom
+  (imenu-list-focus-after-activation . t)
+  :config
+  (leaf leaf-tree
+    :doc "leafのブロックを意識して表示"
+    :diminish leaf-tree
+    :ensure t))
+
 (leaf yafolding
   :ensure t
   :leaf-defer t
@@ -428,42 +464,6 @@
   :commands (quickrun)
   :init
   (bind-key "C-c C-c" 'quickrun prog-mode-map))
-
-(leaf highlight-indent-guides
-  :ensure t
-  :require t
-  :diminish highlight-indent-guides-mode
-  :custom
-  (highlight-indent-guides-method . 'character)
-  (highlight-indent-guides-auto-character-face-perc . 20)
-  (highlight-indent-guides-character . ?\|)
-  :hook
-  (prog-mode-hook . highlight-indent-guides-mode))
-
-;; vi風に空行に~を表示する
-(leaf vi-tilde-fringe
-  :ensure t
-  :require t
-  :leaf-defer t
-  :commands vi-tilde-fringe-mode
-  :diminish vi-tilde-fringe-mode
-  :hook
-  (prog-mode-hook . vi-tilde-fringe-mode))
-
-(leaf minimap
-  :ensure t
-  :leaf-defer t
-  :config
-  (setq minimap-window-location 'right
-        minimap-update-delay 0.2
-        minimap-minimum-width 20)
-  :bind ("s-m" . minimap-mode))
-
-(leaf rainbow-mode
-  :ensure t
-  :leaf-defer t
-  :hook
-  (web-mode-hook . rainbow-mode))
 
 (leaf neotree
   :ensure t
@@ -562,9 +562,6 @@
         web-mode-script-padding 1)
   )
 
-(leaf typescript-mode
-  :ensure t)
-
 (leaf emmet-mode
   :ensure t
   :leaf-defer t
@@ -572,10 +569,8 @@
   :hook
   (web-mode-hook . emmet-mode))
 
-(leaf php-mode
-  :ensure t
-  :leaf-defer t
-  :mode ("\\.php\\'" . php-mode))
+(leaf typescript-mode
+  :ensure t)
 
 (leaf groovy-mode
   :ensure t
@@ -699,15 +694,6 @@
 (leaf fontawesome
   :ensure t)
 
-(leaf prettier-js
-  :ensure t
-  :disabled t
-  :custom (prettier-js-args . '("--prose-wrap" "never"))
-  :hook ((typescript-mode-hook . prettier-js-mode)
-         (web-mode-hook . prettier-js-mode)
-         (yaml-mode-hook . prettier-js-mode))
-  )
-
 (leaf codic
   :ensure t
   :leaf-defer t)
@@ -813,39 +799,13 @@
   :after org
   :commands (org-capture)
   :config
+  (defvar grugrut/org-inbox-file (concat org-directory "inbox.org"))
   (setq org-capture-templates `(
-                                p                                  ("t" "Todo")
-                                ("te" "Engineering" entry
-                                 (file+olp ,(concat org-directory "inbox.org") "Engineering")
-                                 "* TODO %?\n %i\n"
-                                 :prepend nil
-                                 :unnarrowed nil
-                                 :kill-buffer t
-                                 )
-                                ("tw" "Work" entry
-                                 (file+olp ,(concat org-directory "inbox.org") "Work")
-                                 "* TODO %?\n %i\n"
-                                 :prepend nil
-                                 :unnarrowed nil
-                                 :kill-buffer t
-                                 )
-                                ("th" "House" entry
-                                 (file+olp ,(concat org-directory "inbox.org") "House")
-                                 "* TODO %?\n %i\n"
-                                 :prepend nil
-                                 :unnarrowed nil
-                                 :kill-buffer t
-                                 )
-
-                                ("d" "Diary" entry
-                                 (file+olp+datetree ,(concat org-directory "diary.org"))
-                                 "** Activeties\n- %?\n** Meals\n- "
-                                 :prepend t
-                                 :unnarrowed nil
-                                 :kill-buffer t
-                                 :time-prompt t
-                                 )
-                                ("b" "blog" entry
+                                ("t" " Tasks" entry (file ,grugrut/org-inbox-file)
+                                 "* TODO %? %^G\n:PROPERTIES:\n:DEADLINE: %^{Deadline}T\n:EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}\n:END:\n")
+                                ("e" " Event" entry (file ,grugrut/org-inbox-file)
+                                 "* TODO %? %^G\n:PROPERTIES:\n:SCHEDULED: %^{Scheduled}T\n:EFFORT:%^{effort|1:00|0:05|0:15|0:30|2:00|4:00}\n:END:\n")
+                                ("b" " blog" entry
                                  (file+headline "~/src/github.com/grugrut/blog/draft/blog.org" ,(format-time-string "%Y"))
                                  "** TODO %?\n:PROPERTIES:\n:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :archives '(\\\"%(format-time-string \"%Y\")\\\" \\\"%(format-time-string \"%Y-%m\")\\\")\n:EXPORT_FILE_NAME: %(format-time-string \"%Y%m%d%H%M\")\n:END:\n\n")
                                 )))
@@ -921,18 +881,29 @@ Git gutter:
 (leaf counsel
   :ensure t
   :require t
-  :init
-  (global-unset-key (kbd "C-z"))
   :config
+  (leaf ivy-hydra :ensure t)
   (ivy-mode 1)
   :custom
   (ivy-use-virtual-buffers . t)
   (ivy-wrap . t)
+  (ivy-height . 15)
   (ivy-count-format . "(%d/%d) ")
+  (ivy-truncate-lines . nil)
+  (ivy-initial-inputs-alist . '())
+  (ivy-format-functions-alist . '((t . grugrut/ivy-format-function)))
+  (ivy-re-builders-alist . '((t . ivy--regex-ignore-order)))
   :bind
-  (("C-;" . ivy-switch-buffer)
+  (("C-z" . nil)
+   ("C-;" . ivy-switch-buffer)
+   ("C-+" . ivy-resume)
    ("C-x C-f" . counsel-find-file)
    ("M-x" . counsel-M-x)
+   ("M-y" . counsel-yank-pop)
+   ("C-z w" . swiper-all-thing-at-point)
+   ("C-z s" . counsel-git-grep)
+   ("C-z d" . counsel-descbinds)
+   ("C-z i" . counsel-imenu)
    (ivy-minibuffer-map
     ("C-z" . grugrut/ivy-partial))
    (counsel-find-file-map
@@ -954,7 +925,32 @@ Git gutter:
           ;; それ以外ならチラ見アクション
           (ivy-call)))))
      (t
-      (ivy-call)))))
+      (ivy-call))))
+  (defun grugrut/ivy-format-function (cands)
+    "選択の行頭にアイコンを表示する."
+    (ivy--format-function-generic
+     (lambda (str)
+       (concat (all-the-icons-faicon "usb") " " (ivy--add-face str 'ivy-current-match)))
+     (lambda (str)
+       (concat "    " str))
+     cands
+     "\n"))
+  )
+
+(leaf all-the-icons-ivy-rich
+  :ensure t
+  :init (all-the-icons-ivy-rich-mode 1))
+
+(leaf ivy-rich
+  :ensure t
+  :init (ivy-rich-mode 1))
+
+(leaf ivy-posframe
+  :ensure t
+  :diminish t
+  :custom
+  (ivy-posframe-display-functions-alist . '((t . ivy-posframe-display-at-frame-center)))
+  :init (ivy-posframe-mode 1))
 
 (leaf atomic-chrome
   :ensure t
