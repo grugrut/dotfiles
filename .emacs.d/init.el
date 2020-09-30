@@ -800,11 +800,14 @@
   :commands (org-capture)
   :config
   (defvar grugrut/org-inbox-file (concat org-directory "inbox.org"))
+  (defvar grugrut/org-journal-file (concat org-directory "journal.org"))
   (setq org-capture-templates `(
                                 ("t" " Tasks" entry (file ,grugrut/org-inbox-file)
                                  "* TODO %? %^G\n:PROPERTIES:\n:DEADLINE: %^{Deadline}T\n:EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}\n:END:\n")
                                 ("e" " Event" entry (file ,grugrut/org-inbox-file)
                                  "* TODO %? %^G\n:PROPERTIES:\n:SCHEDULED: %^{Scheduled}T\n:EFFORT:%^{effort|1:00|0:05|0:15|0:30|2:00|4:00}\n:END:\n")
+                                ("j" " Journal" entry (file+olp+datetree ,grugrut/org-journal-file)
+                                 "* %<%H:%M> %?")
                                 ("b" " blog" entry
                                  (file+headline "~/src/github.com/grugrut/blog/draft/blog.org" ,(format-time-string "%Y"))
                                  "** TODO %?\n:PROPERTIES:\n:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :archives '(\\\"%(format-time-string \"%Y\")\\\" \\\"%(format-time-string \"%Y-%m\")\\\")\n:EXPORT_FILE_NAME: %(format-time-string \"%Y%m%d%H%M\")\n:END:\n\n")
@@ -964,6 +967,10 @@ Git gutter:
   (let ((file "~/src/github.com/grugrut/blog/content/posts/my-emacs-init-el.md"))
     (org-hugo-export-as-md)
     (write-file file t)))
+
+(leaf win-toast
+  :el-get (win-toast
+           :url "https://raw.githubusercontent.com/grugrut/win-toast/master/win-toast.el"))
 
 (leaf key-settings
   :doc "キー入力設定"
