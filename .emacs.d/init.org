@@ -206,52 +206,57 @@ early-init.elに逃した設定を読みこむために入れていた。
    )
 #+end_src
 
-** 全体設定
-*** gcmh
-アイドル状態のときに、ガベージコレクトしてくれるらしい。
+** ライブラリ群
+#+begin_src emacs-lisp :tangle yes
+ (leaf libraries
+   :doc "ライブラリ群"
+   :config
+   (leaf cl-lib
+     :leaf-defer t)
+   (leaf dash
+     :ensure t
+     :leaf-defer t)
+   (leaf posframe
+     :ensure t
+     :preface
+     (defun my-posframe-arghandler (buffer-or-name arg-name value)
+       (let ((info '(:internal-border-width 1 :internal-border-color "gray80")))
+         (or (plist-get info arg-name) value)))
+     :custom
+     (posframe-arghandler . #'my-posframe-arghandler)
+     :leaf-defer t)
+   (leaf smartrep
+     :ensure t
+     :leaf-defer t))
+#+end_src 
 
-https://github.com/emacsmirror/gcmh
- #+begin_src emacs-lisp :tangle yes
-  (leaf gcmh
-    :ensure t
-    :diminish gcmh
-    :custom
-    (gcmh-verbose . t)
-    :config
-    (gcmh-mode 1))
- #+end_src
-*** ライブラリ群
- #+begin_src emacs-lisp :tangle yes
-  (leaf libraries
-    :doc "ライブラリ群"
-    :config
-    (leaf cl-lib
-      :leaf-defer t)
-    (leaf dash
-      :ensure t
-      :leaf-defer t)
-    (leaf s
-      :ensure t
-      :leaf-defer t)
-    (leaf f
-      :ensure t
-      :leaf-defer t)
-    (leaf ht
-      :ensure t
-      :leaf-defer t)
-    (leaf posframe
-      :ensure t
-      :preface
-      (defun my-posframe-arghandler (buffer-or-name arg-name value)
-        (let ((info '(:internal-border-width 1 :internal-border-color "gray80")))
-          (or (plist-get info arg-name) value)))
-      :custom
-      (posframe-arghandler . #'my-posframe-arghandler)
-      :leaf-defer t)
-    (leaf smartrep
-      :ensure t
-      :leaf-defer t))
- #+end_src 
+** 全体設定
+*** メモリ管理
+**** gcmh
+ アイドル状態のときに、ガベージコレクトしてくれるらしい。
+
+ https://github.com/emacsmirror/gcmh
+  #+begin_src emacs-lisp :tangle yes
+   (leaf gcmh
+     :ensure t
+     :diminish gcmh
+     :custom
+     (gcmh-verbose . t)
+     :config
+     (gcmh-mode 1))
+  #+end_src
+**** GC後に利用メモリサイズを出力する
+
+     #+begin_src emacs-lisp :tangle yes
+              (defun grugrut/gc-debug-function (str)
+                (let ((sum 0))
+                  (dolist (x str)
+                    (setq sum (+ sum (* (cl-second x) (cl-third x)))))
+                  (message "Used Memory: %d MB" (/ sum (* 1024 1024)))))
+              (advice-add 'garbage-collect :filter-return #'grugrut/gc-debug-function)
+     #+end_src
+     
+
 *** popwin
  #+begin_src emacs-lisp :tangle yes
    (leaf popwin
@@ -947,9 +952,8 @@ pythonのモード複数あってなにがよいのかよくわかっていな�
    (leaf python-mode
      :ensure t
      :leaf-defer t
+     :custom ((python-shell-interpreter . "ipython"))
      :mode (("\\.py\\'" . python-mode))
-     :config
-     (bind-key "C-c C-c" 'quickrun python-mode-map)
      )
  #+end_src
 

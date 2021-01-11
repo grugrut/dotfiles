@@ -53,29 +53,12 @@
   (load (concat user-emacs-directory "early-init.el"))
   )
 
-(leaf gcmh
-  :ensure t
-  :diminish gcmh
-  :custom
-  (gcmh-verbose . t)
-  :config
-  (gcmh-mode 1))
-
 (leaf libraries
   :doc "ライブラリ群"
   :config
   (leaf cl-lib
     :leaf-defer t)
   (leaf dash
-    :ensure t
-    :leaf-defer t)
-  (leaf s
-    :ensure t
-    :leaf-defer t)
-  (leaf f
-    :ensure t
-    :leaf-defer t)
-  (leaf ht
     :ensure t
     :leaf-defer t)
   (leaf posframe
@@ -90,6 +73,21 @@
   (leaf smartrep
     :ensure t
     :leaf-defer t))
+
+(leaf gcmh
+  :ensure t
+  :diminish gcmh
+  :custom
+  (gcmh-verbose . t)
+  :config
+  (gcmh-mode 1))
+
+(defun grugrut/gc-debug-function (str)
+  (let ((sum 0))
+    (dolist (x str)
+      (setq sum (+ sum (* (cl-second x) (cl-third x)))))
+    (message "Used Memory: %d MB" (/ sum (* 1024 1024)))))
+(advice-add 'garbage-collect :filter-return #'grugrut/gc-debug-function)
 
 (leaf popwin
   :ensure t
@@ -643,9 +641,8 @@
 (leaf python-mode
   :ensure t
   :leaf-defer t
+  :custom ((python-shell-interpreter . "ipython"))
   :mode (("\\.py\\'" . python-mode))
-  :config
-  (bind-key "C-c C-c" 'quickrun python-mode-map)
   )
 
 (leaf yaml-mode
