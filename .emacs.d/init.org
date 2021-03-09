@@ -321,6 +321,7 @@ early-init.elに逃した設定を読みこむために入れていた。
      :setq-default
      (indent-tabs-mode . nil) ; タブはスペースで
      (tab-width        . 2)
+     (require-final-newline . t)
      )
  #+end_src
 *** uniquify
@@ -1121,7 +1122,7 @@ pythonのモード複数あってなにがよいのかよくわかっていな�
     (setq org-directory "~/src/github.com/grugrut/PersonalProject/")
     :custom
     ;; TODO状態の設定
-    (org-todo-keywords . '((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d)")
+    (org-todo-keywords . '((sequence "TODO(t)" "IN PROGRESS(i)" "|" "DONE(d)")
                            (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "MEETING")))
     (org-todo-keyword-faces . '(("TODO" :foreground "red" :weight bold)
                                 ("STARTED" :foreground "cornflower blue" :weight bold)
@@ -1187,6 +1188,34 @@ pythonのモード複数あってなにがよいのかよくわかっていな�
        (plantuml . t))))
 #+end_src
 
+*** Org Roam
+
+    #+begin_src emacs-lisp :tangle yes
+      (leaf org-roam
+        :ensure t
+        :custom
+        (org-roam-directory . "~/src/github.com/grugrut/til")
+        :bind
+        ((:org-roam-mode-map
+          ("C-c n l" . org-roam)
+          ("C-c n f" . org-roam-find-file)
+          ("C-c n g" . org-roam-graph))
+         (:org-mode-map
+          ("C-c n i" . org-roam-insert)
+          ("C-c n I" . org-roam-insert-immediate)))
+        :config
+        (setq org-roam-capture-template '(
+                                          ("r" " Roam" plain (function org-roam--capture-get-point)
+                                           "%?"
+                                           :file-name "%<%Y%m%d%H%M%S>-${slug}"
+                                           :head "#+title: ${title}\n"
+                                           :unnarrowed t)
+                                          ))
+        :hook
+        (after-init-hook . org-roam-mode))
+
+    #+end_src
+    
 ** Git操作
 #+begin_src emacs-lisp :tangle yes
   (leaf git
@@ -1222,7 +1251,12 @@ pythonのモード複数あってなにがよいのかよくわかっていな�
                                ("r" git-gutter:revert-hunk)
                                ("p" git-gutter:popup-hunk)
                                ("R" git-gutter:set-start-revision)
-                               ("q" nil :color blue))))
+                               ("q" nil :color blue)))
+    (leaf browse-at-remote
+      :ensure t
+      :custom
+      (browse-at-remote-prefer-symbolic . nil)
+      ))
 #+end_src
 
 ** Ivy

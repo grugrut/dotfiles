@@ -149,6 +149,7 @@
   :setq-default
   (indent-tabs-mode . nil) ; タブはスペースで
   (tab-width        . 2)
+  (require-final-newline . t)
   )
 
 ;; 同一バッファ名にディレクトリ付与
@@ -778,7 +779,7 @@
   (setq org-directory "~/src/github.com/grugrut/PersonalProject/")
   :custom
   ;; TODO状態の設定
-  (org-todo-keywords . '((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d)")
+  (org-todo-keywords . '((sequence "TODO(t)" "IN PROGRESS(i)" "|" "DONE(d)")
                          (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "MEETING")))
   (org-todo-keyword-faces . '(("TODO" :foreground "red" :weight bold)
                               ("STARTED" :foreground "cornflower blue" :weight bold)
@@ -843,6 +844,29 @@
      (rust . t)
      (plantuml . t))))
 
+(leaf org-roam
+  :ensure t
+  :custom
+  (org-roam-directory . "~/src/github.com/grugrut/til")
+  :bind
+  ((:org-roam-mode-map
+    ("C-c n l" . org-roam)
+    ("C-c n f" . org-roam-find-file)
+    ("C-c n g" . org-roam-graph))
+   (:org-mode-map
+    ("C-c n i" . org-roam-insert)
+    ("C-c n I" . org-roam-insert-immediate)))
+  :config
+  (setq org-roam-capture-template '(
+                                    ("r" " Roam" plain (function org-roam--capture-get-point)
+                                     "%?"
+                                     :file-name "%<%Y%m%d%H%M%S>-${slug}"
+                                     :head "#+title: ${title}\n"
+                                     :unnarrowed t)
+                                    ))
+  :hook
+  (after-init-hook . org-roam-mode))
+
 (leaf git
   :config
   (leaf magit
@@ -876,7 +900,12 @@ Git gutter:
                              ("r" git-gutter:revert-hunk)
                              ("p" git-gutter:popup-hunk)
                              ("R" git-gutter:set-start-revision)
-                             ("q" nil :color blue))))
+                             ("q" nil :color blue)))
+  (leaf browse-at-remote
+    :ensure t
+    :custom
+    (browse-at-remote-prefer-symbolic . nil)
+    ))
 
 (leaf counsel
   :ensure t
