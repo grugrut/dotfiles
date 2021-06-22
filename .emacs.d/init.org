@@ -868,9 +868,11 @@ HTMLタグを簡単に入力できる。
 
 *** TypeScript
  #+begin_src emacs-lisp :tangle yes
-
    (leaf typescript-mode
-     :ensure t)
+     :ensure t
+     :custom
+     (typescript-indent-level . 2)
+     )
  #+end_src
 
 *** Jenkinsfile編集
