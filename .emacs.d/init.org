@@ -682,6 +682,14 @@ vimの ~f~ に相当する。zap-to-char( ~M-z~ )でもavyインタフェース�
    (setq comment-style 'extra-line)
  #+end_src
 
+ #+begin_src emacs-lisp :tangle yes
+   (leaf editorconfig
+     :ensure t
+     :diminish t
+     :config
+     (editorconfig-mode 1))
+ #+end_src
+
 *** imenu-list
  #+begin_src emacs-lisp :tangle yes
    (leaf imenu-list
