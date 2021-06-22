@@ -64,19 +64,22 @@ Emacs26から登場したネイティブの行番号表示は、ddskkと相性�
 https://www.grugrut.net/posts/201910202227/
 
 #+begin_src emacs-lisp :tangle early-init.el
- ;; ツールバーを表示しない
- (tool-bar-mode 0)
+  ;; ツールバーを表示しない
+  (tool-bar-mode 0)
 
- ;; スクロールバーを表示しない
- (set-scroll-bar-mode nil)
+  ;; スクロールバーを表示しない
+  (set-scroll-bar-mode nil)
 
- ;; 行番号を表示
- (line-number-mode +1)
- (column-number-mode +1)
+  ;; 行番号を表示
+  (line-number-mode +1)
+  (column-number-mode +1)
 
- ;; 行番号表示(Emacs26以降)
- (global-display-line-numbers-mode t)
- (custom-set-variables '(display-line-numbers-width-start t))
+  ;; 行番号表示(Emacs26以降)
+  (global-display-line-numbers-mode t)
+  (custom-set-variables '(display-line-numbers-width-start t))
+
+  ;; native-compのワーニング抑制
+  (custom-set-variables '(warning-suppress-types '((comp))))
 #+end_src
 
 ** フレームサイズ
@@ -1197,34 +1200,6 @@ pythonのモード複数あってなにがよいのかよくわかっていな�
        (rust . t)
        (plantuml . t))))
 #+end_src
-
-*** Org Roam
-
-    #+begin_src emacs-lisp :tangle yes
-      (leaf org-roam
-        :ensure t
-        :custom
-        (org-roam-directory . "~/src/github.com/grugrut/til")
-        :bind
-        ((:org-roam-mode-map
-          ("C-c n l" . org-roam)
-          ("C-c n f" . org-roam-find-file)
-          ("C-c n g" . org-roam-graph))
-         (:org-mode-map
-          ("C-c n i" . org-roam-insert)
-          ("C-c n I" . org-roam-insert-immediate)))
-        :config
-        (setq org-roam-capture-template '(
-                                          ("r" " Roam" plain (function org-roam--capture-get-point)
-                                           "%?"
-                                           :file-name "%<%Y%m%d%H%M%S>-${slug}"
-                                           :head "#+title: ${title}\n"
-                                           :unnarrowed t)
-                                          ))
-        :hook
-        (after-init-hook . org-roam-mode))
-
-    #+end_src
     
 ** Git操作
 #+begin_src emacs-lisp :tangle yes
@@ -1359,6 +1334,14 @@ ivyに興味がでてきたことと、2020/9/12ごろからHelmの開発が終�
     :config
     (atomic-chrome-start-server))
 #+end_src
+** ターミナル
+vtermが良さそうなので使ってみる
+
+#+begin_src emacs-lisp :tangle yes
+  (leaf vterm
+    :ensure t)
+#+end_src
+
 ** Utility
 *** markdownへの出力
  #+begin_src emacs-lisp :tangle yes

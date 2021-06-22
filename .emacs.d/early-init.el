@@ -43,6 +43,9 @@
 (global-display-line-numbers-mode t)
 (custom-set-variables '(display-line-numbers-width-start t))
 
+;; native-compのワーニング抑制
+(custom-set-variables '(warning-suppress-types '((comp))))
+
 (setq default-frame-alist
       (append '((width                . 140)  ; フレーム幅
                 (height               . 40 ) ; フレーム高

@@ -431,6 +431,12 @@
 
 (setq comment-style 'extra-line)
 
+(leaf editorconfig
+  :ensure t
+  :diminish t
+  :config
+  (editorconfig-mode 1))
+
 (leaf imenu-list
   :ensure t
   :bind (("s-i" . imenu-list-smart-toggle))
@@ -569,7 +575,10 @@
   (web-mode-hook . emmet-mode))
 
 (leaf typescript-mode
-  :ensure t)
+  :ensure t
+  :custom
+  (typescript-indent-level . 2)
+  )
 
 (leaf groovy-mode
   :ensure t
@@ -844,29 +853,6 @@
      (rust . t)
      (plantuml . t))))
 
-(leaf org-roam
-  :ensure t
-  :custom
-  (org-roam-directory . "~/src/github.com/grugrut/til")
-  :bind
-  ((:org-roam-mode-map
-    ("C-c n l" . org-roam)
-    ("C-c n f" . org-roam-find-file)
-    ("C-c n g" . org-roam-graph))
-   (:org-mode-map
-    ("C-c n i" . org-roam-insert)
-    ("C-c n I" . org-roam-insert-immediate)))
-  :config
-  (setq org-roam-capture-template '(
-                                    ("r" " Roam" plain (function org-roam--capture-get-point)
-                                     "%?"
-                                     :file-name "%<%Y%m%d%H%M%S>-${slug}"
-                                     :head "#+title: ${title}\n"
-                                     :unnarrowed t)
-                                    ))
-  :hook
-  (after-init-hook . org-roam-mode))
-
 (leaf git
   :config
   (leaf magit
@@ -985,6 +971,9 @@ Git gutter:
   :ensure t
   :config
   (atomic-chrome-start-server))
+
+(leaf vterm
+  :ensure t)
 
 (defun grugrut/export-my-init-to-blog ()
   ""
