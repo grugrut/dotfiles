@@ -210,6 +210,7 @@
   :require t
   :hook (after-init-hook . doom-modeline-mode)
   :custom
+  (doom-modeline-buffer-file-name-style . 'truncate-with-project)
   (doom-modeline-bar-width . 3)
   (doom-modeline-height . 25)
   (doom-modeline-major-mode-color-icon . t)
