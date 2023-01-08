@@ -962,16 +962,18 @@ HTMLタグを簡単に入力できる。
  #+end_src
 
 *** python
-pythonのモード複数あってなにがよいのかよくわかっていない。
+DON'T confuse this with python-mode.el, they are 2 different packages:
+python.el is built-in and has better integration with emacs, while
+python-mode.el is a mess in terms of functions to call.
  #+begin_src emacs-lisp :tangle yes
-   (leaf python-mode
+   (leaf python
      :ensure t
-     :leaf-defer t
-     :custom ((python-shell-interpreter . "ipython"))
-     :mode (("\\.py\\'" . python-mode))
-     )
+     :custom
+     (python-shell-interpreter . "ipython")
+     ;; Remove guess indent python message
+     (python-indent-guess-indent-offset-verbose . nil)
+     (python-indent-offset . 4))
  #+end_src
-
 *** yaml
  #+begin_src emacs-lisp :tangle yes
    (leaf yaml-mode
