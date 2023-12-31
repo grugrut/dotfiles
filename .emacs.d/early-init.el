@@ -23,10 +23,8 @@
 (setq debug-on-error t)
 
 (let ((my-init-org (concat user-emacs-directory "init.org"))
-      (my-init-el (concat user-emacs-directory "init.el"))
-      (my-early-init-el (concat user-emacs-directory "early-init.el")))
-  (when (or (file-newer-than-file-p my-init-org my-init-el)
-            (file-newer-than-file-p my-init-org my-early-init-el))
+      (my-init-el (concat user-emacs-directory "init.el")))
+  (when (file-newer-than-file-p my-init-org my-init-el)
     (message "WARN: init.el is old.\n")))
 
 ;; ツールバーを表示しない
@@ -42,6 +40,9 @@
 ;; 行番号表示(Emacs26以降)
 (global-display-line-numbers-mode t)
 (custom-set-variables '(display-line-numbers-width-start t))
+
+;; タブ表示
+(tab-bar-mode t)
 
 ;; native-compのワーニング抑制
 (custom-set-variables '(warning-suppress-types '((comp))))

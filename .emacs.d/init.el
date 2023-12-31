@@ -82,13 +82,6 @@
   :config
   (gcmh-mode 1))
 
-(defun grugrut/gc-debug-function (str)
-  (let ((sum 0))
-    (dolist (x str)
-      (setq sum (+ sum (* (cl-second x) (cl-third x)))))
-    (message "Used Memory: %d MB" (/ sum (* 1024 1024)))))
-(advice-add 'garbage-collect :filter-return #'grugrut/gc-debug-function)
-
 (leaf popwin
   :ensure t
   :custom
@@ -101,7 +94,9 @@
   ;; recentf
   (defvar recentf-max-saved-items 1000)
   (defvar recentf-auto-cleanup 'never)
+  (recentf-mode)
   (global-set-key [mouse-2] 'mouse-yank-at-click)
+  (global-unset-key "\C-z") ; C-zでSuspendは暴発して使いにくいので無効化
   (delete-selection-mode t) ; リージョン選択時にリージョンまるごと削除
   (leaf exec-path-from-shell
     :ensure t
@@ -133,6 +128,7 @@
   (setq frame-title-format "%f")
   :setq
   `((large-file-warning-threshold	         . ,(* 25 1024 1024))
+    (create-lockfiles . nil)
     (read-file-name-completion-ignore-case . t)
     (use-dialog-box                        . nil)
     (history-length                        . 500)
@@ -481,54 +477,16 @@
   :diminish flycheck-mode
   :hook (prog-mode-hook . flycheck-mode))
 
-(leaf lsp-mode
+(leaf eglot
   :ensure t
   :require t
-  :commands lsp
   :hook
-  (go-mode-hook . lsp)
-  (web-mode-hook . lsp)
-  (elixir-mode-hook . lsp)
-  (typescript-mode-hook . lsp)
-  :config
-  (leaf lsp-ui
-    :ensure t
-    :require t
-    :hook
-    (lsp-mode-hook . lsp-ui-mode)
-    :custom
-    (lsp-ui-sideline-enable . nil)
-    (lsp-prefer-flymake . nil)
-    (lsp-print-performance . t)
-    :config
-    (define-key lsp-ui-mode-map [remap xref-find-definitions] 'lsp-ui-peek-find-definitions)
-    (define-key lsp-ui-mode-map [remap xref-find-references] 'lsp-ui-peek-find-references)
-    (define-key lsp-ui-mode-map (kbd "C-c i") 'lsp-ui-imenu)
-    (define-key lsp-ui-mode-map (kbd "s-l") 'hydra-lsp/body)
-    (setq lsp-ui-doc-position 'bottom)
-    :hydra (hydra-lsp (:exit t :hint nil)
-                      "
- Buffer^^               Server^^                   Symbol
--------------------------------------------------------------------------------------
- [_f_] format           [_M-r_] restart            [_d_] declaration  [_i_] implementation  [_o_] documentation
- [_m_] imenu            [_S_]   shutdown           [_D_] definition   [_t_] type            [_r_] rename
- [_x_] execute action   [_M-s_] describe session   [_R_] references   [_s_] signature"
-                      ("d" lsp-find-declaration)
-                      ("D" lsp-ui-peek-find-definitions)
-                      ("R" lsp-ui-peek-find-references)
-                      ("i" lsp-ui-peek-find-implementation)
-                      ("t" lsp-find-type-definition)
-                      ("s" lsp-signature-help)
-                      ("o" lsp-describe-thing-at-point)
-                      ("r" lsp-rename)
-
-                      ("f" lsp-format-buffer)
-                      ("m" lsp-ui-imenu)
-                      ("x" lsp-execute-code-action)
-
-                      ("M-s" lsp-describe-session)
-                      ("M-r" lsp-restart-workspace)
-                      ("S" lsp-shutdown-workspace))))
+  (go-mode-hook . eglot-ensure)
+  (web-mode-hook . eglot-ensure)
+  (js-mode-hook . eglot-ensure)
+  (elixir-mode-hook . eglot-ensure)
+  (typescript-mode-hook . eglot-ensure)
+  )
 
 (leaf golang
   :config
@@ -556,8 +514,7 @@
          ("\\.scss\\'" . web-mode)
          ("\\.css\\'" . web-mode)
          ("\\.twig\\'" . web-mode)
-         ("\\.vue\\'" . web-mode)
-         ("\\.js\\'" . web-mode))
+         ("\\.vue\\'" . web-mode))
   :config
   (flycheck-add-mode 'javascript-eslint 'web-mode)
   (setq web-mode-markup-indent-offset 2
@@ -575,6 +532,10 @@
   :hook
   (web-mode-hook . emmet-mode))
 
+(leaf js-mode
+  :mode (("\\.js\\'" . js-mode))
+  :custom
+  (js-indent-level . 2))
 (leaf typescript-mode
   :ensure t
   :custom
@@ -670,8 +631,6 @@
     :custom
     (markdown-command . "github-markup")
     (markdown-command-needs-filename . t))
-  (leaf markdown-preview-mode
-    :ensure t))
 
 (leaf dockerfile-mode
   :ensure t)
@@ -726,6 +685,7 @@
   (leaf company-box
     :ensure t
     :require t
+    :disabled t
     :diminish company-box-mode
     :hook (company-mode-hook . company-box-mode)
     :after all-the-icons
@@ -801,6 +761,7 @@
   (org-log-done . 'time)
   (org-clock-persist . t)
   (org-clock-out-when-done . t)
+  (org-adapt-indentation . nil)         ;ノードレベルにあわせたインデントをおこなわない
   )
 (leaf org-capture
   :leaf-defer t
@@ -895,6 +856,7 @@ Git gutter:
     ))
 
 (leaf counsel
+  :disabled t
   :ensure t
   :require t
   :config
@@ -954,24 +916,62 @@ Git gutter:
   )
 
 (leaf all-the-icons-ivy-rich
+  :disabled t
   :ensure t
   :init (all-the-icons-ivy-rich-mode 1))
 
 (leaf ivy-rich
+  :disabled t
   :ensure t
   :init (ivy-rich-mode 1))
 
 (leaf ivy-posframe
+  :disabled t
   :ensure t
   :diminish t
   :custom
   (ivy-posframe-display-functions-alist . '((t . ivy-posframe-display-at-frame-center)))
   :init (ivy-posframe-mode 1))
 
-(leaf atomic-chrome
+(leaf vertico
+  :ensure t
+  :global-minor-mode t
+  :bind ((:vertico-map
+          ("C-z" . vertico-insert)
+          ("C-l" . grugrut/up-dir)))
+  :preface
+  (defun grugrut/up-dir ()
+    "一つ上の `/' まで辿って削除する."
+    (interactive)
+    (let* ((orig (minibuffer-contents))
+           (orig-dir (file-name-directory orig))
+           (up-dir (if orig-dir (file-name-directory (directory-file-name orig-dir))))
+           (target (if (and up-dir orig-dir) up-dir orig)))
+      (delete-minibuffer-contents)
+      (insert target)))
+  :custom
+  (vertico-count . 20)
+  (vertico-cycle . t))
+(leaf savehist
+  :global-minor-mode t)
+(leaf orderless
+  :ensure t
+  :custom ((completion-styles . '(orderless))))
+(leaf marginalia
+  :ensure t
+  :global-minor-mode t)
+(leaf consult
+  :ensure t
+  :bind (([remap swith-to-buffer] . consult-buffer)
+         ([remap goto-line] . consult-goto-line)
+         ([remap yank-pop] . consult-yank-pop)
+         ("C-;" . consult-buffer)))
+(leaf embark
   :ensure t
   :config
-  (atomic-chrome-start-server))
+  (leaf embark-consult
+    :ensure t
+    :after consult))
 
 (leaf vterm
   :ensure t)
