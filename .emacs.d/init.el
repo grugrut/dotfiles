@@ -159,6 +159,7 @@
   ;; 絵文字
   ;; (unicode-fonts-setup) ; 最初に本コマンドの実行が必要
   ;; (all-the-icons-install-fonts)
+  ;; (nerd-icons-install-fonts)
   (leaf unicode-fonts
     :ensure t)
   (leaf all-the-icons
