@@ -3,6 +3,9 @@
 #+options: author:nil
 #+hugo_tags: emacs config
 
+* このページについて
+自分のinit.elの設定メモです。元の設定はOrg modeで管理していて、そこから =org-babel-tangle= でelファイルを出力するようにしています。
+
 * Early Init
 Emacs 27から =early-init.el= が追加された。
 正直、速度的な効果は感じられないが、せっかくなので追加している。
@@ -406,8 +409,10 @@ early-init.elに逃した設定を読みこむために入れていた。
       :hook (after-init-hook . doom-modeline-mode)
       :custom
       (doom-modeline-buffer-file-name-style . 'truncate-with-project)
+      (doom-modeline-buffer-state-icon . t)
       (doom-modeline-bar-width . 3)
       (doom-modeline-height . 25)
+      (doom-modeline-icon . t)
       (doom-modeline-major-mode-color-icon . t)
       (doom-modeline-minor-modes . t)
       (doom-modeline-github . nil)
@@ -769,6 +774,19 @@ vimの ~f~ に相当する。zap-to-char( ~M-z~ )でもavyインタフェース�
     )
 #+end_src
 
+*** tree-sitter
+新しい言語を導入する際は、M-x treesit-install-language-grammerを実行する。
+#+begin_src emacs-lisp :tangle yes
+  (leaf tree-sitter
+    :ensure t
+    :config
+    (leaf tree-sitter-langs
+      :ensure t)
+    (tree-sitter-require 'tsx)
+    :hook
+    (go-mode-hook . tree-sitter-mode))
+#+end_src
+
 *** Golang
  #+begin_src emacs-lisp :tangle yes
    (leaf golang
@@ -831,6 +849,8 @@ HTMLタグを簡単に入力できる。
      (js-indent-level . 2))
    (leaf typescript-mode
      :ensure t
+     :after tree-sitter
+     :mode (("\\.tsx\\'" . tsx-ts-mode))
      :custom
      (typescript-indent-level . 2)
      )
@@ -947,7 +967,7 @@ pythonのモード複数あってなにがよいのかよくわかっていな�
        :mode ("\\.md\\'" . gfm-mode)
        :custom
        (markdown-command . "github-markup")
-       (markdown-command-needs-filename . t))
+       (markdown-command-needs-filename . t)))
  #+end_src
 
 *** dockerfile

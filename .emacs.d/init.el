@@ -207,8 +207,10 @@
   :hook (after-init-hook . doom-modeline-mode)
   :custom
   (doom-modeline-buffer-file-name-style . 'truncate-with-project)
+  (doom-modeline-buffer-state-icon . t)
   (doom-modeline-bar-width . 3)
   (doom-modeline-height . 25)
+  (doom-modeline-icon . t)
   (doom-modeline-major-mode-color-icon . t)
   (doom-modeline-minor-modes . t)
   (doom-modeline-github . nil)
@@ -488,6 +490,15 @@
   (typescript-mode-hook . eglot-ensure)
   )
 
+(leaf tree-sitter
+  :ensure t
+  :config
+  (leaf tree-sitter-langs
+    :ensure t)
+  (tree-sitter-require 'tsx)
+  :hook
+  (go-mode-hook . tree-sitter-mode))
+
 (leaf golang
   :config
   (leaf go-mode
@@ -538,6 +549,8 @@
   (js-indent-level . 2))
 (leaf typescript-mode
   :ensure t
+  :after tree-sitter
+  :mode (("\\.tsx\\'" . tsx-ts-mode))
   :custom
   (typescript-indent-level . 2)
   )
@@ -630,7 +643,7 @@
     :mode ("\\.md\\'" . gfm-mode)
     :custom
     (markdown-command . "github-markup")
-    (markdown-command-needs-filename . t))
+    (markdown-command-needs-filename . t)))
 
 (leaf dockerfile-mode
   :ensure t)
