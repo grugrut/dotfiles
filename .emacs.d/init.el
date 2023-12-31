@@ -462,14 +462,6 @@
   (projectile-mode +1)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
-(leaf quickrun
-  :ensure t
-  :leaf-defer t
-  :after bind-key
-  :commands (quickrun)
-  :init
-  (bind-key "C-c C-c" 'quickrun prog-mode-map))
-
 (leaf neotree
   :ensure t
   :bind ("H-t" . neotree-toggle))
@@ -555,11 +547,6 @@
   :custom
   (typescript-indent-level . 2)
   )
-
-(leaf groovy-mode
-  :ensure t
-  :leaf-defer t
-  :mode (("Jenkinsfile" . groovy-mode)))
 
 (leaf rust-mode
   :ensure t

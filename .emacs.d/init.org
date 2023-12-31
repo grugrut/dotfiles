@@ -737,17 +737,6 @@ vimの ~f~ に相当する。zap-to-char( ~M-z~ )でもavyインタフェース�
      (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
  #+end_src
 
-*** quickrun
- #+begin_src emacs-lisp :tangle yes
-   (leaf quickrun
-     :ensure t
-     :leaf-defer t
-     :after bind-key
-     :commands (quickrun)
-     :init
-     (bind-key "C-c C-c" 'quickrun prog-mode-map))
- #+end_src
-
 *** ファイルツリー
 ファイルツリーの表示にはneotreeを使っている。ほとんど使ってない。
  #+begin_src emacs-lisp :tangle yes
@@ -862,14 +851,6 @@ HTMLタグを簡単に入力できる。
      :custom
      (typescript-indent-level . 2)
      )
- #+end_src
-
-*** Jenkinsfile編集
- #+begin_src emacs-lisp :tangle yes
-   (leaf groovy-mode
-     :ensure t
-     :leaf-defer t
-     :mode (("Jenkinsfile" . groovy-mode)))
  #+end_src
 
 *** rust
@@ -1091,16 +1072,16 @@ pythonのモード複数あってなにがよいのかよくわかっていな�
 #+end_src
 #+begin_src emacs-lisp :tangle yes
 
-   (leaf view
-     :require t
-     :chord (("fj" . view-mode))
-     :bind  (:view-mode-map
-             ("j" . next-line)
-             ("k" . previous-line)
-             ("h" . backward-char)
-             ("l" . forward-char))
-     :config
-     (setq view-read-only t))
+  (leaf view
+    :require t
+    :chord (("fj" . view-mode))
+    :bind  (:view-mode-map
+            ("j" . next-line)
+            ("k" . previous-line)
+            ("h" . backward-char)
+            ("l" . forward-char))
+    :config
+    (setq view-read-only t))
  #+end_src
 
 ** Org Mode
