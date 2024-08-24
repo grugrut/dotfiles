@@ -62,8 +62,6 @@
               default-frame-alist))
 (setq initial-frame-alist default-frame-alist)
 
-(modify-frame-parameters nil '((sticky . t) (width . 100) (height . 40))) ; Xを使う場合の高速化設定らしい
-
 (custom-set-variables '(custom-file (expand-file-name "custom.el" user-emacs-directory)))
 
 ;;; early-init.el ends here
