@@ -27,12 +27,10 @@
 
 (leaf gcmh
   :ensure t
-  :defun
-  (gcmh-mode)
+  :global-minor-mode t
   :custom
   (gcmh-verbose . t)
-  :init
-  (gcmh-mode 1))
+  )
 
 (leaf general-settings
   :config
@@ -79,25 +77,17 @@
 
 (leaf doom-modeline
   :ensure t
-  :defun
-  (doom-modeline-mode)
-  :init
-  (doom-modeline-mode 1)
+  :global-minor-mode t
   :custom
   (doom-modeline-bar-width . 4)
   (doom-modeline-hud . t))
 
 (leaf beacon
   :ensure t
-  :defun
-  (beacon-mode)
-  :config
-  (beacon-mode 1))
+  :global-minor-mode t)
 
 (leaf volatile-highlights
   :ensure t
-  :defun
-  (volatile-highlithgs-mode)
   :global-minor-mode t)
 
 (leaf ddskk
@@ -126,10 +116,8 @@
 
 (leaf puni
   :ensure t
-  :defun
-  (puni-global-mode)
-  :config
-  (puni-global-mode))
+  :global-minor-mode puni-global-mode
+  )
 
 (leaf vertico
   :ensure t
@@ -228,12 +216,10 @@
 
 (leaf anzu
   :ensure t
-  :defun
-  (global-anzu-mode)
+  :global-minor-mode global-anzu-mode
   :bind
   (("M-%" . anzu-query-replace))
-  :config
-  (global-anzu-mode +1))
+  )
 
 (leaf migemo
   :ensure t
@@ -277,10 +263,7 @@
 
 (leaf corfu
   :ensure t
-  :defun
-  (global-corfu-mode)
-  :config
-  (global-corfu-mode)
+  :global-minor-mode global-corfu-mode
   :custom
   (corfu-cycle . t)
   (corfu-auto . t)
