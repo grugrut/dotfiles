@@ -90,6 +90,28 @@
   :ensure t
   :global-minor-mode t)
 
+(leaf anzu
+  :ensure t
+  :global-minor-mode global-anzu-mode
+  :bind
+  (("M-%" . anzu-query-replace))
+  )
+
+(leaf migemo
+  :ensure t
+  :require t
+  :defun
+  (migemo-init)
+  :custom
+  (migemo-command . "cmigemo")
+  (migemo-options . '("-q" "--emacs"))
+  (migemo-dictionary . "/usr/share/cmigemo/utf-8/migemo-dict")
+  (migemo-user-dictionary . nil)
+  (migemo-regex-dictionary . nil)
+  (migemo-coding-system . 'utf-8-unix)
+  :config
+  (migemo-init))
+
 (leaf ddskk
   :ensure t
   :bind
@@ -145,7 +167,10 @@
 
 (leaf undo-tree
   :ensure t
-  :global-minor-mode global-undo-tree-mode)
+  :global-minor-mode global-undo-tree-mode
+  :custom
+  (undo-tree-auto-save-history . nil)
+)
 
 (leaf orderless
   :ensure t
@@ -186,12 +211,18 @@
 (leaf indent-bars
   :vc (:url "https://github.com/jdtsmith/indent-bars")
   :hook
-  ((prog-mode) . indent-bars-mode)
+  (prog-mode . indent-bars-mode)
   :config
   (require 'indent-bars-ts)
   :custom
   (indent-bars-treesit-support . t)
-  (indent-bars-treesit-ignore-blank-lines-types . '("module")))
+  (indent-bars-treesit-ignore-blank-lines-types . '("module"))
+  (indent-bars-pattern . ". . . . ")
+  (indent-bars-width-frac . 0.25)
+  (indent-bars-pad-frac . 0.2)
+  (indent-bars-zigzag . 0.1)
+  (indent-bars-color-by-depth . '(:regexp "outline-\\([0-9]+\\)" :blend 1))
+  (indent-bars-highlight-current-depth . '(:pattern "." :pad 0.1 :width 0.45)))
 
 (leaf avy
   :ensure t
@@ -214,27 +245,8 @@
   :custom-face
   (aw-leading-char-face . '((t (:height 3.0)))))
 
-(leaf anzu
-  :ensure t
-  :global-minor-mode global-anzu-mode
-  :bind
-  (("M-%" . anzu-query-replace))
-  )
-
-(leaf migemo
-  :ensure t
-  :require t
-  :defun
-  (migemo-init)
-  :custom
-  (migemo-command . "cmigemo")
-  (migemo-options . '("-q" "--emacs"))
-  (migemo-dictionary . "/usr/share/cmigemo/utf-8/migemo-dict")
-  (migemo-user-dictionary . nil)
-  (migemo-regex-dictionary . nil)
-  (migemo-coding-system . 'utf-8-unix)
-  :config
-  (migemo-init))
+(leaf which-key
+  :global-minor-mode t)
 
 (leaf treesit
   :config
@@ -273,6 +285,14 @@
   :ensure t)
 
 (leaf flymake
+  :global-minor-mode t)
+
+(leaf project
+  :custom
+  (project-vc-merge-submodules . nil) ; Git Submoduleは別のプロジェクトとして扱う
+  )
+
+(leaf editorconfig
   :global-minor-mode t)
 
 (add-to-list 'load-path "~/.emacs.d/org-mode-release_9.6.30/lisp")

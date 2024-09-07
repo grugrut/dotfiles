@@ -293,6 +293,36 @@ Emacs29から =package-vc-install= が使えるようになり、標準でソー
     :global-minor-mode t)
 #+end_src
 
+** 検索
+*** 置換
+#+begin_src emacs-lisp :tangle yes
+  (leaf anzu
+    :ensure t
+    :global-minor-mode global-anzu-mode
+    :bind
+    (("M-%" . anzu-query-replace))
+    )
+#+end_src
+
+*** Migemo
+
+#+begin_src emacs-lisp :tangle yes
+  (leaf migemo
+    :ensure t
+    :require t
+    :defun
+    (migemo-init)
+    :custom
+    (migemo-command . "cmigemo")
+    (migemo-options . '("-q" "--emacs"))
+    (migemo-dictionary . "/usr/share/cmigemo/utf-8/migemo-dict")
+    (migemo-user-dictionary . nil)
+    (migemo-regex-dictionary . nil)
+    (migemo-coding-system . 'utf-8-unix)
+    :config
+    (migemo-init))
+#+end_src
+
 ** 編集
 *** 日本語入力
 
@@ -370,7 +400,10 @@ smartparensなどの後継として、Puniがよいとお勧めされたので�
 #+begin_src emacs-lisp :tangle yes
   (leaf undo-tree
     :ensure t
-    :global-minor-mode global-undo-tree-mode)
+    :global-minor-mode global-undo-tree-mode
+    :custom
+    (undo-tree-auto-save-history . nil)
+  )
 #+end_src
 *** orderless
 #+begin_src emacs-lisp :tangle yes
@@ -430,15 +463,21 @@ smartparensなどの後継として、Puniがよいとお勧めされたので�
 もともと =highlight-indent-guide= を使っていたが、 =indent-bars= に乗り換えてみる。
 
 #+begin_src emacs-lisp :tangle yes
-    (leaf indent-bars
-      :vc (:url "https://github.com/jdtsmith/indent-bars")
-      :hook
-      ((prog-mode) . indent-bars-mode)
-      :config
-      (require 'indent-bars-ts)
-      :custom
-      (indent-bars-treesit-support . t)
-      (indent-bars-treesit-ignore-blank-lines-types . '("module")))
+  (leaf indent-bars
+    :vc (:url "https://github.com/jdtsmith/indent-bars")
+    :hook
+    (prog-mode . indent-bars-mode)
+    :config
+    (require 'indent-bars-ts)
+    :custom
+    (indent-bars-treesit-support . t)
+    (indent-bars-treesit-ignore-blank-lines-types . '("module"))
+    (indent-bars-pattern . ". . . . ")
+    (indent-bars-width-frac . 0.25)
+    (indent-bars-pad-frac . 0.2)
+    (indent-bars-zigzag . 0.1)
+    (indent-bars-color-by-depth . '(:regexp "outline-\\([0-9]+\\)" :blend 1))
+    (indent-bars-highlight-current-depth . '(:pattern "." :pad 0.1 :width 0.45)))
 #+end_src
 
 *** avy
@@ -472,35 +511,12 @@ Vimの ~f~ に相当する。=Zap-to-Char= ~M-z~ でも、avyインタフェー�
     (aw-leading-char-face . '((t (:height 3.0)))))
 #+end_src
 
-*** 検索
+*** キー表示
 #+begin_src emacs-lisp :tangle yes
-  (leaf anzu
-    :ensure t
-    :global-minor-mode global-anzu-mode
-    :bind
-    (("M-%" . anzu-query-replace))
-    )
+  (leaf which-key
+    :global-minor-mode t)
 #+end_src
-
-*** Migemo
-
-#+begin_src emacs-lisp :tangle yes
-  (leaf migemo
-    :ensure t
-    :require t
-    :defun
-    (migemo-init)
-    :custom
-    (migemo-command . "cmigemo")
-    (migemo-options . '("-q" "--emacs"))
-    (migemo-dictionary . "/usr/share/cmigemo/utf-8/migemo-dict")
-    (migemo-user-dictionary . nil)
-    (migemo-regex-dictionary . nil)
-    (migemo-coding-system . 'utf-8-unix)
-    :config
-    (migemo-init))
-#+end_src
-
+** コーディング
 *** Tree Sitter
 #+begin_src emacs-lisp :tangle yes
   (leaf treesit
@@ -550,11 +566,27 @@ Vimの ~f~ に相当する。=Zap-to-Char= ~M-z~ でも、avyインタフェー�
 #+end_src
 
 *** Flymake
+
 #+begin_src emacs-lisp :tangle yes
   (leaf flymake
     :global-minor-mode t)
 #+end_src
+*** プロジェクト
+#+begin_src emacs-lisp :tangle yes
+  (leaf project
+    :custom
+    (project-vc-merge-submodules . nil) ; Git Submoduleは別のプロジェクトとして扱う
+    )
+#+end_src
+
+*** Editor Config
+#+begin_src emacs-lisp :tangle yes
+  (leaf editorconfig
+    :global-minor-mode t)
+#+end_src
+
 ** Org Mode
+*** Org
 Org Modeの設定。そこまで特殊な設定はいれていないが、
 ソースコードブロックの編集に入る、編集を完了するキーバインドがデフォルトの ~C-c C-'~ が日本語キーボードだと入力しづらいので、
 ~C-c C-;~ を使うように設定している。
