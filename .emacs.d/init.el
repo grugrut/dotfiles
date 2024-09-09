@@ -211,34 +211,6 @@
     :ensure t
     :after consult))
 
-(leaf magit
-  :ensure t
-  :bind
-  (("C-x g" . magit-status)))
-
-(leaf recentf
-  :init
-  (recentf-mode)
-  :config
-  (setopt recentf-max-saved-items 5000)
-  (setopt recentf-auto-cleanup 'never))
-
-(leaf indent-bars
-  :vc (:url "https://github.com/jdtsmith/indent-bars")
-  :hook
-  (prog-mode . indent-bars-mode)
-  :config
-  (require 'indent-bars-ts)
-  :custom
-  (indent-bars-treesit-support . t)
-  (indent-bars-treesit-ignore-blank-lines-types . '("module"))
-  (indent-bars-pattern . ". . . . ")
-  (indent-bars-width-frac . 0.25)
-  (indent-bars-pad-frac . 0.2)
-  (indent-bars-zigzag . 0.1)
-  (indent-bars-color-by-depth . '(:regexp "outline-\\([0-9]+\\)" :blend 1))
-  (indent-bars-highlight-current-depth . '(:pattern "." :pad 0.1 :width 0.45)))
-
 (leaf avy
   :ensure t
   :bind
@@ -262,6 +234,18 @@
 
 (leaf which-key
   :global-minor-mode t)
+
+(leaf magit
+  :ensure t
+  :bind
+  (("C-x g" . magit-status)))
+
+(leaf recentf
+  :init
+  (recentf-mode)
+  :config
+  (setopt recentf-max-saved-items 5000)
+  (setopt recentf-auto-cleanup 'never))
 
 (leaf treesit
   :config
@@ -309,6 +293,21 @@
 
 (leaf editorconfig
   :global-minor-mode t)
+
+(leaf indent-bars
+  :vc (:url "https://github.com/jdtsmith/indent-bars")
+  :hook
+  prog-mode-hook cc-mode-hook org-mode-hook
+  :config
+  (require 'indent-bars-ts)
+  :custom
+  (indent-bars-treesit-support . t)
+  (indent-bars-treesit-ignore-blank-lines-types . '("module"))
+  (indent-bars-pattern . ".")
+  (indent-bars-width-frac . 0.2)
+  (indent-bars-pad-frac . 0.2)
+  (indent-bars-color-by-depth . '(:regexp "outline-\\([0-9]+\\)" :blend 1))
+  (indent-bars-highlight-current-depth . '(:pattern "." :pad 0.1 :width 0.45)))
 
 (add-to-list 'load-path "~/.emacs.d/org-mode-release_9.6.30/lisp")
 

@@ -456,45 +456,6 @@ smartparensなどの後継として、Puniがよいとお勧めされたので�
       :after consult))
 #+end_src
 
-*** Magit
-#+begin_src emacs-lisp :tangle yes
-  (leaf magit
-    :ensure t
-    :bind
-    (("C-x g" . magit-status)))
-#+end_src
-
-*** recentf
-#+begin_src emacs-lisp :tangle yes
-  (leaf recentf
-    :init
-    (recentf-mode)
-    :config
-    (setopt recentf-max-saved-items 5000)
-    (setopt recentf-auto-cleanup 'never))
-#+end_src
-
-*** インデント表示
-もともと =highlight-indent-guide= を使っていたが、 =indent-bars= に乗り換えてみる。
-
-#+begin_src emacs-lisp :tangle yes
-  (leaf indent-bars
-    :vc (:url "https://github.com/jdtsmith/indent-bars")
-    :hook
-    (prog-mode . indent-bars-mode)
-    :config
-    (require 'indent-bars-ts)
-    :custom
-    (indent-bars-treesit-support . t)
-    (indent-bars-treesit-ignore-blank-lines-types . '("module"))
-    (indent-bars-pattern . ". . . . ")
-    (indent-bars-width-frac . 0.25)
-    (indent-bars-pad-frac . 0.2)
-    (indent-bars-zigzag . 0.1)
-    (indent-bars-color-by-depth . '(:regexp "outline-\\([0-9]+\\)" :blend 1))
-    (indent-bars-highlight-current-depth . '(:pattern "." :pad 0.1 :width 0.45)))
-#+end_src
-
 *** avy
 Vimの ~f~ に相当する。=Zap-to-Char= ~M-z~ でも、avyインタフェースで削除位置を指定する。
 
@@ -532,6 +493,22 @@ Vimの ~f~ に相当する。=Zap-to-Char= ~M-z~ でも、avyインタフェー�
     :global-minor-mode t)
 #+end_src
 ** コーディング
+*** Magit
+#+begin_src emacs-lisp :tangle yes
+  (leaf magit
+    :ensure t
+    :bind
+    (("C-x g" . magit-status)))
+#+end_src
+#+begin_src emacs-lisp :tangle yes
+  (leaf recentf
+    :init
+    (recentf-mode)
+    :config
+    (setopt recentf-max-saved-items 5000)
+    (setopt recentf-auto-cleanup 'never))
+#+end_src
+
 *** Tree Sitter
 #+begin_src emacs-lisp :tangle yes
   (leaf treesit
@@ -598,6 +575,25 @@ Vimの ~f~ に相当する。=Zap-to-Char= ~M-z~ でも、avyインタフェー�
 #+begin_src emacs-lisp :tangle yes
   (leaf editorconfig
     :global-minor-mode t)
+#+end_src
+*** インデント表示
+もともと =highlight-indent-guide= を使っていたが、 =indent-bars= に乗り換えてみる。
+
+#+begin_src emacs-lisp :tangle yes
+  (leaf indent-bars
+    :vc (:url "https://github.com/jdtsmith/indent-bars")
+    :hook
+    prog-mode-hook cc-mode-hook org-mode-hook
+    :config
+    (require 'indent-bars-ts)
+    :custom
+    (indent-bars-treesit-support . t)
+    (indent-bars-treesit-ignore-blank-lines-types . '("module"))
+    (indent-bars-pattern . ".")
+    (indent-bars-width-frac . 0.2)
+    (indent-bars-pad-frac . 0.2)
+    (indent-bars-color-by-depth . '(:regexp "outline-\\([0-9]+\\)" :blend 1))
+    (indent-bars-highlight-current-depth . '(:pattern "." :pad 0.1 :width 0.45)))
 #+end_src
 
 ** Org Mode
@@ -673,7 +669,6 @@ Orgが9.7でexportがうまくうごかないので、9.6にダウングレー�
 #+end_src
 
 ** プログラミング言語
-
 *** Typescript
 #+begin_src emacs-lisp :tangle yes
   (leaf typescript-mode
