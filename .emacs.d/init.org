@@ -286,7 +286,9 @@ Emacs29から =package-vc-install= が使えるようになり、標準でソー
     :global-minor-mode t)
 #+end_src
 
-*** volatile-highlights
+*** ヤンク時にわかりやすく表示
+ヤンクしたときに一瞬ハイライトして、追加部分をわかりやすくしてくれる。
+
 #+begin_src emacs-lisp :tangle yes
   (leaf volatile-highlights
     :ensure t
