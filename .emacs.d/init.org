@@ -271,12 +271,25 @@ Emacs29から =package-vc-install= が使えるようになり、標準でソー
     (doom-modeline-hud . t))
 #+end_src
 
-*** popwin
-#+begin_src emacs-lisp
-  (leaf popwin
+*** ポップアップ
+#+begin_src emacs-lisp :tangle yes
+  (leaf shackle
     :ensure t
+    :global-minor-mode t
     :custom
-    (popwin:popup-window-position . 'bottom))
+    (shackle-rules . '(("*Backtrace*" :popup t)
+		       ("*Leaf Expand*" :popup t)
+		       ("*Shell Command Output*" :popup t)
+		       ))
+    )
+#+end_src
+
+*** Window表示
+#+begin_src emacs-lisp :tangle yes
+  (leaf winner
+    :global-minor-mode t
+    :bind
+    ("C-z" . winner-undo))
 #+end_src
 
 *** beacon

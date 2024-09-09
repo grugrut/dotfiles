@@ -82,6 +82,21 @@
   (doom-modeline-bar-width . 4)
   (doom-modeline-hud . t))
 
+(leaf shackle
+  :ensure t
+  :global-minor-mode t
+  :custom
+  (shackle-rules . '(("*Backtrace*" :popup t)
+		       ("*Leaf Expand*" :popup t)
+		       ("*Shell Command Output*" :popup t)
+		       ))
+  )
+
+(leaf winner
+  :global-minor-mode t
+  :bind
+  ("C-z" . winner-undo))
+
 (leaf beacon
   :ensure t
   :global-minor-mode t)
