@@ -1,5 +1,5 @@
 #+title: My Emacs Config
-#+date: 2024-08-24
+#+date: 2024-09-08
 #+options: author:nil
 #+hugo_tags: emacs config
 #+STARTUP: show3levels
@@ -678,6 +678,14 @@ Orgが9.7でexportがうまくうごかないので、9.6にダウングレー�
      ("\\.tsx\\'" . tsx-ts-mode)))
 #+end_src
 
+*** markdown
+#+begin_src emacs-lisp :tangle yes
+  (leaf markdown-mode
+    :ensure t
+    :mode
+    (("\\.md\\'" . gfm-mode))
+    )
+#+end_src
 ** ユーティリティ
 *** ブログ向けmarkdownへの変換
 ブログに紹介記事を書くように、このOrgファイルをMarkdownに変換する

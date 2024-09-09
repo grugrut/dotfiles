@@ -369,6 +369,12 @@
   (("\\.ts\\'" . typescript-mode)
    ("\\.tsx\\'" . tsx-ts-mode)))
 
+(leaf markdown-mode
+  :ensure t
+  :mode
+  (("\\.md\\'" . gfm-mode))
+  )
+
 (defun grugrut/export-my-init-to-blog ()
   "Export as markdown for my blog post."
   (interactive)
