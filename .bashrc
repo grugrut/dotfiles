@@ -126,8 +126,9 @@ umask 022
 export GOROOT=/usr/local/go
 export GOPATH=~/
 export GO111MODULE=on
-export PATH=${GOROOT}/bin:${GOPATH}/bin:~/.local/bin:${PATH}
-export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0.0
+export PATH=${GOROOT}/bin:${GOPATH}/bin:~/.local/bin:/usr/local/bin:${PATH}
+#export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0.0
+export DISPLAY=$(ip route | grep default | awk '{print $3; exit;}'):0.0
 export LIBGL_ALWAYS_INDIRECT=1
 export BROWSER=~/bin/browser
 export EDITOR=vim
@@ -140,5 +141,7 @@ source ~/.cargo/env
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-[ -x /usr/bin/tmux ] && tmux
+if [ -x /usr/bin/tmux ]; then
+    tmux -u new-session -A -s default
+fi
 
