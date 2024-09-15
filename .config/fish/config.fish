@@ -1,7 +1,6 @@
-if not functions -q fisher
-    set -q XDG_CONFIG_HOME; or set XDG_CONFIG_HOME ~/.config
-    curl https://git.io/fisher --create-dirs -sLo $XDG_CONFIG_HOME/fish/functions/fisher.fish
-    fish -c fisher
+set -g theme_display_date yes
+
+if status is-interactive
+    # Commands to run in interactive sessions can go here
 end
 
-set -x DISPLAY localhost:0.0
