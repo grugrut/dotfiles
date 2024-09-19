@@ -141,7 +141,7 @@ source ~/.cargo/env
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-if [ -x /usr/bin/tmux ]; then
+if [ -x /usr/local/bin/tmux ]; then
     tmux -u new-session -A -s default
 fi
 
