@@ -206,18 +206,19 @@ Emacs29から =package-vc-install= が使えるようになり、標準でソー
   (leaf general-settings
     :config
     (prefer-coding-system 'utf-8-unix)
-    (setq read-answer-short t)
     (global-set-key [mouse-2] 'mouse-yank-at-click)
     (global-unset-key "\C-z")
     (delete-selection-mode t)
-    (setq large-file-warning-threshold (* 25 1024 1024))
-    (setq create-lockfiles nil)
-    (setq history-length 500)
-    (setq history-delete-duplicates t)
-    (setq line-move-visual nil)
-    (setq mouse-drag-copy-region t)
-    (setq backup-inhibited t)
-    (setq require-final-newline t)
+    :setq
+    (read-answer-short . t)
+    ;(large-file-warning-threshold . '(* 25 1024 1024))
+    (create-lockfiles . nil)
+    (history-length . 500)
+    (history-delete-duplicates . t)
+    (line-move-visual . nil)
+    (mouse-drag-copy-region . t)
+    (backup-inhibited . t)
+    (require-final-newline . t)
     )
 #+end_src
 ** 外観
@@ -285,6 +286,8 @@ Emacs29から =package-vc-install= が使えるようになり、標準でソー
 #+end_src
 
 *** Window表示
+Windowの構成を記憶してくれる。いろいろ機能はあるが、メインはポップアップ表示されたバッファをそのまま消去する(1つ前の状態に戻す)ために使っている。
+
 #+begin_src emacs-lisp :tangle yes
   (leaf winner
     :global-minor-mode t
@@ -292,15 +295,17 @@ Emacs29から =package-vc-install= が使えるようになり、標準でソー
     ("C-z" . winner-undo))
 #+end_src
 
-*** beacon
+*** 操作をハイライトしてわかりやすく
+Beaconを使うと、バッファを切り替えたときに一瞬カーソルがハイライトされる。
+バッファを切り替えたことや、カーソルの位置がわかりやすくなる。
+
 #+begin_src emacs-lisp :tangle yes
   (leaf beacon
     :ensure t
     :global-minor-mode t)
 #+end_src
 
-*** ヤンク時にわかりやすく表示
-ヤンクしたときに一瞬ハイライトして、追加部分をわかりやすくしてくれる。
+ヤンクした内容を一瞬ハイライトして、追加部分をわかりやすくしてくれる。
 
 #+begin_src emacs-lisp :tangle yes
   (leaf volatile-highlights
@@ -508,7 +513,12 @@ Vimの ~f~ に相当する。=Zap-to-Char= ~M-z~ でも、avyインタフェー�
     (setopt recentf-max-saved-items 5000)
     (setopt recentf-auto-cleanup 'never))
 #+end_src
-
+*** Git Gutter
+#+begin_src emacs-lisp :tangle yes
+  (leaf git-gutter
+    :ensure t
+    :global-minor-mode global-git-gutter-mode)
+#+end_src
 *** Tree Sitter
 #+begin_src emacs-lisp :tangle yes
   (leaf treesit
@@ -685,7 +695,7 @@ Orgが9.7でexportがうまくうごかないので、9.6にダウングレー�
     :mode
     (("\\.md\\'" . gfm-mode))
     )
-#+end_src
+  #+end_src
 ** ユーティリティ
 *** ブログ向けmarkdownへの変換
 ブログに紹介記事を書くように、このOrgファイルをMarkdownに変換する
