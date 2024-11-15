@@ -35,18 +35,19 @@
 (leaf general-settings
   :config
   (prefer-coding-system 'utf-8-unix)
-  (setq read-answer-short t)
   (global-set-key [mouse-2] 'mouse-yank-at-click)
   (global-unset-key "\C-z")
   (delete-selection-mode t)
-  (setq large-file-warning-threshold (* 25 1024 1024))
-  (setq create-lockfiles nil)
-  (setq history-length 500)
-  (setq history-delete-duplicates t)
-  (setq line-move-visual nil)
-  (setq mouse-drag-copy-region t)
-  (setq backup-inhibited t)
-  (setq require-final-newline t)
+  :setq
+  (read-answer-short . t)
+  ;(large-file-warning-threshold . '(* 25 1024 1024))
+  (create-lockfiles . nil)
+  (history-length . 500)
+  (history-delete-duplicates . t)
+  (line-move-visual . nil)
+  (mouse-drag-copy-region . t)
+  (backup-inhibited . t)
+  (require-final-newline . t)
   )
 
 (leaf :font
@@ -246,6 +247,10 @@
   :config
   (setopt recentf-max-saved-items 5000)
   (setopt recentf-auto-cleanup 'never))
+
+(leaf git-gutter
+  :ensure t
+  :global-minor-mode global-git-gutter-mode)
 
 (leaf treesit
   :config
