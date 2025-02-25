@@ -14,7 +14,7 @@
                        ("gnu"   . "https://elpa.gnu.org/packages/")))
   (package-initialize)
   (use-package leaf :ensure t)
-  
+
   (leaf leaf-keywords
     :ensure t
     :config
@@ -88,9 +88,9 @@
   :global-minor-mode t
   :custom
   (shackle-rules . '(("*Backtrace*" :popup t)
-		       ("*Leaf Expand*" :popup t)
-		       ("*Shell Command Output*" :popup t)
-		       ))
+		     ("*Leaf Expand*" :popup t)
+		     ("*Shell Command Output*" :popup t)
+		     ))
   )
 
 (leaf winner
@@ -250,24 +250,28 @@
 
 (leaf git-gutter
   :ensure t
-  :global-minor-mode global-git-gutter-mode)
+  :global-minor-mode global-git-gutter-mode
+  :custom
+  ((git-gutter:added-sign . "++")
+   (git-gutter:deleted-sign . "--")
+   (git-gutter:modified-sign . "==")))
 
 (leaf treesit
   :config
   (setopt treesit-font-lock-level 4)
   (setopt treesit-language-source-alist
-  	  '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-  	    (css "https://github.com/tree-sitter/tree-sitter-css")
-  	    (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-	    (go "https://github.com/tree-sitter/tree-sitter-go")
-	    (html "https://github.com/tree-sitter/tree-sitter-html")
-	    (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-	    (json "https://github.com/tree-sitter/tree-sitter-json")
-	    (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-	    (toml "https://github.com/tree-sitter/tree-sitter-toml")
-	    (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-	    (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-	    (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+    	'((bash "https://github.com/tree-sitter/tree-sitter-bash")
+    	  (css "https://github.com/tree-sitter/tree-sitter-css")
+    	  (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+  	  (go "https://github.com/tree-sitter/tree-sitter-go")
+  	  (html "https://github.com/tree-sitter/tree-sitter-html")
+  	  (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+  	  (json "https://github.com/tree-sitter/tree-sitter-json")
+  	  (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+  	  (toml "https://github.com/tree-sitter/tree-sitter-toml")
+  	  (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+  	  (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+  	  (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 )
 
 (leaf eglot
@@ -332,10 +336,10 @@
   :custom
   ;; TODOの状態繊維設定
   (org-todo-keywords . '((sequence "TODO(t)" "IN PROGRESS(i)" "|" "DONE(d)")
-			   (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELED(c@/!)" "MEETING")))
+			 (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELED(c@/!)" "MEETING")))
   (org-todo-keyword-faces . '(("TODO" :foreground "red" :weight bold)
-				("IN PROGRESS" :foreground "cornflower blue" :weight bold)
-				("DONE" :foreground "green" :weight bold)))
+			      ("IN PROGRESS" :foreground "cornflower blue" :weight bold)
+			      ("DONE" :foreground "green" :weight bold)))
   (org-log-done . 'time)
   (org-clock-persist . t)
   (org-clock-out-when-done . t)
@@ -352,16 +356,16 @@
   (defvar grugrut/org-inbox-file (concat org-directory "inbox.org"))
   (defvar grugrut/org-journal-file (concat org-directory "journal.org"))
   (setopt org-capture-templates `(
-				  ("t" " Tasks" entry (file ,grugrut/org-inbox-file)
-				   "* TODO %? %^G\n:PROPERTIES:\n:DEADLINE: %^{Deadline}T\n:EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}\n:END:\n")
-				  ("e" " Event" entry (file ,grugrut/org-inbox-file)
-				   "* TODO %? %^G\n:PROPERTIES:\n:SCHEDULED: %^{Scheduled}T\n:EFFORT:%^{effort|1:00|0:05|0:15|0:30|2:00|4:00}\n:END:\n")
-				  ("j" " Journal" entry (file+olp+datetree ,grugrut/org-journal-file)
-				   "* %<%H:%M> %?")
-				  ("b" " blog" entry
-				   (file+headline "~/src/github.com/grugrut/blog/draft/blog.org" ,(format-time-string "%Y"))
-				   "** TODO %?\n:PROPERTIES:\n:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :archives '(\\\"%(format-time-string \"%Y\")\\\" \\\"%(format-time-string \"%Y-%m\")\\\")\n:EXPORT_FILE_NAME: %(format-time-string \"%Y%m%d%H%M\")\n:END:\n\n")
-				  )))
+				("t" " Tasks" entry (file ,grugrut/org-inbox-file)
+				 "* TODO %? %^G\n:PROPERTIES:\n:DEADLINE: %^{Deadline}T\n:EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}\n:END:\n")
+				("e" " Event" entry (file ,grugrut/org-inbox-file)
+				 "* TODO %? %^G\n:PROPERTIES:\n:SCHEDULED: %^{Scheduled}T\n:EFFORT:%^{effort|1:00|0:05|0:15|0:30|2:00|4:00}\n:END:\n")
+				("j" " Journal" entry (file+olp+datetree ,grugrut/org-journal-file)
+				 "* %<%H:%M> %?")
+				("b" " blog" entry
+				 (file+headline "~/src/github.com/grugrut/blog/draft/blog.org" ,(format-time-string "%Y"))
+				 "** TODO %?\n:PROPERTIES:\n:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :archives '(\"%(format-time-string \"%Y\")\" \"%(format-time-string \"%Y-%m\")\")\n:EXPORT_FILE_NAME: draft\n:END:\n\n")
+				)))
 
 (leaf ox-hugo
   :ensure t
