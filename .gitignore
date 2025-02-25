@@ -1,2 +1,3 @@
 .emacs.d/straight/
 .emacs.d/var/
+.emacs.d/custom.el
