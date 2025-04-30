@@ -646,6 +646,14 @@ Vimの ~f~ に相当する。=Zap-to-Char= ~M-z~ でも、avyインタフェー�
      ("M-p" . copilot-previous-completion)
   ))
 #+end_src
+*** Copilot Chat
+#+begin_src emacs-lisp :tangle yes
+  (leaf copilot-chat
+    :ensure t
+    :custom
+    (copilot-chat-frontend . 'org)
+    )
+#+end_src
 *** Ellama
 #+begin_src emacs-lisp :tangle yes
   (leaf llm
@@ -758,6 +766,12 @@ Orgが9.7でexportがうまくうごかないので、9.6にダウングレー�
     (("\\.md\\'" . gfm-mode))
     )
   #+end_src
+
+*** Yaml
+#+begin_src emacs-lisp :tangle yes
+  (leaf yaml-mode
+    :ensure t)
+#+end_src
 ** ユーティリティ
 *** ブログ向けmarkdownへの変換
 ブログに紹介記事を書くように、このOrgファイルをMarkdownに変換する
