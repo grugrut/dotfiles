@@ -1,7 +1,8 @@
 #+title: My Emacs Config
-#+date: 2024-09-08
+#+date: 2025-04-30
 #+options: author:nil
 #+hugo_tags: emacs config
+#+hugo_type: posts
 #+STARTUP: show3levels
 
 * このページについて
@@ -62,15 +63,26 @@ init.elを直接編集するのではなく、init.org経由で管理するよ�
 そのため、起動時にチェックしてinit.orgの方が新しかったら警告する。
 本来は、保存時に自動でこの辺やってくれたほうがよい気はする。
 
-最近、 =org-export-tangle= で完全一致の場合に上書きしてくれなくなった(もともとそうだっけ)ことに気付いたので、
-別の手段でチェックする必要がありそうと思案中。
-
 #+begin_src emacs-lisp :tangle early-init.el
   (let ((my-init-org (concat user-emacs-directory "init.org"))
         (my-init-el (concat user-emacs-directory "init.el")))
     (when (file-newer-than-file-p my-init-org my-init-el)
       (message "WARN: init.el is old.\n")))
 #+end_src
+
+なお、init.orgからの変換は、以下のMakefileを作成している。
+=project.el= を使っているので、 ~C-x p !~ でプロジェクトルートでコマンドを実行できるので、
+Emacsから簡単にビルドすることができる。
+
+#+begin_src makefile :tangle no
+  all: init.el
+	  emacs -batch -f batch-byte-compile *init.el
+
+  init.el: init.org
+	  emacs -batch --eval "(progn (require 'ob-tangle) (org-babel-tangle-file \"init.org\"))"
+
+#+end_src
+
 ** GUIの見た目設定
 ツールバーは使わないので消している。
 メニューバーはときどき使うので残している。
@@ -125,11 +137,12 @@ https://www.grugrut.net/posts/201910202227/
 これをロードしてしまうと、 =custom-ser-variables= よりも優先されて先に設定されてしまうため、
 =init.el= を修正したつもりなのに昔の設定で動いてしまうことがある。
 
-単なる優先順位の問題だが、そもそも読みこむ必要がないので不要なのだが、
+そもそも読みこむ必要がないので不要なのだが、
 定義はしておかないと起動時に文句を言われてしまうので設定だけして読まずに捨ててる。
+どこかのバージョンで、このハックをしなくてもよくなったはずだが、害も無いので残している。
 
 #+begin_src emacs-lisp :tangle early-init.el
- (custom-set-variables '(custom-file (expand-file-name "custom.el" user-emacs-directory)))
+  (custom-set-variables '(custom-file (expand-file-name "custom.el" user-emacs-directory)))
 #+end_src
 
 ** early-init.el フッタ
@@ -159,7 +172,7 @@ https://www.grugrut.net/posts/201910202227/
 パッケージ取得に失敗してしまうことが多くあきらめた。
 
 現在は、 =leaf.el= を使っている。
-=leaf.el= はuse-package経由で入れることでインストール部分がシンプルになるので修正
+=leaf.el= はuse-package経由で入れることでインストール部分がシンプルになる。
 
 https://a.conao3.com/blog/2024/7c7c265/
 
@@ -193,6 +206,8 @@ Emacs29から =package-vc-install= が使えるようになり、標準でソー
 #+end_src
 ** 一般設定
 *** メモリ管理
+アイドル状態のときにGCをかけてくれる。
+
 #+begin_src emacs-lisp :tangle yes
   (leaf gcmh
     :ensure t
@@ -202,6 +217,8 @@ Emacs29から =package-vc-install= が使えるようになり、標準でソー
     )
 #+end_src
 *** 変数設定
+全体的に影響する変数を設定している。
+
 #+begin_src emacs-lisp :tangle yes
   (leaf general-settings
     :config
@@ -346,6 +363,7 @@ Beaconを使うと、バッファを切り替えたときに一瞬カーソル�
 ** 編集
 *** 日本語入力
 
+
 日本語入力には、みんな大好きskkを使っている。
 AZIKも有効化する。
 
@@ -375,7 +393,14 @@ AZIKも有効化する。
     (skk-status-indicator              . 'minior-mode))
 
 #+end_src
-
+*** Expand-Region
+選択するリージョンを少しずつ広げられる。
+#+begin_src emacs-lisp :tangle yes
+  (leaf expand-region
+    :ensure t
+    :bind (("C-." . er/expand-region))
+    )
+#+end_src
 *** Puni
 
 smartparensなどの後継として、Puniがよいとお勧めされたので使ってみる。
@@ -609,7 +634,38 @@ Vimの ~f~ に相当する。=Zap-to-Char= ~M-z~ でも、avyインタフェー�
     (indent-bars-color-by-depth . '(:regexp "outline-\\([0-9]+\\)" :blend 1))
     (indent-bars-highlight-current-depth . '(:pattern "." :pad 0.1 :width 0.45)))
 #+end_src
+*** GitHub Copilot
+#+begin_src emacs-lisp :tangle yes
+  (leaf copilot
+    :vc (:url "https://github.com/copilot-emacs/copilot.el")
+    :hook prog-mode-hook
+    :bind
+    (:copilot-completion-map
+     ("<tab>" . copilot-accept-completion)
+     ("M-n" . copilot-next-completion)
+     ("M-p" . copilot-previous-completion)
+  ))
+#+end_src
+*** Ellama
+#+begin_src emacs-lisp :tangle yes
+  (leaf llm
+    :vc (:url "https://github.com/ahyatt/llm/tree/main")
+    :require llm-gemini
+    :config
+    (load "~/.emacs.d/secrets.el")
+    (setq llm-gemini (make-llm-gemini :key gemini-api-key))
+    )
+#+end_src
 
+#+begin_src emacs-lisp :tangle yes
+  (leaf ellama
+    :ensure t
+    :bind
+    ("C-c e" . ellama-transient-main-menu)
+    :custom
+    (ellama-language . "Japanese")
+    (ellama-provider . llm-gemini))
+#+end_src
 ** Org Mode
 *** Org
 Org Modeの設定。そこまで特殊な設定はいれていないが、
@@ -679,7 +735,9 @@ Orgが9.7でexportがうまくうごかないので、9.6にダウングレー�
   (leaf ox-hugo
     :ensure t
     :after ox
-    :mode ("\\.org$'" . org-hugo-auto-export-mode))
+    :mode ("\\.org$'" . org-hugo-auto-export-mode)
+    :custom
+    (org-hugo-use-code-for-kbd . t))
 #+end_src
 
 ** プログラミング言語
@@ -709,7 +767,7 @@ Orgが9.7でexportがうまくうごかないので、9.6にダウングレー�
     (interactive)
     (require 'ox-hugo)
     (declare-function org-hugo-export-as-md "ox-hugo")
-    (let ((file "~/src/github.com/grugrut/blog/content/posts/my-emacs-init-el.md"))
+    (let ((file "~/src/github.com/grugrut/blog/content/dotfiles/emacs.md"))
       (org-hugo-export-as-md)
       (write-file file t)))
 #+end_src
